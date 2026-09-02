@@ -16,6 +16,10 @@ const ICONS = {
   sla: '<path d="M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   process: '<path d="M4 4h6v6H4zM14 14h6v6h-6zM10 7h4a2 2 0 012 2v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   bpmn: '<path d="M3 5h6v5H3zM15 3h6v5h-6zM15 16h6v5h-6zM9 7.5h6M12 7.5v11h3M9 7.5v11h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>',
+  rating: '<path d="M12 15a6 6 0 100-12 6 6 0 000 12zM8.2 13.5L7 22l5-3 5 3-1.2-8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  review: '<path d="M4 7.5l7-3.2a2 2 0 011.7 0l7 3.2M6.5 9v9.5a1.5 1.5 0 001.5 1.5h8a1.5 1.5 0 001.5-1.5V9M9.5 13.5l1.8 1.8 3.4-3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
+  moderation: '<path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9-4.8-1.1-8-4.5-8-9V6l8-3zM9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  incentives: '<path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>',
 };
 const icon = (name) => html`<svg class="nav__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 
@@ -24,8 +28,14 @@ function navItems() {
     { label: 'Работа', items: [
       { path: '/', title: 'Рабочий стол', icon: 'dashboard' },
       { path: '/tasks', title: 'Мои задачи', icon: 'tasks', badge: state.counts.tasks, alert: true },
-      { path: '/ideas', title: 'Доска идей', icon: 'ideas' },
+      { path: '/ideas', title: 'Идеи и решения', icon: 'ideas' },
       { path: '/initiatives', title: 'Реестр инициатив', icon: 'initiatives' },
+    ]},
+    { label: 'Вклад сотрудников', items: [
+      ...(can('idea.review') ? [{ path: '/review', title: 'Ревью предложений', icon: 'review' }] : []),
+      { path: '/rating', title: 'Рейтинг советчиков', icon: 'rating' },
+      ...(can('idea.moderate') ? [{ path: '/moderation', title: 'Модерация идей', icon: 'moderation' }] : []),
+      ...(can('idea.incentive') ? [{ path: '/incentives', title: 'Поощрения', icon: 'incentives' }] : []),
     ]},
     { label: 'Жизненный цикл', items: [
       { path: '/process', title: 'Процесс Stage-Gate', icon: 'process' },
@@ -158,10 +168,13 @@ export function bindShell(root) {
 async function showNotifications() {
   const { modal, fmtAgo } = await import('./core.js');
   const items = await api.get('/api/notifications');
+  // Уведомление ведёт либо в карточку инициативы, либо в карточку идеи
+  const target = (n) => n.initiative_id ? `/initiatives/${n.initiative_id}`
+    : n.idea_id ? `/ideas/${n.idea_id}` : null;
   const body = items.length ? html`<div class="list">
     ${items.map((n) => html`
-      <div class="list__item ${n.is_read ? '' : 'is-unread'} ${n.initiative_id ? 'is-clickable' : ''}"
-           ${n.initiative_id ? `data-goto="/initiatives/${n.initiative_id}"` : ''}>
+      <div class="list__item ${n.is_read ? '' : 'is-unread'} ${target(n) ? 'is-clickable' : ''}"
+           ${target(n) ? `data-goto="${target(n)}"` : ''}>
         <div class="list__main">
           <div class="list__title">${esc(n.title)}</div>
           ${n.body ? `<div class="list__body">${esc(n.body)}</div>` : ''}
@@ -169,7 +182,7 @@ async function showNotifications() {
             ${n.number ? `<span class="mono">${esc(n.number)}</span>` : ''}</div>
         </div>
       </div>`)}
-  </div>` : '<div class="empty"><h4>Уведомлений нет</h4><p>Здесь появятся оповещения о движении ваших инициатив и решениях на Gate.</p></div>';
+  </div>` : '<div class="empty"><h4>Уведомлений нет</h4><p>Здесь появятся оповещения о ваших идеях, начисленных очках и решениях на Gate.</p></div>';
 
   modal({
     title: 'Уведомления', body, wide: false,

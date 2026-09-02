@@ -34,8 +34,10 @@ route.post('/api/tasks/:id/done', async ({ user, params, ip, sendJson }) => {
 
 // ── Уведомления ──────────────────────────────────────────────
 route.get('/api/notifications', async ({ user, sendJson }) => {
-  sendJson(200, q.all(`SELECT n.*, i.number FROM notifications n
+  // Номер берётся от инициативы либо от идеи — в зависимости от того, к чему привязано уведомление
+  sendJson(200, q.all(`SELECT n.*, COALESCE(i.number, d.number) AS number FROM notifications n
                        LEFT JOIN initiatives i ON i.id = n.initiative_id
+                       LEFT JOIN ideas d ON d.id = n.idea_id
                        WHERE n.user_id = ? ORDER BY n.created_at DESC LIMIT 60`, user.id));
 });
 

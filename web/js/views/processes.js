@@ -1,13 +1,14 @@
 // Страница BPMN-схем: процессы каждой роли с пошаговым разбором прямо на схеме.
-import { api, state, esc, html, can, navigate, toast, modal, ROLE_TITLES } from '../core.js';
+import { api, state, esc, html, can, navigate, toast, modal, plural, ROLE_TITLES } from '../core.js';
 import { renderDiagram, LEGEND } from '../bpmn.js';
 import { layout } from '../bpmn-layout.js';
-import { DIAGRAMS, ROLE_ORDER } from '../processes-data.js';
+import { DIAGRAMS, ROLE_ORDER, SCENARIOS, scenarioOf } from '../processes-data.js';
 
 // Сквозная нумерация: номер схемы не зависит от выбранного фильтра ролей
 const seqOf = (d) => DIAGRAMS.indexOf(d) + 1;
 
-const ROLE_TAB = { all: 'Сквозной процесс', ...ROLE_TITLES };
+// Внутри сценария «все» означает весь его набор схем, а не только сквозную
+const ROLE_TAB = { all: 'Все схемы пути', ...ROLE_TITLES };
 
 // Мини-фигуры для условных обозначений — те же, что на схеме
 function legendIcon(type) {
@@ -26,9 +27,13 @@ function legendIcon(type) {
 }
 
 export async function processesView(view, query) {
-  const role = query.get('role') || (state.user.role === 'dtszn' ? 'all' : state.user.role);
+  const scenarioId = SCENARIOS.some((s) => s.id === query.get('s')) ? query.get('s') : SCENARIOS[0].id;
+  const scenario = scenarioOf(scenarioId);
+  const inScenario = DIAGRAMS.filter((d) => d.scenario === scenarioId);
+
+  const role = query.get('role') || 'all';
   const id = query.get('d');
-  const visible = role === 'all' ? DIAGRAMS : DIAGRAMS.filter((d) => d.role === role || d.role === 'all');
+  const visible = role === 'all' ? inScenario : inScenario.filter((d) => d.role === role || d.role === 'all');
   const current = visible.find((d) => d.id === id) || visible[0];
 
   // Схемы сгруппированы по владельцу процесса
@@ -38,6 +43,10 @@ export async function processesView(view, query) {
     if (!g) groups.push(g = { title: d.group, items: [] });
     g.items.push(d);
   }
+  const link = (over = {}) => {
+    const p = new URLSearchParams({ s: scenarioId, role, ...over });
+    return `/processes?${p}`;
+  };
 
   view.innerHTML = html`
     <div class="page-head">
@@ -45,18 +54,48 @@ export async function processesView(view, query) {
         <div style="flex:1;min-width:280px">
           <h2>Схемы процессов</h2>
           <p>Детализированные модели в нотации BPMN: кто что делает, где проходят границы
-             ответственности, какие сроки действуют и как принимаются решения. Каждую схему
-             можно разобрать по шагам — с подсказками прямо на элементах.
+             ответственности, какие сроки действуют и как принимаются решения. Альбом разделён
+             на два пользовательских пути — подача полноценной инициативы и обсуждение идей.
              Разделы и шаги пронумерованы сквозным образом: на шаг «${seqOf(current)}.3» можно
              сослаться в регламенте, и он однозначно находится.</p>
         </div>
       </div>
+
+      <div class="scen-switch" data-tour="proc-scenarios">
+        ${SCENARIOS.map((s) => html`
+          <button class="scen-switch__item ${s.id === scenarioId ? 'is-on' : ''}" data-scenario="${esc(s.id)}">
+            <b>${esc(s.title)}</b>
+            <span>${esc(s.lead)}</span>
+            <small>${DIAGRAMS.filter((d) => d.scenario === s.id).length} ${plural(DIAGRAMS.filter((d) => d.scenario === s.id).length, 'схема', 'схемы', 'схем')}</small>
+          </button>`)}
+      </div>
+
       <div class="chip-row" style="margin-top:14px" data-tour="proc-roles">
         ${ROLE_ORDER.map((r) => {
-          const n = r === 'all' ? DIAGRAMS.length : DIAGRAMS.filter((d) => d.role === r).length;
+          const n = r === 'all' ? inScenario.length : inScenario.filter((d) => d.role === r).length;
           if (!n) return '';
           return `<button class="chip ${role === r ? 'is-on' : ''}" data-role="${r}">${esc(ROLE_TAB[r])} · ${n}</button>`;
         })}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card__head">
+        <div>
+          <h3>${esc(scenario.title)}</h3>
+          <div class="card__hint">${esc(scenario.description)}</div>
+        </div>
+      </div>
+      <div class="card__body">
+        <div class="fs-12 fw-600 text-3" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">
+          Кто что делает на этом пути</div>
+        <div class="role-matrix">
+          ${scenario.roles.map((r) => html`
+            <div class="role-matrix__row">
+              <div class="role-matrix__role">${esc(r.title)}</div>
+              <div class="role-matrix__does">${esc(r.does)}</div>
+            </div>`)}
+        </div>
       </div>
     </div>
 
@@ -167,9 +206,11 @@ export async function processesView(view, query) {
     </div>`;
 
   // ── Навигация ──
-  view.querySelectorAll('[data-role]').forEach((b) => b.onclick = () => navigate(`/processes?role=${b.dataset.role}`));
+  view.querySelectorAll('[data-scenario]').forEach((b) => b.onclick = () =>
+    navigate(`/processes?s=${b.dataset.scenario}`));
+  view.querySelectorAll('[data-role]').forEach((b) => b.onclick = () => navigate(link({ role: b.dataset.role })));
   view.querySelectorAll('[data-diagram]').forEach((b) => b.onclick = () =>
-    navigate(`/processes?role=${role}&d=${b.dataset.diagram}`));
+    navigate(link({ d: b.dataset.diagram })));
   view.querySelector('[data-tours]')?.addEventListener('click', async () =>
     (await import('../tour.js')).openTourCatalog());
 

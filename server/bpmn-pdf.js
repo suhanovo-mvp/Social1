@@ -2,7 +2,7 @@
 // поэтому бумажная версия совпадает с экранной шаг в шаг.
 import { PdfDoc, Canvas } from './pdf.js';
 import { GEO, layout, routeFlow, wrapText, numberAnchor } from '../web/js/bpmn-layout.js';
-import { DIAGRAMS } from '../web/js/processes-data.js';
+import { DIAGRAMS, SCENARIOS, scenarioOf } from '../web/js/processes-data.js';
 
 // Стандартные листы в альбомной ориентации, пункты
 const SHEETS = {
@@ -240,10 +240,10 @@ function drawWalkthrough(cv, block, x, top, width) {
 }
 
 /** Шапка и подвал страницы. */
-function drawChrome(cv, { seq, title, sla, group, page, total, sheet = A3 }) {
+function drawChrome(cv, { seq, title, sla, group, scenario, page, total, sheet = A3 }) {
   cv.rgb(C.brand).rect(0, sheet.h - 4, sheet.w, 4, 'f');
   cv.text(`Раздел ${seq}. ${title}`, MARGIN, sheet.h - 34, { size: 15, font: 'bold', color: C.text });
-  const meta = [group, sla ? `SLA: ${sla}` : null].filter(Boolean).join('   ·   ');
+  const meta = [scenario, group, sla ? `SLA: ${sla}` : null].filter(Boolean).join('   ·   ');
   if (meta) cv.text(meta, MARGIN, sheet.h - 50, { size: 9, color: C.text3 });
   cv.text('Social1 — платформа системных инноваций ДТСЗН', sheet.w - MARGIN, sheet.h - 34,
     { size: 9, align: 'right', color: C.text3 });
@@ -321,7 +321,7 @@ export function diagramPdf(diagram) {
   const plan = planPage(cv, diagram, seq, sheet);
   const total = plan.separate ? 2 : 1;
   drawChrome(cv, { seq, title: diagram.title, sla: diagram.sla, group: diagram.group,
-                   page: 1, total, sheet });
+                   scenario: scenarioOf(diagram.scenario).short, page: 1, total, sheet });
   drawDiagram(cv, diagram, seq, plan.diagramArea);
   drawLegend(cv, FOOTER_H + 8, sheet);
   if (plan.wt && !plan.separate) drawWalkthrough(cv, plan.wt, MARGIN, plan.wtTop, sheet.w - MARGIN * 2);
@@ -330,7 +330,7 @@ export function diagramPdf(diagram) {
   if (plan.separate) {
     const cv2 = new Canvas(doc);
     drawChrome(cv2, { seq, title: diagram.title, sla: diagram.sla, group: diagram.group,
-                      page: 2, total, sheet });
+                      scenario: scenarioOf(diagram.scenario).short, page: 2, total, sheet });
     drawWalkthrough(cv2, plan.wt, MARGIN, sheet.h - HEADER_H, sheet.w - MARGIN * 2);
     doc.addPage(sheet.w, sheet.h, cv2.toString());
   }
@@ -350,15 +350,24 @@ export function albumPdf() {
   t.text('Social1', MARGIN, A3.h - 70, { size: 30, font: 'bold', color: '#ffffff' });
   t.text('Платформа системных инноваций ДТСЗН', MARGIN, A3.h - 96, { size: 13, color: '#dde9f9' });
   t.text('Схемы процессов', MARGIN, A3.h - 230, { size: 40, font: 'bold', color: C.text });
-  t.text('Детализированные модели в нотации BPMN по процессам каждой роли',
+  t.text('Детализированные модели в нотации BPMN: два пользовательских пути',
     MARGIN, A3.h - 262, { size: 14, color: C.text2 });
+  let ty = A3.h - 306;
+  SCENARIOS.forEach((sc, i) => {
+    t.text(`${i + 1}. ${sc.title}`, MARGIN, ty, { size: 12.5, font: 'bold', color: C.text });
+    ty -= 17;
+    t.text(sc.lead, MARGIN + 16, ty, { size: 10.5, color: C.text2 });
+    ty -= 15;
+    const n = DIAGRAMS.filter((d) => d.scenario === sc.id).length;
+    t.text(`Схем: ${n}   ·   Ролей: ${sc.roles.length}`, MARGIN + 16, ty, { size: 9.5, color: C.text3 });
+    ty -= 26;
+  });
   const facts = [
-    `Схем: ${DIAGRAMS.length}`,
-    `Ролей: ${new Set(DIAGRAMS.map((d) => d.role)).size}`,
+    `Всего схем: ${DIAGRAMS.length}`,
     `Шагов с разбором: ${DIAGRAMS.reduce((s, d) => s + (d.walkthrough?.length || 0), 0)}`,
     'Нумерация разделов и шагов — сквозная',
   ];
-  facts.forEach((f, i) => t.text(f, MARGIN, A3.h - 320 - i * 20, { size: 11, color: C.text2 }));
+  facts.forEach((f, i) => t.text(f, MARGIN, ty - i * 18, { size: 11, color: C.text2 }));
   t.text(new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }),
     MARGIN, FOOTER_H + 4, { size: 9, color: C.text3 });
   doc.addPage(A3.w, A3.h, t.toString());
@@ -377,7 +386,16 @@ export function albumPdf() {
   c.text('Содержание', MARGIN, A3.h - 44, { size: 20, font: 'bold', color: C.text });
   let y = A3.h - 84;
   let lastGroup = null;
+  let lastScenario = null;
   DIAGRAMS.forEach((d, i) => {
+    if (d.scenario !== lastScenario) {
+      lastScenario = d.scenario;
+      lastGroup = null;
+      y -= 6;
+      c.rgb(C.brand).rect(MARGIN, y - 4, A3.w - MARGIN * 2, 20, 'f');
+      c.text(scenarioOf(d.scenario).title, MARGIN + 8, y + 1, { size: 10.5, font: 'bold', color: '#ffffff' });
+      y -= 28;
+    }
     if (d.group !== lastGroup) {
       lastGroup = d.group;
       y -= 8;
@@ -400,7 +418,7 @@ export function albumPdf() {
     const pl = plans[i];
     const cv = new Canvas(doc);
     drawChrome(cv, { seq: i + 1, title: d.title, sla: d.sla, group: d.group,
-                     page: startPage[i], total: totalPages });
+                     scenario: scenarioOf(d.scenario).short, page: startPage[i], total: totalPages });
     drawDiagram(cv, d, i + 1, pl.diagramArea);
     drawLegend(cv, FOOTER_H + 8);
     if (pl.wt && !pl.separate) drawWalkthrough(cv, pl.wt, MARGIN, pl.wtTop, A3.w - MARGIN * 2);
@@ -409,7 +427,7 @@ export function albumPdf() {
     if (pl.separate) {
       const cv2 = new Canvas(doc);
       drawChrome(cv2, { seq: i + 1, title: d.title, sla: d.sla, group: d.group,
-                        page: startPage[i] + 1, total: totalPages });
+                        scenario: scenarioOf(d.scenario).short, page: startPage[i] + 1, total: totalPages });
       drawWalkthrough(cv2, pl.wt, MARGIN, A3.h - HEADER_H, A3.w - MARGIN * 2);
       doc.addPage(A3.w, A3.h, cv2.toString());
     }

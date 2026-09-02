@@ -4,7 +4,9 @@ import { api, state, html, esc, refreshMe, onRoute, startRouter, navigate,
 import { renderShell, bindShell, renderLogin } from './shell.js';
 import { dashboard, tasksView } from './views/dashboard.js';
 import { initiativesList, initiativeDetail, initiativeCreate } from './views/initiatives.js';
-import { ideasBoard } from './views/ideas.js';
+import { ideasBoard, ideaCreate, ideaDetail } from './views/ideas.js';
+import { ratingView, moderationView, incentivesView } from './views/rating.js';
+import { reviewView } from './views/review.js';
 import { analyticsView, slaView } from './views/analytics.js';
 import { projectsList, projectDetail } from './views/projects.js';
 import { pilotsList, pilotDetail, surveyDetail } from './views/pilots.js';
@@ -18,7 +20,13 @@ const root = document.getElementById('root');
 const ROUTES = [
   [/^\/$/,                    'Рабочий стол',            (v) => dashboard(v)],
   [/^\/tasks$/,               'Мои задачи',              (v) => tasksView(v)],
-  [/^\/ideas$/,               'Доска идей',              (v, m, q) => ideasBoard(v, q)],
+  [/^\/ideas$/,               'Идеи и решения',          (v, m, q) => ideasBoard(v, q)],
+  [/^\/ideas\/new$/,          'Новая идея',              (v) => ideaCreate(v)],
+  [/^\/ideas\/(\d+)$/,        'Идея',                    (v, m) => ideaDetail(v, m[1])],
+  [/^\/review$/,              'Ревью предложений',       (v, m, q) => reviewView(v, q)],
+  [/^\/rating$/,              'Рейтинг советчиков',      (v, m, q) => ratingView(v, q)],
+  [/^\/moderation$/,          'Модерация идей',          (v, m, q) => moderationView(v, q)],
+  [/^\/incentives$/,          'Рекомендации к поощрению',(v, m, q) => incentivesView(v, q)],
   [/^\/initiatives$/,         'Инициативы',              (v, m, q) => initiativesList(v, q)],
   [/^\/initiatives\/new$/,    'Подать инициативу',       (v) => initiativeCreate(v)],
   [/^\/initiatives\/(\d+)$/,  'Инициатива',              (v, m) => initiativeDetail(v, m[1])],

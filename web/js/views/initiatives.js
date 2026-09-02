@@ -1,8 +1,57 @@
 // Модуль управления инициативами: список, карточка жизненного цикла, подача, решения на Gate.
-import { bindVoting, voteBlock } from './ideas.js';
 import { api, state, esc, html, avatar, can, navigate, toast, modal, confirmDialog, nl2br,
          fmtDate, fmtShort, fmtAgo, fmtHours, num, debounce, slaChip, plural,
          STATUS_META, DECISION_META, ROLE_TITLES } from '../core.js';
+
+// ══ Голосование за инициативу ════════════════════════════════
+// Поддержка коллег — сигнал приоритета для экспертов, но не замена решению на Gate.
+const ICON_UP = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+const ICON_DOWN = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
+
+export function voteBlock(i) {
+  const closed = i.status === 'scaled' || i.status === 'killed';
+  const tone = i.votes_score > 0 ? 'pos' : i.votes_score < 0 ? 'neg' : '';
+  return html`
+    <div class="vote" data-vote-for="${i.id}">
+      <button class="vote__btn ${i.my_vote === 1 ? 'is-on' : ''}" data-v="1" ${closed ? 'disabled' : ''}
+              title="${closed ? 'Голосование завершено' : 'Поддержать инициативу'}"
+              aria-label="Поддержать">${ICON_UP}</button>
+      <div class="vote__score vote__score--${tone}" data-score>${i.votes_score > 0 ? '+' : ''}${i.votes_score}</div>
+      <div class="vote__label">${plural(Math.abs(i.votes_score), 'голос', 'голоса', 'голосов')}</div>
+      <button class="vote__btn vote__btn--down ${i.my_vote === -1 ? 'is-on' : ''}" data-v="-1" ${closed ? 'disabled' : ''}
+              title="${closed ? 'Голосование завершено' : 'Не поддерживаю'}"
+              aria-label="Не поддерживаю">${ICON_DOWN}</button>
+    </div>`;
+}
+
+/** Голосование без перезагрузки списка: карточка обновляется на месте. */
+export function bindVoting(root, items) {
+  root.querySelectorAll('[data-vote-for]').forEach((box) => {
+    const id = Number(box.dataset.voteFor);
+    box.querySelectorAll('.vote__btn').forEach((btn) => btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (btn.disabled) return;
+      const wanted = Number(btn.dataset.v);
+      box.classList.add('is-busy');
+      try {
+        const r = await api.post(`/api/initiatives/${id}/vote`, { value: wanted });
+        const score = box.querySelector('[data-score]');
+        score.textContent = (r.votes_score > 0 ? '+' : '') + r.votes_score;
+        score.className = `vote__score ${r.votes_score > 0 ? 'vote__score--pos' : r.votes_score < 0 ? 'vote__score--neg' : ''}`;
+        box.querySelector('.vote__label').textContent = plural(Math.abs(r.votes_score), 'голос', 'голоса', 'голосов');
+        box.querySelectorAll('.vote__btn').forEach((b) => {
+          b.classList.toggle('is-on', Number(b.dataset.v) === r.my_vote && r.my_vote !== 0);
+        });
+        const item = items?.find((x) => x.id === id);
+        if (item) { item.votes_score = r.votes_score; item.my_vote = r.my_vote; }
+      } catch (err) {
+        toast(err.message, 'error');
+      } finally {
+        box.classList.remove('is-busy');
+      }
+    }));
+  });
+}
 
 // ══ Конвейер этапов ══════════════════════════════════════════
 export function pipeline(stages, current, status, counts) {

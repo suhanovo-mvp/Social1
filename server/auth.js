@@ -15,14 +15,30 @@ export const ROLES = {
 };
 
 // Права: что роль может делать. Проверяются на сервере при каждом запросе.
+//
+// Модуль «Идеи и решения» добавляет свои права поверх ролей платформы:
+//   idea.create      — подавать идеи;
+//   idea.propose     — предлагать решения и делиться проверенным опытом (советчик);
+//   idea.review      — быстрое ревью чужих предложений карточками (ревьюер);
+//   idea.moderate    — проверять идеи, подтверждать опыт, отменять начисления (модератор);
+//   idea.incentive   — видеть рекомендации к поощрению и формировать их (руководитель);
+//   idea.incentive.decide — согласовывать, утверждать и отклонять поощрения;
+//   idea.admin       — правила начисления очков, меры поощрения, настройки модуля.
 const PERMISSIONS = {
-  employee:          ['initiative.create', 'initiative.read', 'initiative.comment', 'pilot.feedback', 'community', 'survey.answer'],
-  head:              ['initiative.create', 'initiative.read', 'initiative.comment', 'gate.1', 'pilot.apply', 'pilot.manage', 'analytics.institution', 'community', 'survey.answer', 'rollout.manage'],
-  expert:            ['initiative.create', 'initiative.read', 'initiative.comment', 'gate.2', 'analytics.expert', 'community', 'survey.answer', 'bestpractice.publish'],
-  developer:         ['initiative.read', 'initiative.comment', 'gate.3', 'project.manage', 'board.manage', 'docs.manage', 'community', 'survey.answer'],
-  supplier:          ['initiative.read', 'initiative.comment', 'community', 'project.contribute'],
-  pilot_coordinator: ['initiative.read', 'initiative.comment', 'gate.4', 'pilot.manage', 'pilot.feedback', 'survey.manage', 'analytics.pilot', 'community', 'survey.answer'],
-  dtszn:             ['initiative.create', 'initiative.read', 'initiative.comment', 'gate.2', 'gate.5', 'analytics.all', 'admin', 'workflow.configure', 'audit.read', 'community', 'rollout.manage', 'bestpractice.publish', 'awards.grant', 'survey.answer', 'pilot.manage'],
+  employee:          ['initiative.create', 'initiative.read', 'initiative.comment', 'pilot.feedback', 'community', 'survey.answer',
+                      'idea.create', 'idea.propose', 'idea.review'],
+  head:              ['initiative.create', 'initiative.read', 'initiative.comment', 'gate.1', 'pilot.apply', 'pilot.manage', 'analytics.institution', 'community', 'survey.answer', 'rollout.manage',
+                      'idea.create', 'idea.propose', 'idea.review', 'idea.incentive', 'idea.incentive.decide'],
+  expert:            ['initiative.create', 'initiative.read', 'initiative.comment', 'gate.2', 'analytics.expert', 'community', 'survey.answer', 'bestpractice.publish',
+                      'idea.create', 'idea.propose', 'idea.review', 'idea.moderate', 'idea.incentive'],
+  developer:         ['initiative.read', 'initiative.comment', 'gate.3', 'project.manage', 'board.manage', 'docs.manage', 'community', 'survey.answer',
+                      'idea.create', 'idea.propose', 'idea.review'],
+  supplier:          ['initiative.read', 'initiative.comment', 'community', 'project.contribute',
+                      'idea.propose', 'idea.review'],
+  pilot_coordinator: ['initiative.read', 'initiative.comment', 'gate.4', 'pilot.manage', 'pilot.feedback', 'survey.manage', 'analytics.pilot', 'community', 'survey.answer',
+                      'idea.create', 'idea.propose', 'idea.review'],
+  dtszn:             ['initiative.create', 'initiative.read', 'initiative.comment', 'gate.2', 'gate.5', 'analytics.all', 'admin', 'workflow.configure', 'audit.read', 'community', 'rollout.manage', 'bestpractice.publish', 'awards.grant', 'survey.answer', 'pilot.manage',
+                      'idea.create', 'idea.propose', 'idea.review', 'idea.moderate', 'idea.incentive', 'idea.incentive.decide', 'idea.admin'],
 };
 
 export function can(user, permission) {

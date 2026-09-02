@@ -194,7 +194,8 @@ export async function practicesView(view) {
 
 // ══ Профиль участника ════════════════════════════════════════
 export async function profileView(view, id) {
-  const u = await api.get(`/api/users/${id}`);
+  const { advisorPanel } = await import('./rating.js');
+  const [u, advisor] = await Promise.all([api.get(`/api/users/${id}`), advisorPanel(id)]);
   view.innerHTML = html`
     <div class="page-head">
       <div class="row" style="gap:16px;align-items:flex-start">
@@ -209,6 +210,8 @@ export async function profileView(view, id) {
         </div>
       </div>
     </div>
+
+    ${advisor}
 
     <div class="grid grid--kpi" style="margin-bottom:16px">
       <div class="kpi"><div class="kpi__label">Подано инициатив</div><div class="kpi__value">${u.initiatives.length}</div></div>

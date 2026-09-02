@@ -5,12 +5,16 @@ import { fileURLToPath } from 'node:url';
 import { matchRoute, sendJson, serveStatic, parseCookies, HttpError } from './http.js';
 import { userFromToken } from './auth.js';
 import { ensureWorkflow, sweepSla } from './workflow.js';
+import { ensureIdeaHub, sweepIdeaHub } from './ideahub.js';
 import { logAction } from './audit.js';
 import { q } from './db.js';
 
 // Регистрация маршрутов
 import './api/auth.js';
 import './api/initiatives.js';
+import './api/ideas.js';
+import './api/review.js';
+import './api/rating.js';
 import './api/work.js';
 import './api/pilots.js';
 import './api/analytics.js';
@@ -24,6 +28,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 
 ensureWorkflow();
+ensureIdeaHub();
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
@@ -77,6 +82,19 @@ const slaTimer = setInterval(() => {
 }, 15 * 60 * 1000);
 slaTimer.unref();
 
+// Обслуживание модуля «Идеи и решения»: знаки отличия и рекомендации к поощрению.
+// Рейтинг считается запросом на лету, поэтому здесь пересчитываются только
+// накопительные признаки — раз в час этого достаточно.
+const ideaTimer = setInterval(() => {
+  try {
+    const r = sweepIdeaHub();
+    if (r.badges || r.incentives) {
+      console.log(`Идеи и решения: знаков отличия — ${r.badges}, рекомендаций к поощрению — ${r.incentives}`);
+    }
+  } catch (e) { console.error('Ошибка обслуживания модуля идей:', e.message); }
+}, 60 * 60 * 1000);
+ideaTimer.unref();
+
 server.listen(PORT, HOST, () => {
   const users = q.get('SELECT COUNT(*) AS c FROM users').c;
   console.log('');
@@ -85,6 +103,7 @@ server.listen(PORT, HOST, () => {
   console.log(`  Портал:        http://${HOST}:${PORT}`);
   console.log(`  Пользователей: ${users}`);
   console.log(`  Инициатив:     ${q.get('SELECT COUNT(*) AS c FROM initiatives').c}`);
+  console.log(`  Идей:          ${q.get('SELECT COUNT(*) AS c FROM ideas').c}`);
   if (!users) console.log('\n  Данных нет. Заполните демо-данными: npm run seed');
   console.log('');
 });

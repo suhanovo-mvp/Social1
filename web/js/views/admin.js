@@ -11,7 +11,7 @@ export async function adminView(view, query) {
          без изменения кода — это обеспечивает адаптивность процесса к меняющимся условиям.</p>
     </div>
     <div class="tabs">
-      ${[['workflow', 'Процесс Stage-Gate'], ['users', 'Участники'],
+      ${[['workflow', 'Процесс Stage-Gate'], ['ideahub', 'Идеи и решения'], ['users', 'Участники'],
          ['audit', 'Журнал аудита'], ['system', 'Состояние системы']]
         .map(([k, t]) => `<button class="tab ${tab === k ? 'is-active' : ''}" data-tab="${k}">${t}</button>`)}
     </div>
@@ -19,7 +19,248 @@ export async function adminView(view, query) {
 
   view.querySelectorAll('.tab').forEach((t) => t.onclick = () => navigate(`/admin?tab=${t.dataset.tab}`));
   const panel = view.querySelector('#admin-panel');
-  ({ workflow: workflowPanel, users: usersPanel, audit: auditPanel, system: systemPanel }[tab] || workflowPanel)(panel);
+  ({ workflow: workflowPanel, ideahub: ideaHubPanel, users: usersPanel,
+     audit: auditPanel, system: systemPanel }[tab] || workflowPanel)(panel);
+}
+
+// ── Модуль «Идеи и решения» ──────────────────────────────────
+// Правила начисления очков, меры поощрения и режим работы модуля меняются
+// администратором без изменения кода.
+const INCENTIVE_CATEGORIES = {
+  time: 'Время и режим работы', recognition: 'Признание',
+  development: 'Развитие и карьера', material: 'Материальные меры', social: 'Социальные программы',
+};
+
+async function ideaHubPanel(panel) {
+  const d = await api.get('/api/admin/ideahub');
+  const s = d.settings;
+  const byCategory = {};
+  for (const t of d.incentive_types) (byCategory[t.category] ||= []).push(t);
+
+  panel.innerHTML = html`
+    <div class="grid grid--kpi" style="margin-bottom:16px">
+      <div class="kpi"><div class="kpi__label">Идей подано</div><div class="kpi__value">${num(d.stats.ideas)}</div></div>
+      <div class="kpi"><div class="kpi__label">Предложено решений</div><div class="kpi__value">${num(d.stats.proposals)}</div></div>
+      <div class="kpi kpi--ok"><div class="kpi__label">Начислено очков</div><div class="kpi__value">${num(d.stats.points)}</div>
+        <div class="kpi__meta">Отменено начислений: ${num(d.stats.revoked)}</div></div>
+      <div class="kpi"><div class="kpi__label">Рекомендаций к поощрению</div><div class="kpi__value">${num(d.stats.incentives)}</div></div>
+      <div class="kpi ${d.stats.flags ? 'kpi--warn' : ''}"><div class="kpi__label">Оценок в ревью</div>
+        <div class="kpi__value">${num(d.stats.reviews)}</div>
+        <div class="kpi__meta">${d.stats.flags ? `Открытых сигналов антифрода: ${d.stats.flags}` : 'Сигналов антифрода нет'}</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card__head"><h3>Режим работы модуля</h3>
+        <span class="card__hint spacer">Изменения применяются немедленно и фиксируются в аудите</span></div>
+      <div class="card__body">
+        <label class="checkbox" style="margin-bottom:10px">
+          <input type="checkbox" id="s-moderation" ${s.moderation_required === '1' ? 'checked' : ''}>
+          <span><b>Обязательная модерация новых идей</b><br>
+            <span class="fs-12 text-3">Идея публикуется со статусом «Новая» и открывается для решений
+              после проверки модератором. При выключенной настройке идея сразу доступна для предложений.</span></span>
+        </label>
+        <label class="checkbox" style="margin-bottom:14px">
+          <input type="checkbox" id="s-rating" ${s.rating_visible === '1' ? 'checked' : ''}>
+          <span><b>Рейтинг советчиков виден всем участникам</b><br>
+            <span class="fs-12 text-3">При выключении рейтинг остаётся доступен только модераторам,
+              руководителям и администраторам — этого требуют политики некоторых организаций.</span></span>
+        </label>
+        <div class="grid grid--2">
+          <div class="field">
+            <label class="field__label" for="s-threshold">Порог очков для рекомендации к поощрению</label>
+            <input class="input" id="s-threshold" type="number" min="0" step="1" value="${esc(s.incentive_threshold)}">
+          </div>
+          <div class="field">
+            <label class="field__label" for="s-top">Сколько человек попадает в рекомендации</label>
+            <input class="input" id="s-top" type="number" min="1" max="50" step="1" value="${esc(s.incentive_top)}">
+          </div>
+        </div>
+      </div>
+      <div class="card__foot row">
+        <button class="btn btn--sm" id="refresh-badges">Пересчитать знаки отличия</button>
+        <button class="btn btn--sm btn--primary spacer" id="save-settings">Сохранить настройки</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card__head">
+        <div><h3>Быстрое ревью предложений</h3>
+          <div class="card__hint">Оценки в ревью не начисляют очки автору — они влияют только на
+            полезность предложения и порядок в очереди модератора. Пределы ниже защищают
+            от механического пролистывания.</div></div>
+      </div>
+      <div class="card__body">
+        <label class="checkbox" style="margin-bottom:14px">
+          <input type="checkbox" id="s-undo" ${s.review_undo === '1' ? 'checked' : ''}>
+          <span><b>Разрешать возврат к предыдущей карточке</b><br>
+            <span class="fs-12 text-3">Отменить можно только последнюю оценку и только в течение
+              десяти минут — это исправление промаха, а не пересмотр решения.</span></span>
+        </label>
+        <div class="grid grid--2">
+          <div class="field">
+            <label class="field__label" for="s-top-threshold">Лайков для попадания в «Топ предложений»</label>
+            <input class="input" id="s-top-threshold" type="number" min="1" step="1" value="${esc(s.review_top_threshold)}">
+          </div>
+          <div class="field">
+            <label class="field__label" for="s-min-ms">Минимальное время на карточке, мс</label>
+            <input class="input" id="s-min-ms" type="number" min="0" step="100" value="${esc(s.review_min_ms)}">
+            <div class="field__hint">Быстрее — оценка считается непрочитанной.</div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="s-burst">Быстрых оценок подряд до сигнала модератору</label>
+            <input class="input" id="s-burst" type="number" min="2" step="1" value="${esc(s.review_burst_limit)}">
+          </div>
+          <div class="field">
+            <label class="field__label" for="s-per-min">Предел оценок в минуту</label>
+            <input class="input" id="s-per-min" type="number" min="1" step="1" value="${esc(s.review_per_minute)}">
+          </div>
+          <div class="field">
+            <label class="field__label" for="s-per-hour">Предел оценок в час</label>
+            <input class="input" id="s-per-hour" type="number" min="1" step="1" value="${esc(s.review_per_hour)}">
+          </div>
+        </div>
+      </div>
+      <div class="card__foot row">
+        <a class="btn btn--sm spacer" href="/moderation?tab=reports">Открытые сигналы антифрода</a>
+        <button class="btn btn--sm btn--primary" id="save-review">Сохранить</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card__head"><h3>Правила начисления очков</h3>
+        <span class="card__hint spacer">Значения меняются без изменения кода</span></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Действие</th><th class="num" style="width:100px">Очки</th>
+          <th class="num" style="width:130px">Предел по объекту</th><th style="width:110px">Состояние</th><th style="width:110px"></th></tr></thead>
+        <tbody>${d.rules.map((r) => html`
+          <tr>
+            <td><div class="fw-600 fs-13">${esc(r.title)}</div>
+              ${r.description ? `<div class="fs-12 text-3">${esc(r.description)}</div>` : ''}
+              <div class="fs-12 text-3 mono">${esc(r.code)}</div></td>
+            <td class="num fw-600">${r.points}</td>
+            <td class="num fs-13">${r.cap_per_target ?? '—'}</td>
+            <td><span class="badge badge--${r.is_active ? 'ok' : 'danger'}">${r.is_active ? 'Действует' : 'Отключено'}</span></td>
+            <td><button class="btn btn--sm" data-rule="${esc(r.code)}">Изменить</button></td>
+          </tr>`)}
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Меры поощрения</h3>
+        <span class="card__hint spacer">Применяются только в рамках трудового законодательства
+          и внутренних регламентов</span></div>
+      <div class="card__body">
+        ${Object.entries(byCategory).map(([cat, list]) => html`
+          <div style="margin-bottom:18px">
+            <div class="fs-12 fw-600 text-3" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">
+              ${esc(INCENTIVE_CATEGORIES[cat] || cat)}</div>
+            <div class="list" style="border:1px solid var(--border);border-radius:var(--radius-sm)">
+              ${list.map((t) => html`
+                <div class="list__item">
+                  <div class="list__main">
+                    <div class="list__title">${esc(t.title)}</div>
+                    ${t.legal_note ? `<div class="list__body">${esc(t.legal_note)}</div>` : ''}
+                  </div>
+                  <label class="checkbox" style="flex-shrink:0">
+                    <input type="checkbox" data-type="${esc(t.code)}" ${t.is_active ? 'checked' : ''}>
+                    <span class="fs-12">${t.is_active ? 'Доступна' : 'Отключена'}</span>
+                  </label>
+                </div>`)}
+            </div>
+          </div>`)}
+      </div>
+    </div>`;
+
+  panel.querySelector('#save-settings').onclick = async () => {
+    try {
+      await api.patch('/api/admin/ideahub/settings', {
+        moderation_required: panel.querySelector('#s-moderation').checked,
+        rating_visible: panel.querySelector('#s-rating').checked,
+        incentive_threshold: panel.querySelector('#s-threshold').value,
+        incentive_top: panel.querySelector('#s-top').value,
+      });
+      toast('Настройки модуля сохранены', 'ok');
+      ideaHubPanel(panel);
+    } catch (err) { toast(err.message, 'error'); }
+  };
+
+  panel.querySelector('#save-review').onclick = async () => {
+    try {
+      await api.patch('/api/admin/ideahub/settings', {
+        review_undo: panel.querySelector('#s-undo').checked,
+        review_top_threshold: panel.querySelector('#s-top-threshold').value,
+        review_min_ms: panel.querySelector('#s-min-ms').value,
+        review_burst_limit: panel.querySelector('#s-burst').value,
+        review_per_minute: panel.querySelector('#s-per-min').value,
+        review_per_hour: panel.querySelector('#s-per-hour').value,
+      });
+      toast('Настройки ревью сохранены', 'ok');
+      ideaHubPanel(panel);
+    } catch (err) { toast(err.message, 'error'); }
+  };
+
+  panel.querySelector('#refresh-badges').onclick = async () => {
+    try {
+      const r = await api.post('/api/admin/ideahub/refresh-badges', {});
+      toast(`Проверено участников: ${r.checked}, присвоено знаков: ${r.granted}`, 'ok');
+    } catch (err) { toast(err.message, 'error'); }
+  };
+
+  panel.querySelectorAll('[data-type]').forEach((cb) => cb.onchange = async () => {
+    try {
+      await api.patch(`/api/admin/ideahub/incentive-types/${cb.dataset.type}`, { is_active: cb.checked });
+      cb.nextElementSibling.textContent = cb.checked ? 'Доступна' : 'Отключена';
+    } catch (err) { toast(err.message, 'error'); cb.checked = !cb.checked; }
+  });
+
+  panel.querySelectorAll('[data-rule]').forEach((b) => b.onclick = () =>
+    editRuleModal(d.rules.find((r) => r.code === b.dataset.rule), () => ideaHubPanel(panel)));
+}
+
+function editRuleModal(rule, onDone) {
+  modal({
+    title: `Правило: ${rule.title}`,
+    body: html`
+      <div class="row" style="gap:12px;align-items:flex-start">
+        <div class="field" style="width:130px">
+          <label class="field__label" for="r-points">Очки</label>
+          <input class="input" id="r-points" type="number" min="0" max="1000" step="1" value="${rule.points}">
+        </div>
+        <div class="field" style="flex:1">
+          <label class="field__label" for="r-cap">Предел очков по одному объекту</label>
+          <input class="input" id="r-cap" type="number" min="0" step="1" value="${rule.cap_per_target ?? ''}"
+                 placeholder="без ограничения">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="r-title">Формулировка для участников</label>
+        <input class="input" id="r-title" value="${esc(rule.title)}">
+      </div>
+      <div class="field">
+        <label class="field__label" for="r-desc">Пояснение</label>
+        <textarea class="textarea" id="r-desc" style="min-height:70px">${esc(rule.description || '')}</textarea>
+      </div>
+      <label class="checkbox"><input type="checkbox" id="r-active" ${rule.is_active ? 'checked' : ''}>
+        <span>Правило действует</span></label>
+      <div class="field__hint" style="margin-top:12px">Новые значения применяются к начислениям,
+        которые произойдут после сохранения. Уже начисленные очки не пересчитываются.</div>`,
+    footer: '<button class="btn" data-close>Отмена</button><button class="btn btn--primary" data-ok>Сохранить</button>',
+    onMount: (el, close) => {
+      el.querySelector('[data-ok]').onclick = async () => {
+        try {
+          await api.patch(`/api/admin/ideahub/rules/${rule.code}`, {
+            points: Number(el.querySelector('#r-points').value),
+            cap_per_target: el.querySelector('#r-cap').value === '' ? null : Number(el.querySelector('#r-cap').value),
+            title: el.querySelector('#r-title').value.trim(),
+            description: el.querySelector('#r-desc').value.trim(),
+            is_active: el.querySelector('#r-active').checked,
+          });
+          toast('Правило обновлено', 'ok'); close(); onDone();
+        } catch (err) { toast(err.message, 'error'); }
+      };
+    },
+  });
 }
 
 // ── Конфигурация процесса ────────────────────────────────────

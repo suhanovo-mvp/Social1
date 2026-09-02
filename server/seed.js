@@ -3,6 +3,7 @@
 import { q, tx, db } from './db.js';
 import { hashPassword } from './auth.js';
 import { ensureWorkflow, stageConfig, dueDate, grantAward, LAST_STAGE } from './workflow.js';
+import { ensureIdeaHub, awardPoints, refreshBadges, periodBounds } from './ideahub.js';
 import { logAction } from './audit.js';
 import { classify } from './ai.js';
 
@@ -22,6 +23,10 @@ if (RESET) {
   for (const t of ['survey_answers','survey_responses','survey_questions','surveys','pilot_kpis','pilots',
     'pilot_applications','board_items','sprints','documents','projects','forum_posts','forum_topics',
     'best_practices','rollouts','awards','comments','attachments','gate_decisions','stage_transitions',
+    // модуль «Идеи и решения»
+    'review_flags','proposal_reviews','idea_reports','incentives','advisor_badges','points_ledger',
+    'idea_comments','proposal_endorsements','idea_reactions','idea_attachments','proposals',
+    'idea_drafts','ideas',
     'notifications','tasks','initiatives','sessions','users','institutions','workflow_config']) {
     try { db.exec(`DELETE FROM ${t}`); } catch {}
   }
@@ -31,6 +36,7 @@ if (RESET) {
 }
 
 ensureWorkflow();
+ensureIdeaHub();
 if (q.get('SELECT COUNT(*) AS c FROM users').c > 0 && !RESET) {
   console.log('Данные уже загружены. Для пересоздания: npm run reset');
   process.exit(0);
@@ -644,6 +650,426 @@ for (const [title, cat, author, body, replies] of TOPICS) {
   });
 }
 
+// ── Модуль «Идеи и решения» ──────────────────────────────────
+// Идеи — быстрый вход в экосистему: сотрудник фиксирует проблему, коллеги
+// предлагают решения и делятся опытом, за полезный вклад начисляются очки.
+const IDEAS = [
+  {
+    author: 'smirnova@social1.mos.ru', created: 74, status: 'done', template: 'speed',
+    category: 'Оптимизация процессов', priority: 'high',
+    title: 'Долгая передача смены в отделении надомного обслуживания',
+    problem: 'Передача смены занимает до 40 минут: уходящий социальный работник пересказывает сменщику особенности каждого получателя услуг — кто на диете, у кого сегодня врач, к кому нельзя приходить до полудня. Часть информации теряется, из-за этого случаются накладки с визитами.',
+    desired_result: 'Сменщик получает готовую сводку по своим получателям услуг за 5 минут и ничего не забывает.',
+    moderator: 'lebedeva@social1.mos.ru', moderated: 72,
+    note: 'Проблема понятна и подтверждается коллегами из других центров. Принимаю к обсуждению.',
+    reactions: [['petrov@social1.mos.ru', 'useful'], ['fedorov@social1.mos.ru', 'useful'],
+                ['ivanova@social1.mos.ru', 'support'], ['orlova@social1.mos.ru', 'support'],
+                ['nikitina@social1.mos.ru', 'join'], ['kuznecov@social1.mos.ru', 'useful']],
+    proposals: [
+      {
+        author: 'fedorov@social1.mos.ru', created: 70, kind: 'experience', status: 'implemented',
+        summary: 'У нас в «Бибирево» два года работает короткая карточка получателя услуг в общей таблице: три строки — ограничения, ближайшие события, особые пожелания. Смена передаётся по списку, а не по памяти.',
+        how_to_apply: 'Завести в общем доступе таблицу по отделению: одна строка на получателя услуг, три поля. Заполняет тот, кто был на визите последним, — это занимает минуту. Сменщик утром открывает свой список и читает только своих.',
+        expected_effect: 'Передача смены сократилась с 35–40 до 6–8 минут. За два года ни одной накладки с визитами по причине несогласованности.',
+        risks: 'В таблицу нельзя вносить диагнозы и другие сведения, которые относятся к специальным категориям персональных данных.',
+        verified_by: 'lebedeva@social1.mos.ru',
+        endorsers: ['smirnova@social1.mos.ru', 'petrov@social1.mos.ru', 'ivanova@social1.mos.ru',
+                    'orlova@social1.mos.ru', 'nikitina@social1.mos.ru', 'kuznecov@social1.mos.ru',
+                    'larina@social1.mos.ru'],
+      },
+      {
+        author: 'petrov@social1.mos.ru', created: 68, kind: 'proposal', status: 'published',
+        summary: 'Добавить в учётную систему поле «заметка к следующему визиту», которое видно сменщику при открытии карточки.',
+        how_to_apply: 'Доработка карточки получателя услуг в существующей системе. Требуется заявка в отдел сопровождения.',
+        expected_effect: 'Информация не теряется между сменами, доступ разграничен по отделению.',
+        risks: 'Потребуется время на доработку системы, за неделю не сделать.',
+        needs_approval: 1,
+        endorsers: ['smirnova@social1.mos.ru', 'orlova@social1.mos.ru'],
+      },
+    ],
+    comments: [
+      ['orlova@social1.mos.ru', 'У нас та же история, только в реабилитационном центре. Таблица выглядит рабочим вариантом — попробуем на одном отделении.', 66],
+      ['smirnova@social1.mos.ru', 'Спасибо, начали вести карточки со вторника. Передача смены уже укладывается в десять минут.', 60],
+    ],
+  },
+  {
+    author: 'ivanova@social1.mos.ru', created: 58, status: 'in_progress', template: 'errors',
+    category: 'Качество услуг', priority: 'high',
+    title: 'Родители заполняют одни и те же сведения в четырёх заявлениях',
+    problem: 'Семья, обращающаяся за несколькими мерами поддержки, каждый раз заново вписывает состав семьи, доходы и контакты. На четыре заявления уходит около часа, ошибки в повторяющихся данных приводят к возврату документов.',
+    desired_result: 'Данные вводятся один раз и подставляются в остальные заявления автоматически.',
+    moderator: 'lebedeva@social1.mos.ru', moderated: 56,
+    note: 'Идея пересекается с направлением цифровизации приёма. Открываю обсуждение.',
+    reactions: [['larina@social1.mos.ru', 'useful'], ['fedorov@social1.mos.ru', 'useful'],
+                ['petrov@social1.mos.ru', 'support'], ['nikitina@social1.mos.ru', 'support'],
+                ['smirnova@social1.mos.ru', 'join']],
+    proposals: [
+      {
+        author: 'larina@social1.mos.ru', created: 54, kind: 'proposal', status: 'useful', accepted: true,
+        summary: 'Ввести единую анкету семьи: специалист заполняет её один раз при первом обращении, дальше данные подставляются во все заявления, а заявитель только подтверждает актуальность.',
+        how_to_apply: 'Первый шаг — бумажный: единый бланк сведений о семье, который прикладывается к пакету. Параллельно — заявка на доработку системы приёма заявлений.',
+        expected_effect: 'Время подачи четырёх заявлений сокращается с часа до 15–20 минут, повторные ошибки исчезают.',
+        risks: 'Нужно согласовать состав единой анкеты с юридической службой: перечень сведений в разных услугах различается.',
+        needs_approval: 1,
+        endorsers: ['ivanova@social1.mos.ru', 'petrov@social1.mos.ru', 'fedorov@social1.mos.ru',
+                    'nikitina@social1.mos.ru'],
+      },
+      {
+        author: 'nikitina@social1.mos.ru', created: 52, kind: 'proposal', status: 'published',
+        summary: 'Сделать памятку со списком услуг, которые обычно оформляются вместе, чтобы специалист сразу предлагал полный набор.',
+        how_to_apply: 'Собрать статистику по частым сочетаниям услуг и выпустить памятку для специалистов приёма.',
+        expected_effect: 'Меньше повторных визитов, семья узнаёт обо всех доступных мерах сразу.',
+        endorsers: ['ivanova@social1.mos.ru'],
+      },
+    ],
+    comments: [
+      ['larina@social1.mos.ru', 'Готова собрать перечень полей, которые повторяются во всех четырёх заявлениях. По нашей практике их около двадцати.', 50],
+    ],
+  },
+  {
+    author: 'kuznecov@social1.mos.ru', created: 45, status: 'accepted', template: 'ui',
+    category: 'Цифровые сервисы', priority: 'normal',
+    title: 'Расписание занятий в интернате висит только на стенде',
+    problem: 'Расписание реабилитационных занятий печатается и вывешивается на стенде первого этажа. Проживающие с нарушениями зрения и мобильности не могут его прочитать, родственники звонят по телефону и уточняют каждый раз.',
+    desired_result: 'Расписание доступно с телефона и на экране в холле, с крупным шрифтом и голосовым прочтением.',
+    moderator: 'grigoriev@social1.mos.ru', moderated: 43,
+    note: 'Идея касается доступной среды — приоритетное направление. Принимаю к обсуждению.',
+    reactions: [['orlova@social1.mos.ru', 'useful'], ['orlova@social1.mos.ru', 'join'],
+                ['nikitina@social1.mos.ru', 'useful'], ['ivanova@social1.mos.ru', 'support']],
+    proposals: [
+      {
+        author: 'orlova@social1.mos.ru', created: 42, kind: 'experience', status: 'verified',
+        summary: 'В «Преодолении» повесили в холле обычный телевизор с флешкой: расписание крупным шрифтом сменяется каждые 20 секунд. Обошлось без закупки специального оборудования — использовали списанный телевизор.',
+        how_to_apply: 'Файл расписания готовит методист в понедельник, сохраняет на флешку в формате изображений. Телевизор включается по расписанию розеточным таймером.',
+        expected_effect: 'Звонков родственников с вопросом «когда занятие» стало заметно меньше, проживающие с остаточным зрением читают расписание сами.',
+        risks: 'Решение не помогает полностью незрячим — им по-прежнему нужен голосовой формат.',
+        verified_by: 'grigoriev@social1.mos.ru',
+        endorsers: ['kuznecov@social1.mos.ru', 'nikitina@social1.mos.ru', 'ivanova@social1.mos.ru',
+                    'smirnova@social1.mos.ru'],
+      },
+    ],
+    comments: [
+      ['kuznecov@social1.mos.ru', 'Телевизор нашли, попробуем на этой неделе. Отдельно подумаем про голосовое прочтение для незрячих.', 40],
+    ],
+  },
+  {
+    author: 'orlova@social1.mos.ru', created: 33, status: 'accepted', template: 'automate',
+    category: 'Оптимизация процессов', priority: 'normal',
+    title: 'Ежемесячный отчёт по занятости залов собирается вручную',
+    problem: 'Методист в конце месяца обходит журналы четырёх залов, переписывает часы занятий в таблицу и сводит отчёт. Уходит полный рабочий день, к тому же данные из журналов не всегда совпадают с фактическим расписанием.',
+    desired_result: 'Отчёт формируется из расписания автоматически, методист только проверяет и подписывает.',
+    moderator: 'lebedeva@social1.mos.ru', moderated: 31,
+    note: 'Типовая задача для большинства учреждений. Принимаю к обсуждению — интересен опыт коллег.',
+    reactions: [['kuznecov@social1.mos.ru', 'useful'], ['nikitina@social1.mos.ru', 'useful'],
+                ['smirnova@social1.mos.ru', 'support']],
+    proposals: [
+      {
+        author: 'nikitina@social1.mos.ru', created: 30, kind: 'proposal', status: 'useful',
+        summary: 'Вести расписание сразу в электронной таблице с автоматическим подсчётом часов по залам — тогда отчёт получается сам собой к концу месяца.',
+        how_to_apply: 'Один раз настроить шаблон таблицы с формулами. Дальше методист вносит занятия в расписание, а лист «Отчёт» пересчитывается автоматически.',
+        expected_effect: 'День работы в конце месяца превращается в проверку готовых цифр за полчаса.',
+        endorsers: ['orlova@social1.mos.ru', 'kuznecov@social1.mos.ru', 'ivanova@social1.mos.ru'],
+      },
+    ],
+    comments: [],
+  },
+  {
+    author: 'larina@social1.mos.ru', created: 26, status: 'accepted', template: 'other',
+    category: 'Качество услуг', priority: 'normal',
+    title: 'Соискателям неясно, чем именно помогает центр занятости',
+    problem: 'На первой консультации половина времени уходит на объяснение, какие услуги вообще существуют. Люди приходят с ожиданием, что им сразу дадут вакансию, и уходят разочарованными, не узнав про обучение и профориентацию.',
+    desired_result: 'Человек до прихода понимает, с чем ему помогут, и приходит с конкретным запросом.',
+    moderator: 'lebedeva@social1.mos.ru', moderated: 25,
+    note: 'Идея открыта для решений. Интересны примеры из других учреждений.',
+    reactions: [['ivanova@social1.mos.ru', 'useful'], ['petrov@social1.mos.ru', 'support'],
+                ['fedorov@social1.mos.ru', 'support']],
+    proposals: [
+      {
+        author: 'ivanova@social1.mos.ru', created: 24, kind: 'proposal', status: 'published',
+        summary: 'Короткий опросник при записи: три вопроса о ситуации соискателя. По ответам система показывает, какие услуги ему подойдут, а консультант заранее видит запрос.',
+        how_to_apply: 'Составить опросник вместе с консультантами, разместить на странице записи. Ответы приходят вместе с записью.',
+        expected_effect: 'Консультация начинается с сути, ожидания совпадают с возможностями центра.',
+        endorsers: ['larina@social1.mos.ru', 'petrov@social1.mos.ru'],
+      },
+    ],
+    comments: [],
+  },
+  {
+    author: 'petrov@social1.mos.ru', created: 18, status: 'review',
+    category: 'Цифровые сервисы', priority: 'normal', template: 'ui',
+    title: 'В электронной очереди не видно, к какому окну идти',
+    problem: 'Табло показывает номер талона, но не номер окна. Люди подходят не к тому специалисту, очередь сбивается, сотрудники тратят время на перенаправление.',
+    desired_result: 'На табло и в SMS видно номер окна вместе с номером талона.',
+    moderator: 'grigoriev@social1.mos.ru', moderated: 16,
+    note: 'Уточните, пожалуйста, о каком именно табло идёт речь — в холле или в зале ожидания? От этого зависит, кто исполнитель.',
+    reactions: [['smirnova@social1.mos.ru', 'useful'], ['fedorov@social1.mos.ru', 'useful']],
+    proposals: [],
+    comments: [
+      ['petrov@social1.mos.ru', 'Речь про большое табло в холле. В зале ожидания табло вообще нет, там сотрудник называет номера голосом.', 15],
+    ],
+  },
+  {
+    author: 'fedorov@social1.mos.ru', created: 12, status: 'accepted', template: 'speed',
+    category: 'Оптимизация процессов', priority: 'high',
+    title: 'Согласование заявки на бытовую технику для подопечного идёт три недели',
+    problem: 'Заявка на выдачу технических средств проходит четырёх согласующих последовательно, каждый по нескольку дней. Подопечный ждёт три недели, при этом отказов почти не бывает — согласование формально.',
+    desired_result: 'Срок сокращается до недели без потери контроля.',
+    moderator: 'lebedeva@social1.mos.ru', moderated: 11,
+    note: 'Проблема системная, встречается в нескольких учреждениях. Открываю обсуждение.',
+    reactions: [['smirnova@social1.mos.ru', 'useful'], ['kuznecov@social1.mos.ru', 'useful'],
+                ['orlova@social1.mos.ru', 'useful'], ['ivanova@social1.mos.ru', 'support'],
+                ['nikitina@social1.mos.ru', 'support'], ['larina@social1.mos.ru', 'join'],
+                ['petrov@social1.mos.ru', 'join']],
+    proposals: [
+      {
+        author: 'smirnova@social1.mos.ru', created: 10, kind: 'proposal', status: 'useful',
+        summary: 'Согласовывать параллельно, а не по цепочке: заявка уходит всем четверым сразу, решение считается принятым, если за три дня не поступило возражений.',
+        how_to_apply: 'Изменить порядок в регламенте учреждения и настроить рассылку заявки всем согласующим одновременно.',
+        expected_effect: 'Срок сокращается с трёх недель до трёх–пяти дней, контроль сохраняется.',
+        risks: 'Требуется изменение внутреннего регламента и согласие руководителя учреждения.',
+        needs_approval: 1,
+        endorsers: ['fedorov@social1.mos.ru', 'kuznecov@social1.mos.ru', 'ivanova@social1.mos.ru',
+                    'orlova@social1.mos.ru', 'nikitina@social1.mos.ru'],
+      },
+      {
+        author: 'kuznecov@social1.mos.ru', created: 9, kind: 'proposal', status: 'published',
+        summary: 'Установить предельный срок ответа для каждого согласующего — два рабочих дня, с автоматическим напоминанием.',
+        how_to_apply: 'Добавить контроль сроков в существующую систему документооборота.',
+        expected_effect: 'Дисциплина согласования повышается, крайние случаи видны руководителю.',
+        endorsers: ['fedorov@social1.mos.ru'],
+      },
+    ],
+    comments: [
+      ['fedorov@social1.mos.ru', 'Параллельное согласование выглядит реалистично. Обсудим с директором на ближайшей планёрке.', 8],
+    ],
+  },
+  {
+    author: 'nikitina@social1.mos.ru', created: 7, status: 'new',
+    category: 'Качество услуг', priority: 'normal', template: 'other',
+    title: 'Приёмные семьи не знают, к кому обращаться между визитами куратора',
+    problem: 'Между плановыми визитами куратора у приёмной семьи возникают вопросы, а к кому обратиться — непонятно. Звонят на общий номер учреждения, попадают не туда, часть вопросов остаётся без ответа.',
+    desired_result: 'У каждой семьи есть понятный канал связи с ответом в течение рабочего дня.',
+    reactions: [['ivanova@social1.mos.ru', 'useful'], ['larina@social1.mos.ru', 'support']],
+    proposals: [], comments: [],
+  },
+  {
+    author: 'orlova@social1.mos.ru', created: 5, status: 'new',
+    category: 'Доступная среда', priority: 'high', template: 'errors',
+    title: 'Пандус у входа обледеневает раньше, чем его успевают обработать',
+    problem: 'Утром пандус покрывается наледью, а обработка по графику начинается в девять. Первые посетители приходят к восьми. За зиму — два падения.',
+    desired_result: 'Пандус безопасен с момента открытия учреждения.',
+    reactions: [['kuznecov@social1.mos.ru', 'useful'], ['nikitina@social1.mos.ru', 'useful'],
+                ['smirnova@social1.mos.ru', 'support']],
+    proposals: [], comments: [],
+  },
+  {
+    author: 'petrov@social1.mos.ru', created: 21, status: 'rejected',
+    category: 'Цифровые сервисы', priority: 'low', template: 'other',
+    title: 'Сделать в системе кнопку «напечатать всё»',
+    problem: 'Приходится печатать документы по одному.',
+    desired_result: 'Печатать всё сразу.',
+    moderator: 'grigoriev@social1.mos.ru', moderated: 19,
+    note: 'Идея решается настройкой рабочего места: пакетная печать уже есть в меню «Файл — Печать пакета». Обратитесь в отдел сопровождения, вам покажут. Централизованный проект здесь не требуется.',
+    reactions: [], proposals: [], comments: [],
+  },
+];
+
+const ideaRows = [];
+IDEAS.forEach((spec, idx) => {
+  const author = U[spec.author];
+  const number = `IDEA-${new Date().getFullYear()}-${String(idx + 1).padStart(4, '0')}`;
+  const id = q.insert(`INSERT INTO ideas
+    (number, title, problem, desired_result, category, priority, template, author_id, institution_id,
+     status, moderation_note, moderated_by, moderated_at, created_at, updated_at, closed_at)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    number, spec.title, spec.problem, spec.desired_result, spec.category, spec.priority || 'normal',
+    spec.template || null, author.id, author.institution_id, spec.status,
+    spec.note || null, spec.moderator ? U[spec.moderator].id : null,
+    spec.moderated ? ts(spec.moderated) : null,
+    ts(spec.created), ts(Math.max(1, spec.moderated ?? spec.created)),
+    ['rejected', 'archived', 'done'].includes(spec.status) ? ts(Math.max(1, spec.created - 40)) : null);
+
+  for (const [email, kind] of spec.reactions || []) {
+    try {
+      q.run('INSERT INTO idea_reactions (idea_id, user_id, kind, created_at) VALUES (?,?,?,?)',
+        id, U[email].id, kind, ts(Math.max(1, spec.created - 2)));
+    } catch {}
+  }
+  for (const [email, body, days] of spec.comments || []) {
+    q.run('INSERT INTO idea_comments (idea_id, author_id, body, created_at) VALUES (?,?,?,?)',
+      id, U[email].id, body, ts(days));
+  }
+  ideaRows.push({ id, number, spec, author });
+});
+
+// Начисление очков через рабочие правила модуля — с теми же проверками,
+// что и при обычной работе: дубли, самооценка и предел по объекту.
+let ledgerCount = 0;
+const awardAt = (when, opts) => {
+  const r = awardPoints(opts);
+  if (!r.awarded) return r;
+  ledgerCount += 1;
+  q.run('UPDATE points_ledger SET created_at=? WHERE id=(SELECT MAX(id) FROM points_ledger)', ts(when));
+  return r;
+};
+
+for (const idea of ideaRows) {
+  const { spec } = idea;
+  if (['accepted', 'in_progress', 'done'].includes(spec.status)) {
+    awardAt(spec.moderated ?? spec.created, {
+      userId: idea.author.id, code: 'idea.approved', ideaId: idea.id,
+      reason: `Идея ${idea.number} принята к обсуждению`,
+      awardedBy: spec.moderator ? U[spec.moderator].id : null,
+    });
+  }
+
+  for (const p of spec.proposals || []) {
+    const pAuthor = U[p.author];
+    const pid = q.insert(`INSERT INTO proposals
+      (idea_id, author_id, summary, how_to_apply, expected_effect, risks, needs_approval, kind, status,
+       verified_by, verified_at, useful_marked_at, created_at, updated_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      idea.id, pAuthor.id, p.summary, p.how_to_apply || null, p.expected_effect || null,
+      p.risks || null, p.needs_approval || 0, p.kind, p.status,
+      p.verified_by ? U[p.verified_by].id : null, p.verified_by ? ts(p.created - 2) : null,
+      ['useful', 'implemented'].includes(p.status) ? ts(p.created - 3) : null,
+      ts(p.created), ts(Math.max(1, p.created - 3)));
+
+    if (p.accepted) q.run('UPDATE ideas SET accepted_proposal_id=? WHERE id=?', pid, idea.id);
+
+    awardAt(p.created, {
+      userId: pAuthor.id, code: 'proposal.created', ideaId: idea.id, proposalId: pid,
+      sourceUserId: idea.author.id, reason: `Предложено решение по идее ${idea.number}`,
+    });
+
+    for (const email of p.endorsers || []) {
+      if (U[email].id === pAuthor.id) continue;
+      try {
+        q.run('INSERT INTO proposal_endorsements (proposal_id, user_id, created_at) VALUES (?,?,?)',
+          pid, U[email].id, ts(Math.max(1, p.created - 4)));
+      } catch { continue; }
+      awardAt(Math.max(1, p.created - 4), {
+        userId: pAuthor.id, code: 'proposal.endorsed', ideaId: idea.id, proposalId: pid,
+        sourceUserId: U[email].id, reason: 'Решение поддержано коллегой',
+      });
+    }
+
+    if (['useful', 'implemented'].includes(p.status)) {
+      awardAt(Math.max(1, p.created - 3), {
+        userId: pAuthor.id, code: 'proposal.useful', ideaId: idea.id, proposalId: pid,
+        sourceUserId: idea.author.id, reason: `Решение признано полезным автором идеи ${idea.number}`,
+      });
+    }
+    if (p.status === 'verified' || (p.kind === 'experience' && p.status === 'implemented')) {
+      awardAt(Math.max(1, p.created - 2), {
+        userId: pAuthor.id, code: 'experience.verified', ideaId: idea.id, proposalId: pid,
+        sourceUserId: p.verified_by ? U[p.verified_by].id : U['lebedeva@social1.mos.ru'].id,
+        reason: `Проверенный опыт подтверждён (идея ${idea.number})`,
+      });
+    }
+    if (p.accepted) {
+      awardAt(Math.max(1, p.created - 5), {
+        userId: pAuthor.id, code: 'proposal.accepted', ideaId: idea.id, proposalId: pid,
+        sourceUserId: U['lebedeva@social1.mos.ru'].id, reason: `Предложение принято в работу (идея ${idea.number})`,
+      });
+    }
+    if (p.status === 'implemented') {
+      awardAt(Math.max(1, p.created - 6), {
+        userId: pAuthor.id, code: 'proposal.implemented', ideaId: idea.id, proposalId: pid,
+        sourceUserId: U['lebedeva@social1.mos.ru'].id, reason: `Предложение внедрено и дало эффект (идея ${idea.number})`,
+      });
+    }
+  }
+}
+
+// ── Быстрое ревью предложений ────────────────────────────────
+// Оценки коллег в режиме карточек: они формируют полезность предложения
+// и порядок в очереди модератора, но очков автору не начисляют.
+const REVIEWERS = Object.values(U).filter((u) => ['employee', 'head', 'expert', 'pilot_coordinator'].includes(u.role));
+const SKIP_REASON_CODES = ['unclear', 'costly', 'risky', 'duplicate', 'irrelevant', 'against_rules'];
+// Чем ближе предложение к внедрению, тем охотнее его отмечают полезным
+const LIKE_SHARE = { implemented: 0.92, verified: 0.85, useful: 0.72, published: 0.45, rejected: 0.2 };
+
+let reviewCount = 0;
+for (const p of q.all(`SELECT p.id, p.author_id, p.status, p.created_at, i.status AS idea_status
+                       FROM proposals p JOIN ideas i ON i.id = p.idea_id`)) {
+  if (!['review', 'accepted', 'in_progress'].includes(p.idea_status)) continue;
+  const share = LIKE_SHARE[p.status] ?? 0.5;
+  // Заметные предложения видит больше коллег
+  const audience = [...REVIEWERS].sort(() => Math.random() - 0.5)
+    .slice(0, Math.round(REVIEWERS.length * (0.45 + share * 0.5)));
+
+  for (const r of audience) {
+    if (r.id === p.author_id) continue;
+    const roll = Math.random();
+    const verdict = roll < share ? 'like' : roll < share + 0.12 ? 'favorite' : 'skip';
+    try {
+      q.run(`INSERT INTO proposal_reviews (proposal_id, user_id, verdict, reason, dwell_ms, device, created_at)
+             VALUES (?,?,?,?,?,?,?)`,
+        p.id, r.id, verdict,
+        verdict === 'skip' ? pick(SKIP_REASON_CODES) : null,
+        2000 + Math.floor(Math.random() * 9000),      // осмысленное время на карточке
+        `seed-${r.id}`, ts(Math.max(1, Math.floor(Math.random() * 20))));
+      reviewCount += 1;
+    } catch {}
+  }
+}
+console.log(`Оценок в ревью: ${reviewCount}`);
+
+// Обращение о нарушении — для демонстрации разбора модератором
+q.run(`INSERT INTO idea_reports (target_type, target_id, user_id, reason, created_at) VALUES ('idea',?,?,?,?)`,
+  ideaRows.at(-1).id, U['fedorov@social1.mos.ru'].id,
+  'Идея дублирует уже настроенную возможность системы, стоит объединить с описанием в базе знаний.', ts(17));
+
+// Часть начислений переносим в текущий календарный месяц: иначе рейтинг за месяц
+// оказывается пустым, если демонстрационные данные загружены в начале месяца.
+const daysThisMonth = Math.max(1, new Date().getDate() - 1);
+q.all('SELECT id FROM points_ledger ORDER BY created_at DESC LIMIT ?', Math.ceil(ledgerCount * 0.45))
+  .forEach((r, i) => q.run('UPDATE points_ledger SET created_at=? WHERE id=?', ts(i % daysThisMonth), r.id));
+
+for (const u of q.all("SELECT DISTINCT user_id FROM points_ledger WHERE status='approved'")) {
+  refreshBadges(u.user_id);
+}
+
+// Рекомендации к поощрению по итогам периода: система предлагает, решает руководитель
+const period = periodBounds('month');
+const totals = q.all(`
+  SELECT l.user_id, SUM(l.points) AS points, u.institution_id FROM points_ledger l
+  JOIN users u ON u.id = l.user_id
+  WHERE l.status='approved' GROUP BY l.user_id ORDER BY points DESC`);
+// Три лучших советчика экосистемы и лучший советчик учреждения, чей руководитель
+// открывает демонстрацию, — иначе раздел поощрений у него окажется пустым.
+const demoInstitution = U['volkov@social1.mos.ru'].institution_id;
+const leaders = totals.slice(0, 3);
+const local = totals.find((t) => t.institution_id === demoInstitution && !leaders.includes(t));
+if (local) leaders.push(local);
+
+const MEASURES = [
+  ['bonus', 'approved', 'Вклад подтверждён внедрённым решением. Направлено в отдел кадров для оформления.'],
+  ['extra_day_off', 'agreed', 'Согласовано с руководителем отделения, дата будет определена по графику.'],
+  ['head_gratitude', 'proposed', null],
+  ['advisor_of_month', 'proposed', null],
+];
+leaders.forEach((l, i) => {
+  const [code, status, note] = MEASURES[i] || MEASURES[2];
+  q.run(`INSERT INTO incentives
+    (user_id, type_code, period, period_label, points_at_creation, rank_at_creation, status, note,
+     decision_note, proposed_by, decided_by, decided_at, created_at, updated_at)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    l.user_id, code, 'month', period.label, l.points, i + 1, status,
+    `${l.points} очков за период, ${i + 1} место в рейтинге советчиков.`, note,
+    U['lebedeva@social1.mos.ru'].id,
+    status === 'proposed' ? null : U['volkov@social1.mos.ru'].id,
+    status === 'proposed' ? null : ts(3), ts(6), ts(status === 'proposed' ? 6 : 3));
+});
+
+// Уведомления модуля старше десяти дней помечаем прочитанными — иначе список
+// в демонстрации выглядит как непрочитанная лента начислений.
+q.run(`UPDATE notifications SET is_read=1
+       WHERE idea_id IS NOT NULL OR type IN ('points','badge','incentive_proposed')`);
+
+console.log(`Идей: ${ideaRows.length}, предложений: ${q.get('SELECT COUNT(*) AS c FROM proposals').c}, начислений: ${ledgerCount}`);
+
 // ── Задачи и уведомления по текущим ожидающим Gate ───────────
 for (const it of created.filter((c) => c.status === 'active')) {
   const cfg = stageConfig(it.stage);
@@ -679,6 +1105,11 @@ console.log(`
   Пилотов:       ${q.get('SELECT COUNT(*) AS c FROM pilots').c}
   Тем форума:    ${q.get('SELECT COUNT(*) AS c FROM forum_topics').c}
   Голосов:       ${q.get('SELECT COUNT(*) AS c FROM votes').c}
+  Идей:          ${q.get('SELECT COUNT(*) AS c FROM ideas').c}
+  Решений к ним: ${q.get('SELECT COUNT(*) AS c FROM proposals').c}
+  Оценок в ревью:${q.get('SELECT COUNT(*) AS c FROM proposal_reviews').c}
+  Очков:         ${q.get("SELECT COALESCE(SUM(points),0) AS s FROM points_ledger WHERE status='approved'").s}
+  Поощрений:     ${q.get('SELECT COUNT(*) AS c FROM incentives').c}
 
   Вход: любой e-mail из списка, пароль social1
   Например: director@social1.mos.ru (ДТСЗН), volkov@social1.mos.ru (руководитель),

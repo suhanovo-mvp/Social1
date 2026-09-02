@@ -3,7 +3,7 @@
 import { route, HttpError } from '../http.js';
 import { logAction } from '../audit.js';
 import { diagramPdf, albumPdf } from '../bpmn-pdf.js';
-import { DIAGRAMS } from '../../web/js/processes-data.js';
+import { DIAGRAMS, SCENARIOS } from '../../web/js/processes-data.js';
 
 const fileName = (s) => String(s)
   .replace(/[«»"]/g, '').replace(/[^\wА-Яа-яЁё0-9-]+/g, '_').replace(/_+/g, '_').slice(0, 80);
@@ -22,7 +22,7 @@ function sendPdf(res, buf, name) {
 // Перечень схем — для клиента и для проверки доступности выгрузки
 route.get('/api/processes', async ({ sendJson }) => {
   sendJson(200, DIAGRAMS.map((d, i) => ({
-    seq: i + 1, id: d.id, role: d.role, group: d.group,
+    seq: i + 1, id: d.id, role: d.role, scenario: d.scenario, group: d.group,
     title: d.title, sla: d.sla || null,
     nodes: d.nodes.length, steps: d.walkthrough?.length || 0,
   })));

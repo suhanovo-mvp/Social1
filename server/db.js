@@ -8,7 +8,11 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const DATA_DIR = join(ROOT, 'data');
 mkdirSync(DATA_DIR, { recursive: true });
 
-export const db = new DatabaseSync(join(DATA_DIR, 'social1.db'));
+// Путь к файлу БД переопределяется переменной окружения — этим пользуются тесты,
+// чтобы не трогать рабочую базу.
+export const DB_FILE = process.env.SOCIAL1_DB || join(DATA_DIR, 'social1.db');
+
+export const db = new DatabaseSync(DB_FILE);
 
 db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA foreign_keys = ON');
@@ -402,6 +406,262 @@ CREATE TABLE IF NOT EXISTS audit_log (
 );
 CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity, entity_id);
 `);
+
+// ─────────────────────────────────────────────────────────────
+// Модуль «Идеи и решения»
+// Быстрый вход в экосистему: сотрудник фиксирует проблему за минуту, коллеги
+// предлагают решения и делятся проверенным опытом, вклад советчиков измеряется
+// очками и превращается в рекомендации к поощрению. Идея, принятая в работу,
+// поднимается в инициативу и уходит в конвейер Stage-Gate.
+// ─────────────────────────────────────────────────────────────
+db.exec(`
+-- Идея: короткая запись о проблеме и желаемом результате
+CREATE TABLE IF NOT EXISTS ideas (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  number          TEXT NOT NULL UNIQUE,          -- IDEA-2026-0001
+  title           TEXT NOT NULL,
+  problem         TEXT NOT NULL,
+  desired_result  TEXT NOT NULL,
+  category        TEXT,
+  priority        TEXT NOT NULL DEFAULT 'normal', -- low | normal | high
+  template        TEXT,                           -- быстрый шаблон подачи
+  source_link     TEXT,                           -- место в системе, где возникает проблема
+  author_id       INTEGER NOT NULL REFERENCES users(id),
+  institution_id  INTEGER REFERENCES institutions(id),
+  -- new | review | accepted | rejected | in_progress | done | archived
+  status          TEXT NOT NULL DEFAULT 'new',
+  moderation_note TEXT,
+  moderated_by    INTEGER REFERENCES users(id),
+  moderated_at    TEXT,
+  duplicate_of_id INTEGER REFERENCES ideas(id) ON DELETE SET NULL,
+  initiative_id   INTEGER REFERENCES initiatives(id) ON DELETE SET NULL,
+  accepted_proposal_id INTEGER,                   -- предложение, принятое в работу
+  created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  closed_at       TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status, created_at);
+CREATE INDEX IF NOT EXISTS idx_ideas_author ON ideas(author_id);
+CREATE INDEX IF NOT EXISTS idx_ideas_category ON ideas(category);
+
+-- Черновик формы: сохраняется автоматически, по одному на пользователя
+CREATE TABLE IF NOT EXISTS idea_drafts (
+  user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  payload    TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Предложение решения или проверенный опыт
+CREATE TABLE IF NOT EXISTS proposals (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  idea_id         INTEGER NOT NULL REFERENCES ideas(id) ON DELETE CASCADE,
+  author_id       INTEGER NOT NULL REFERENCES users(id),
+  summary         TEXT NOT NULL,                  -- краткое описание решения
+  how_to_apply    TEXT,
+  expected_effect TEXT,
+  risks           TEXT,
+  needs_approval  INTEGER NOT NULL DEFAULT 0,     -- требуется одобрение руководителя
+  kind            TEXT NOT NULL DEFAULT 'proposal', -- proposal | experience
+  -- published | useful | verified | rejected | implemented
+  status          TEXT NOT NULL DEFAULT 'published',
+  verified_by     INTEGER REFERENCES users(id),
+  verified_at     TEXT,
+  useful_marked_at TEXT,
+  moderation_note TEXT,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_prop_idea ON proposals(idea_id, status);
+CREATE INDEX IF NOT EXISTS idx_prop_author ON proposals(author_id);
+
+-- Файлы и ссылки идей и предложений
+CREATE TABLE IF NOT EXISTS idea_attachments (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  idea_id     INTEGER REFERENCES ideas(id) ON DELETE CASCADE,
+  proposal_id INTEGER REFERENCES proposals(id) ON DELETE CASCADE,
+  filename    TEXT NOT NULL,
+  mime        TEXT,
+  size        INTEGER,
+  kind        TEXT NOT NULL DEFAULT 'link',       -- file | link
+  url         TEXT,
+  content     BLOB,
+  uploaded_by INTEGER NOT NULL REFERENCES users(id),
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_iatt_idea ON idea_attachments(idea_id);
+
+-- Быстрая поддержка идеи: «полезно», «поддерживаю», «готов участвовать»
+CREATE TABLE IF NOT EXISTS idea_reactions (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  idea_id    INTEGER NOT NULL REFERENCES ideas(id) ON DELETE CASCADE,
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  kind       TEXT NOT NULL,                       -- useful | support | join
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(idea_id, user_id, kind)
+);
+CREATE INDEX IF NOT EXISTS idx_ireact_idea ON idea_reactions(idea_id);
+
+-- Подтверждение предложения другими сотрудниками
+CREATE TABLE IF NOT EXISTS proposal_endorsements (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  proposal_id INTEGER NOT NULL REFERENCES proposals(id) ON DELETE CASCADE,
+  user_id     INTEGER NOT NULL REFERENCES users(id),
+  created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(proposal_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_pend_prop ON proposal_endorsements(proposal_id);
+
+-- Обсуждение идеи и отдельных предложений
+CREATE TABLE IF NOT EXISTS idea_comments (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  idea_id     INTEGER NOT NULL REFERENCES ideas(id) ON DELETE CASCADE,
+  proposal_id INTEGER REFERENCES proposals(id) ON DELETE CASCADE,
+  author_id   INTEGER NOT NULL REFERENCES users(id),
+  body        TEXT NOT NULL,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_icomm_idea ON idea_comments(idea_id);
+
+-- Правила начисления очков: администратор меняет их без изменения кода
+CREATE TABLE IF NOT EXISTS points_rules (
+  code         TEXT PRIMARY KEY,
+  title        TEXT NOT NULL,
+  points       INTEGER NOT NULL,
+  cap_per_target INTEGER,                         -- предел очков по одному объекту
+  description  TEXT,
+  is_active    INTEGER NOT NULL DEFAULT 1,
+  order_idx    INTEGER NOT NULL DEFAULT 0,
+  updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Журнал начислений: кто, когда, за что и сколько получил
+CREATE TABLE IF NOT EXISTS points_ledger (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id      INTEGER NOT NULL REFERENCES users(id),
+  rule_code    TEXT NOT NULL,
+  points       INTEGER NOT NULL,
+  idea_id      INTEGER REFERENCES ideas(id) ON DELETE CASCADE,
+  proposal_id  INTEGER REFERENCES proposals(id) ON DELETE CASCADE,
+  source_user_id INTEGER REFERENCES users(id),    -- кто своим действием вызвал начисление
+  reason       TEXT,
+  status       TEXT NOT NULL DEFAULT 'approved',  -- approved | revoked
+  awarded_by   INTEGER REFERENCES users(id),
+  created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+  revoked_at   TEXT,
+  revoked_by   INTEGER REFERENCES users(id),
+  revoke_reason TEXT,
+  -- Защита от повторного начисления за одно и то же действие. Собирается в коде:
+  -- в SQL значения NULL не равны друг другу, поэтому составной UNIQUE тут не работает.
+  dedup_key    TEXT NOT NULL UNIQUE
+);
+CREATE INDEX IF NOT EXISTS idx_ledger_user ON points_ledger(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_ledger_created ON points_ledger(created_at);
+
+-- Знаки отличия советчиков
+CREATE TABLE IF NOT EXISTS advisor_badges (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  code       TEXT NOT NULL,
+  title      TEXT NOT NULL,
+  granted_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, code)
+);
+
+-- Справочник допустимых мер поощрения (настраивается администратором)
+CREATE TABLE IF NOT EXISTS incentive_types (
+  code        TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  description TEXT,
+  category    TEXT NOT NULL DEFAULT 'recognition', -- time | recognition | development | material | social
+  legal_note  TEXT,
+  is_active   INTEGER NOT NULL DEFAULT 1,
+  order_idx   INTEGER NOT NULL DEFAULT 0
+);
+
+-- Рекомендация к поощрению: система предлагает, решение принимает руководитель
+CREATE TABLE IF NOT EXISTS incentives (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id      INTEGER NOT NULL REFERENCES users(id),
+  type_code    TEXT NOT NULL REFERENCES incentive_types(code),
+  period       TEXT NOT NULL,                     -- month | quarter | year
+  period_label TEXT NOT NULL,
+  points_at_creation INTEGER NOT NULL DEFAULT 0,
+  rank_at_creation   INTEGER,
+  -- proposed | agreed | approved | rejected | implemented
+  status       TEXT NOT NULL DEFAULT 'proposed',
+  note         TEXT,
+  decision_note TEXT,
+  proposed_by  INTEGER REFERENCES users(id),
+  decided_by   INTEGER REFERENCES users(id),
+  decided_at   TEXT,
+  created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_incent_user ON incentives(user_id, status);
+
+-- Жалобы на некорректные идеи и предложения
+CREATE TABLE IF NOT EXISTS idea_reports (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  target_type TEXT NOT NULL,                      -- idea | proposal
+  target_id   INTEGER NOT NULL,
+  user_id     INTEGER NOT NULL REFERENCES users(id),
+  reason      TEXT NOT NULL,
+  status      TEXT NOT NULL DEFAULT 'open',       -- open | resolved | dismissed
+  resolved_by INTEGER REFERENCES users(id),
+  resolved_at TEXT,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(target_type, target_id, user_id)
+);
+
+-- Быстрое ревью предложений: одна оценка одного человека по одному предложению.
+-- Лайк не начисляет очки автору — он влияет только на полезность и порядок показа,
+-- поэтому массовое пролистывание нельзя превратить в накрутку рейтинга.
+CREATE TABLE IF NOT EXISTS proposal_reviews (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  proposal_id INTEGER NOT NULL REFERENCES proposals(id) ON DELETE CASCADE,
+  user_id     INTEGER NOT NULL REFERENCES users(id),
+  verdict     TEXT NOT NULL,        -- like | skip | favorite
+  reason      TEXT,                 -- причина пропуска: unclear|costly|risky|duplicate|irrelevant|against_rules
+  dwell_ms    INTEGER,              -- сколько карточка была на экране — признак осмысленности оценки
+  device      TEXT,                 -- метка устройства для выявления оценок с одного устройства
+  created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(proposal_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_review_prop ON proposal_reviews(proposal_id, verdict);
+CREATE INDEX IF NOT EXISTS idx_review_user ON proposal_reviews(user_id, created_at);
+
+-- Сигналы антифрода: серийные быстрые оценки, превышение частоты, одно устройство
+CREATE TABLE IF NOT EXISTS review_flags (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id     INTEGER NOT NULL REFERENCES users(id),
+  kind        TEXT NOT NULL,        -- burst | rate_limit | shared_device
+  details     TEXT,
+  status      TEXT NOT NULL DEFAULT 'open',  -- open | reviewed | dismissed
+  resolved_by INTEGER REFERENCES users(id),
+  resolved_at TEXT,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_rflag_status ON review_flags(status, created_at);
+
+-- Настройки модуля: обязательность модерации, видимость рейтинга и прочее
+CREATE TABLE IF NOT EXISTS ideahub_settings (
+  key        TEXT PRIMARY KEY,
+  value      TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+`);
+
+// ─────────────────────────────────────────────────────────────
+// Миграции существующих баз
+// ─────────────────────────────────────────────────────────────
+function addColumn(table, column, ddl) {
+  const exists = db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === column);
+  if (!exists) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${ddl}`);
+}
+
+// Уведомления модуля привязываются к идее так же, как остальные — к инициативе
+addColumn('notifications', 'idea_id', 'INTEGER REFERENCES ideas(id) ON DELETE CASCADE');
+addColumn('tasks', 'idea_id', 'INTEGER REFERENCES ideas(id) ON DELETE CASCADE');
 
 // Защита журнала аудита от изменения и удаления на уровне БД
 db.exec(`

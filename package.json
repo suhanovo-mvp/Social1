@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node --no-warnings server/index.js",
     "seed": "node --no-warnings server/seed.js",
-    "reset": "node --no-warnings server/seed.js --reset"
+    "reset": "node --no-warnings server/seed.js --reset",
+    "test": "node --no-warnings --test \"tests/**/*.test.js\""
   }
 }
