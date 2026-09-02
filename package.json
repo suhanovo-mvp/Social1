@@ -1,0 +1,13 @@
+{
+  "name": "social1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Social1 — управленческая платформа системных инноваций ДТСЗН",
+  "type": "module",
+  "engines": { "node": ">=22.5.0" },
+  "scripts": {
+    "start": "node --no-warnings server/index.js",
+    "seed": "node --no-warnings server/seed.js",
+    "reset": "node --no-warnings server/seed.js --reset"
+  }
+}

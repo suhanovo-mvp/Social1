@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:54px 64px 0">
+    <div class="eyebrow">Измеримость</div>
+    <h2 style="margin-top:16px">Три группы показателей и приборная панель руководителя</h2>
+    <p class="lede" style="margin:16px 0 0;max-width:920px;font-size:19px">
+      Все КПЭ считаются из фактических данных системы, а не вводятся вручную.
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:28px">
+      <div style="border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#1b3a6b;color:#ffffff;padding:15px 20px;font-size:17px;font-weight:700">Вовлечённость и культура</div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px;font-size:15px;color:#4a5568;line-height:1.4">
+          <div>Зарегистрировано и внедрено инициатив</div>
+          <div>Доля сотрудников, подавших инициативу</div>
+          <div>Прохождение каждой точки решения</div>
+          <div>Участники пилотов</div>
+          <div>Масштабирование «снизу» — без директив</div>
+          <div>Валоризация: измеренный эффект внедрений</div>
+        </div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#24508f;color:#ffffff;padding:15px 20px;font-size:17px;font-weight:700">Скорость и эффективность</div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px;font-size:15px;color:#4a5568;line-height:1.4">
+          <div>Полный цикл «проблема → масштабирование»</div>
+          <div>Фактическое время каждого этапа</div>
+          <div>Соблюдение SLA по каждой точке решения</div>
+          <div>Коэффициент успешности пилотирования</div>
+          <div>Время до первого решения по инициативе</div>
+        </div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#2f66b5;color:#ffffff;padding:15px 20px;font-size:17px;font-weight:700">Качество и риски</div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:10px;font-size:15px;color:#4a5568;line-height:1.4">
+          <div>Решения Kill — сколько и на каком этапе</div>
+          <div>Решения Redirect и Hold</div>
+          <div>Риск «заморозки»: застряли дольше срока</div>
+          <div>Где именно останавливаются инициативы</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:14px 16px">
+        <div style="font-size:12.5px;color:#7c8798;margin-bottom:6px">Соблюдение SLA</div>
+        <div style="font-family:'PT Serif',Georgia,serif;font-size:28px;font-weight:700;color:#a8620a;line-height:1">62<span style="font-size:16px">%</span></div>
+        <div style="height:4px;background:#eef1f6;border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:62%;height:100%;background:#a8620a"></div></div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:14px 16px">
+        <div style="font-size:12.5px;color:#7c8798;margin-bottom:6px">Полный цикл, медиана</div>
+        <div style="font-family:'PT Serif',Georgia,serif;font-size:28px;font-weight:700;color:#1b3a6b;line-height:1">124<span style="font-size:16px"> дн.</span></div>
+        <div style="height:4px;background:#eef1f6;border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:70%;height:100%;background:#1b3a6b"></div></div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:14px 16px">
+        <div style="font-size:12.5px;color:#7c8798;margin-bottom:6px">Успешность пилотов</div>
+        <div style="font-family:'PT Serif',Georgia,serif;font-size:28px;font-weight:700;color:#1a7f52;line-height:1">50<span style="font-size:16px">%</span></div>
+        <div style="height:4px;background:#eef1f6;border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:50%;height:100%;background:#1a7f52"></div></div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:14px 16px">
+        <div style="font-size:12.5px;color:#7c8798;margin-bottom:6px">Риск «заморозки»</div>
+        <div style="font-family:'PT Serif',Georgia,serif;font-size:28px;font-weight:700;color:#b32b2b;line-height:1">25<span style="font-size:16px">%</span></div>
+        <div style="height:4px;background:#eef1f6;border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:25%;height:100%;background:#b32b2b"></div></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;font-size:14.5px;color:#7c8798;line-height:1.45">
+      Значения демонстрационные — показывают, какие показатели платформа считает сама, а не результаты Департамента.
+      Решения Kill среди них не негативный показатель: они означают, что отбор работает.
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">12</span></div>
+</div>
+</x-dc>
+</body>
+</html>

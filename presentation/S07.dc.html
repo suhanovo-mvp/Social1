@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:52px 64px 0">
+    <div class="eyebrow">Отбор решений</div>
+    <h2 style="margin-top:14px">Ворота 3, 4 и 5: от прототипа до тиражирования</h2>
+    <p class="lede" style="margin:14px 0 0;max-width:1000px;font-size:18px">
+      Дальше отбор идёт не по замыслу, а по доказательствам: работает ли решение,
+      подтвердился ли обещанный эффект, готова ли сеть учреждений его принять.
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:26px">
+      <div style="border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#2f66b5;padding:13px 20px">
+          <div style="font-size:16.5px;font-weight:700;color:#ffffff">Gate 3 — готовность прототипа</div>
+          <div style="font-size:13px;color:#cfe0f7;margin-top:3px">продакт-менеджер ДТСЗН · 4 спринта по 2 недели</div>
+        </div>
+        <div style="padding:16px 20px">
+          <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.09em;color:#7c8798;font-weight:700;margin-bottom:7px">КРИТЕРИИ</div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:14px;color:#4a5568;line-height:1.4;margin-bottom:14px">
+            <div>Достигнуты цели спринтов</div>
+            <div>Есть работающий MVP</div>
+            <div>Положительная обратная связь на демонстрациях</div>
+          </div>
+          <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.09em;color:#7c8798;font-weight:700;margin-bottom:7px">ДОКАЗАТЕЛЬСТВО</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Демонстрация будущим пользователям до пилота, а не после</div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#24508f;padding:13px 20px">
+          <div style="font-size:16.5px;font-weight:700;color:#ffffff">Gate 4 — результаты пилота</div>
+          <div style="font-size:13px;color:#cfe0f7;margin-top:3px">координатор пилотов · 1 месяц + 1 неделя анализа</div>
+        </div>
+        <div style="padding:16px 20px">
+          <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.09em;color:#7c8798;font-weight:700;margin-bottom:7px">КРИТЕРИИ</div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:14px;color:#4a5568;line-height:1.4;margin-bottom:14px">
+            <div>Заявленный эффект подтверждён фактическими данными</div>
+            <div>Высокая удовлетворённость пользователей</div>
+            <div>Нет критических технических и организационных проблем</div>
+            <div>Соблюдены требования к защите данных</div>
+          </div>
+          <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.09em;color:#7c8798;font-weight:700;margin-bottom:7px">ДОКАЗАТЕЛЬСТВО</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Показатели «до» и «после», опросы сотрудников и граждан</div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #12294c;border-radius:10px;overflow:hidden">
+        <div style="background:#12294c;padding:13px 20px">
+          <div style="font-size:16.5px;font-weight:700;color:#ffffff">Gate 5 — решение о тиражировании</div>
+          <div style="font-size:13px;color:#9dc4f5;margin-top:3px">ДТСЗН · начало в течение 2 недель</div>
+        </div>
+        <div style="padding:16px 20px">
+          <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.09em;color:#7c8798;font-weight:700;margin-bottom:7px">КРИТЕРИИ</div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:14px;color:#4a5568;line-height:1.4;margin-bottom:14px">
+            <div>Подтверждённый эффект пилота</div>
+            <div>Готовность других учреждений к внедрению</div>
+            <div>Наличие финансовых и кадровых ресурсов</div>
+          </div>
+          <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.09em;color:#7c8798;font-weight:700;margin-bottom:7px">ЕСЛИ KILL</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Решение остаётся в библиотеке практик для добровольного внедрения</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;background:#f9fafc;border-left:3px solid #b32b2b;padding:15px 22px;font-size:15px;color:#4a5568;line-height:1.5">
+      <b style="color:#141b28">Здесь отсеиваются решения, которые хорошо выглядели на бумаге.</b>
+      Именно поэтому эффект заявляется числом уже при подаче: на Gate 4 прогноз сравнивается с фактом.
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">7</span></div>
+</div>
+</x-dc>
+</body>
+</html>

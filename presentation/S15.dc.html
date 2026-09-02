@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl" style="background:#12294c;color:#ffffff">
+  <div style="position:absolute;right:-200px;bottom:-240px;width:600px;height:600px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+  <div style="padding:58px 64px 0;position:relative">
+    <div class="eyebrow" style="color:rgba(255,255,255,.5)">Решения</div>
+    <h2 style="margin-top:16px;color:#ffffff;max-width:900px">Что требуется от руководства Департамента</h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:42px">
+      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:22px 24px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="font-family:'PT Mono',monospace;font-size:15px;color:#9dc4f5;font-weight:700;padding-top:2px">01</div>
+          <div>
+            <div style="font-size:18px;font-weight:700;margin-bottom:8px">Утвердить пилотную группу</div>
+            <div style="font-size:15px;color:rgba(255,255,255,.72);line-height:1.5">Определить 3–5 учреждений, готовых работать по-новому, и закрепить их руководителей как участников процесса</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:22px 24px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="font-family:'PT Mono',monospace;font-size:15px;color:#9dc4f5;font-weight:700;padding-top:2px">02</div>
+          <div>
+            <div style="font-size:18px;font-weight:700;margin-bottom:8px">Назначить владельцев ролей</div>
+            <div style="font-size:15px;color:rgba(255,255,255,.72);line-height:1.5">Комитет экспертов, продакт-менеджер от Департамента, координатор пилотных площадок — без них конвейер не работает</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:22px 24px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="font-family:'PT Mono',monospace;font-size:15px;color:#9dc4f5;font-weight:700;padding-top:2px">03</div>
+          <div>
+            <div style="font-size:18px;font-weight:700;margin-bottom:8px">Закрепить сроки в регламенте</div>
+            <div style="font-size:15px;color:rgba(255,255,255,.72);line-height:1.5">Придать SLA нормативный статус: 3 рабочих дня руководителю, 5 — экспертам. Без этого сроки останутся рекомендацией</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:22px 24px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="font-family:'PT Mono',monospace;font-size:15px;color:#9dc4f5;font-weight:700;padding-top:2px">04</div>
+          <div>
+            <div style="font-size:18px;font-weight:700;margin-bottom:8px">Выделить ресурс на прототипы</div>
+            <div style="font-size:15px;color:rgba(255,255,255,.72);line-height:1.5">Мощность команды цифровой трансформации на 3–4 параллельных прототипа — иначе инициативы встанут после экспертизы</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <div style="font-family:'PT Serif',Georgia,serif;font-size:24px;font-weight:700;color:#ffffff">Каждая перспективная инициатива должна иметь понятный путь от идеи до внедрения</div>
+    </div>
+  </div>
+  <div style="position:absolute;left:64px;right:64px;bottom:30px;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:rgba(255,255,255,.4);border-top:1px solid rgba(255,255,255,.14);padding-top:12px">
+    <span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">15</span>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

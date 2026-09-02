@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:54px 64px 0">
+    <div class="eyebrow">Жизненный цикл</div>
+    <h2 style="margin-top:16px">Шесть стадий, пять точек принятия решений, срок на каждой</h2>
+    <p class="lede" style="margin:16px 0 0;max-width:940px;font-size:19px">
+      Модель «этап — ворота»: работы отделены от решений. На каждой точке уполномоченный участник
+      выбирает Go, Kill, Hold или Redirect — и обязан обосновать выбор.
+    </p>
+
+    <div style="display:flex;margin-top:36px;align-items:stretch">
+      <div style="flex:1;background:#f9fafc;border:1px solid #dfe4ed;border-right:none;border-radius:10px 0 0 10px;padding:16px 14px 16px 18px">
+        <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.08em;color:#7c8798;font-weight:700">ЭТАП 1</div>
+        <div style="font-size:16px;font-weight:700;margin-top:6px;line-height:1.25">Фиксация проблемы</div>
+        <div style="font-size:13px;color:#7c8798;margin-top:8px">без Gate</div>
+      </div>
+      <div style="flex:1;background:#f9fafc;border:1px solid #dfe4ed;border-right:none;padding:16px 14px">
+        <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.08em;color:#7c8798;font-weight:700">ЭТАП 2</div>
+        <div style="font-size:16px;font-weight:700;margin-top:6px;line-height:1.25">Оценка руководителем</div>
+        <div style="font-size:13px;color:#24508f;margin-top:8px;font-weight:700">Gate 1 · 3 раб. дня</div>
+      </div>
+      <div style="flex:1;background:#f9fafc;border:1px solid #dfe4ed;border-right:none;padding:16px 14px">
+        <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.08em;color:#7c8798;font-weight:700">ЭТАП 2</div>
+        <div style="font-size:16px;font-weight:700;margin-top:6px;line-height:1.25">Экспертиза ДТСЗН</div>
+        <div style="font-size:13px;color:#24508f;margin-top:8px;font-weight:700">Gate 2 · 5 раб. дней</div>
+      </div>
+      <div style="flex:1;background:#f9fafc;border:1px solid #dfe4ed;border-right:none;padding:16px 14px">
+        <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.08em;color:#7c8798;font-weight:700">ЭТАП 3</div>
+        <div style="font-size:16px;font-weight:700;margin-top:6px;line-height:1.25">Разработка прототипа</div>
+        <div style="font-size:13px;color:#24508f;margin-top:8px;font-weight:700">Gate 3 · 4 спринта</div>
+      </div>
+      <div style="flex:1;background:#f9fafc;border:1px solid #dfe4ed;border-right:none;padding:16px 14px">
+        <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.08em;color:#7c8798;font-weight:700">ЭТАП 4</div>
+        <div style="font-size:16px;font-weight:700;margin-top:6px;line-height:1.25">Пилотирование</div>
+        <div style="font-size:13px;color:#24508f;margin-top:8px;font-weight:700">Gate 4 · 1 месяц</div>
+      </div>
+      <div style="flex:1;background:#12294c;border:1px solid #12294c;border-radius:0 10px 10px 0;padding:16px 18px 16px 14px">
+        <div style="font-family:'PT Mono',monospace;font-size:11px;letter-spacing:.08em;color:rgba(255,255,255,.55);font-weight:700">ЭТАП 5</div>
+        <div style="font-size:16px;font-weight:700;margin-top:6px;line-height:1.25;color:#ffffff">Масштабирование</div>
+        <div style="font-size:13px;color:#9dc4f5;margin-top:8px;font-weight:700">Gate 5 · 2 недели</div>
+      </div>
+    </div>
+
+    <div style="margin-top:34px;border:1px solid #dfe4ed;border-radius:10px;padding:22px 26px">
+      <div style="font-family:'PT Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#7c8798;font-weight:700;margin-bottom:16px">УСТРОЙСТВО ЛЮБЫХ ВОРОТ</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px">
+        <div>
+          <div style="font-size:15.5px;font-weight:700;margin-bottom:6px">Триггер</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Что запускает рассмотрение и в какой момент начинается отсчёт</div>
+        </div>
+        <div>
+          <div style="font-size:15.5px;font-weight:700;margin-bottom:6px">Ответственный</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Одна роль, а не коллегиальное «мы подумаем»</div>
+        </div>
+        <div>
+          <div style="font-size:15.5px;font-weight:700;margin-bottom:6px">Критерии</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Заданы заранее, оцениваются по каждому отдельно</div>
+        </div>
+        <div>
+          <div style="font-size:15.5px;font-weight:700;margin-bottom:6px">Срок</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Контролируется системой, просрочка эскалируется</div>
+        </div>
+        <div>
+          <div style="font-size:15.5px;font-weight:700;margin-bottom:6px">Решение</div>
+          <div style="font-size:14px;color:#4a5568;line-height:1.45">Из заданного перечня, с обязательным обоснованием</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;font-size:15.5px;color:#4a5568;line-height:1.5">
+      Дальше — что именно оценивается на каждых воротах и какими доказательствами это подтверждается.
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">5</span></div>
+</div>
+</x-dc>
+</body>
+</html>

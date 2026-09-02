@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:58px 64px 0">
+    <div class="eyebrow">Проблема</div>
+    <h2 style="margin-top:16px;max-width:900px">Сотрудник видит проблему первым. Изменение приходит последним</h2>
+    <p class="lede" style="margin:20px 0 0;max-width:880px">
+      Именно сотрудник учреждения ежедневно работает с гражданами, регламентами и социальными
+      технологиями — и первым сталкивается с избыточной операцией или новой потребностью.
+      Но путь от увиденной проблемы до изменения регламента или сервиса сегодня не управляем.
+    </p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:44px">
+      <div style="border:1px solid #dfe4ed;border-radius:10px;padding:24px 26px;background:#f9fafc">
+        <div style="font-family:'PT Mono',monospace;font-size:13px;letter-spacing:.1em;color:#b32b2b;font-weight:700;margin-bottom:16px">КАК СЕЙЧАС</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:17px;color:#4a5568;line-height:1.45">
+          <div style="display:flex;gap:12px"><span style="color:#b32b2b;font-weight:700">·</span><span>Инициатива уходит «наверх» и теряется из виду</span></div>
+          <div style="display:flex;gap:12px"><span style="color:#b32b2b;font-weight:700">·</span><span>Нет сроков — решение может не приниматься месяцами</span></div>
+          <div style="display:flex;gap:12px"><span style="color:#b32b2b;font-weight:700">·</span><span>Отказ приходит без объяснения — мотивация падает</span></div>
+          <div style="display:flex;gap:12px"><span style="color:#b32b2b;font-weight:700">·</span><span>Эффект не измеряется, опыт не накапливается</span></div>
+        </div>
+      </div>
+      <div style="border:1px solid #24508f;border-radius:10px;padding:24px 26px;background:#eff5fd">
+        <div style="font-family:'PT Mono',monospace;font-size:13px;letter-spacing:.1em;color:#1a7f52;font-weight:700;margin-bottom:16px">КАК В SOCIAL1</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:17px;color:#24508f;line-height:1.45">
+          <div style="display:flex;gap:12px"><span style="color:#1a7f52;font-weight:700">·</span><span>Каждая инициатива имеет номер, этап и ответственного</span></div>
+          <div style="display:flex;gap:12px"><span style="color:#1a7f52;font-weight:700">·</span><span>На каждом шаге — срок, который контролирует система</span></div>
+          <div style="display:flex;gap:12px"><span style="color:#1a7f52;font-weight:700">·</span><span>Любое решение сопровождается обоснованием</span></div>
+          <div style="display:flex;gap:12px"><span style="color:#1a7f52;font-weight:700">·</span><span>Эффект проверяется на пилоте до тиражирования</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">2</span></div>
+</div>
+</x-dc>
+</body>
+</html>

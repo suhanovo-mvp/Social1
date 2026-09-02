@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:54px 64px 0">
+    <div class="eyebrow">Состояние</div>
+    <h2 style="margin-top:16px">Платформа построена и работает</h2>
+    <p class="lede" style="margin:16px 0 0;max-width:900px;font-size:19px">
+      Реализованы все функциональные модули технического задания. Портал запускается
+      одной командой, работает офлайн и не требует внешних сервисов.
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:38px">
+      <div style="background:#f9fafc;border-radius:9px;padding:20px 22px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:9px">Управление инициативами</div>
+        <div style="font-size:15px;color:#4a5568;line-height:1.5">Простая форма подачи, номер, полная карточка жизненного цикла, поиск и фильтры</div>
+      </div>
+      <div style="background:#f9fafc;border-radius:9px;padding:20px 22px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:9px">Движок процессов</div>
+        <div style="font-size:15px;color:#4a5568;line-height:1.5">Автоматическая маршрутизация, задачи в кабинетах, таймеры SLA и эскалация</div>
+      </div>
+      <div style="background:#f9fafc;border-radius:9px;padding:20px 22px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:9px">Доска идей</div>
+        <div style="font-size:15px;color:#4a5568;line-height:1.5">Витрина инициатив с голосованием: поддержка коллег как сигнал приоритета</div>
+      </div>
+      <div style="background:#f9fafc;border-radius:9px;padding:20px 22px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:9px">Разработка и пилоты</div>
+        <div style="font-size:15px;color:#4a5568;line-height:1.5">Agile-доски и спринты, заявки площадок, KPI пилота, опросы участников</div>
+      </div>
+      <div style="background:#f9fafc;border-radius:9px;padding:20px 22px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:9px">Аналитика и КПЭ</div>
+        <div style="font-size:15px;color:#4a5568;line-height:1.5">Три группы показателей, воронка, сравнение учреждений, выгрузка отчётов</div>
+      </div>
+      <div style="background:#f9fafc;border-radius:9px;padding:20px 22px">
+        <div style="font-size:17px;font-weight:700;margin-bottom:9px">Сообщество и обучение</div>
+        <div style="font-size:15px;color:#4a5568;line-height:1.5">Форум, библиотека практик, схемы процессов, встроенное обучение по ролям</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:52px;margin-top:38px;align-items:flex-end">
+      <div><div style="font-family:'PT Serif',Georgia,serif;font-size:38px;font-weight:700;color:#1b3a6b">14</div><div style="font-size:14px;color:#7c8798;margin-top:2px">схем процессов BPMN</div></div>
+      <div><div style="font-family:'PT Serif',Georgia,serif;font-size:38px;font-weight:700;color:#1b3a6b">6</div><div style="font-size:14px;color:#7c8798;margin-top:2px">сценариев обучения</div></div>
+      <div><div style="font-family:'PT Serif',Georgia,serif;font-size:38px;font-weight:700;color:#1b3a6b">7</div><div style="font-size:14px;color:#7c8798;margin-top:2px">ролей с разграничением прав</div></div>
+      <div><div style="font-family:'PT Serif',Georgia,serif;font-size:38px;font-weight:700;color:#1b3a6b">0</div><div style="font-size:14px;color:#7c8798;margin-top:2px">внешних зависимостей</div></div>
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">11</span></div>
+</div>
+</x-dc>
+</body>
+</html>

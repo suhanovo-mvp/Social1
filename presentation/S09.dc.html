@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:54px 64px 0">
+    <div class="eyebrow">Честность отбора</div>
+    <h2 style="margin-top:16px">Четыре правила, которые не дают отбору стать формальностью</h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:38px">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="border:1px solid #dfe4ed;border-radius:10px;padding:20px 22px">
+          <div style="font-size:18px;font-weight:700;margin-bottom:9px">Решение без обоснования не принимается</div>
+          <div style="font-size:15.5px;color:#4a5568;line-height:1.5">
+            Система отклоняет решение на воротах без аргументации. Автор всегда узнаёт,
+            почему получил именно такой ответ, а не остаётся без объяснения.
+          </div>
+        </div>
+        <div style="border:1px solid #dfe4ed;border-radius:10px;padding:20px 22px">
+          <div style="font-size:18px;font-weight:700;margin-bottom:9px">Оценка идёт по заданным критериям</div>
+          <div style="font-size:15.5px;color:#4a5568;line-height:1.5">
+            Перечень критериев для каждых ворот определён заранее. Оценка ставится по каждому
+            отдельно и сохраняется в карточке — решение нельзя свести к «не подходит».
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="border:1px solid #dfe4ed;border-radius:10px;padding:20px 22px">
+          <div style="font-size:18px;font-weight:700;margin-bottom:9px">Срок нельзя проигнорировать</div>
+          <div style="font-size:15.5px;color:#4a5568;line-height:1.5">
+            Отсчёт идёт в рабочих днях и виден всем участникам. Просроченная задача
+            автоматически эскалируется координатору экосистемы — без чьего-либо напоминания.
+          </div>
+        </div>
+        <div style="border:1px solid #dfe4ed;border-radius:10px;padding:20px 22px">
+          <div style="font-size:18px;font-weight:700;margin-bottom:9px">Журнал действий неизменяем</div>
+          <div style="font-size:15.5px;color:#4a5568;line-height:1.5">
+            Записи связаны криптографической цепочкой: изменение или удаление задним числом
+            ломает цепочку и выявляется проверкой целостности.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:30px;background:#12294c;border-radius:10px;padding:22px 28px;display:flex;align-items:center;gap:26px;flex-wrap:wrap">
+      <div style="font-size:16px;color:rgba(255,255,255,.75);line-height:1.5;flex:1;min-width:400px">
+        Настройка процесса — без участия разработчиков: сроки, критерии, ответственные роли
+        и перечень допустимых решений меняются в интерфейсе и вступают в силу немедленно.
+      </div>
+      <div style="font-family:'PT Mono',monospace;font-size:13px;color:#9dc4f5;letter-spacing:.08em">АДАПТИВНОСТЬ ПРОЦЕССА</div>
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">9</span></div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:52px 64px 0">
+    <div class="eyebrow">Отбор идей</div>
+    <h2 style="margin-top:14px">Ворота 1 и 2: от «есть идея» до «беремся разрабатывать»</h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:28px">
+      <div style="border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#1b3a6b;padding:14px 22px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:18px;font-weight:700;color:#ffffff">Gate 1 — руководитель учреждения</span>
+          <span style="font-size:14px;color:#9dc4f5;font-weight:700">3 рабочих дня</span>
+        </div>
+        <div style="padding:18px 22px">
+          <div style="font-family:'PT Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#7c8798;font-weight:700;margin-bottom:8px">ЧТО ОЦЕНИВАЕТ</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:15px;color:#4a5568;line-height:1.4;margin-bottom:16px">
+            <div>Соответствие внутренним политикам и регламентам</div>
+            <div>Наличие потенциала для локального улучшения</div>
+            <div>Реалистичность в рамках бюджетных ограничений</div>
+          </div>
+          <div style="font-family:'PT Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#7c8798;font-weight:700;margin-bottom:8px">НА ЧЁМ ОСНОВАНО РЕШЕНИЕ</div>
+          <div style="font-size:15px;color:#4a5568;line-height:1.45;margin-bottom:16px">
+            Описание проблемы с фактическими данными автора, количественная оценка эффекта,
+            поддержка коллег на доске идей, подсказка о похожих инициативах
+          </div>
+          <div style="font-family:'PT Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#7c8798;font-weight:700;margin-bottom:8px">ВОЗМОЖНЫЕ РЕШЕНИЯ</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            <span style="background:#e3f5ec;color:#1a7f52;font-size:13px;font-weight:700;padding:4px 11px;border-radius:100px">Go</span>
+            <span style="background:#fbe7e7;color:#b32b2b;font-size:13px;font-weight:700;padding:4px 11px;border-radius:100px">Kill</span>
+            <span style="background:#fdf0dd;color:#a8620a;font-size:13px;font-weight:700;padding:4px 11px;border-radius:100px">Hold</span>
+            <span style="background:#f0e9f9;color:#6b3fa0;font-size:13px;font-weight:700;padding:4px 11px;border-radius:100px">Redirect</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#24508f;padding:14px 22px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:18px;font-weight:700;color:#ffffff">Gate 2 — комитет экспертов ДТСЗН</span>
+          <span style="font-size:14px;color:#9dc4f5;font-weight:700">5 рабочих дней</span>
+        </div>
+        <div style="padding:18px 22px">
+          <div style="font-family:'PT Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#7c8798;font-weight:700;margin-bottom:8px">ЧТО ОЦЕНИВАЕТ</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:15px;color:#4a5568;line-height:1.4;margin-bottom:16px">
+            <div>Стратегическая совместимость с целями Департамента</div>
+            <div>Потенциал масштабирования на другие учреждения</div>
+            <div>Ожидаемый эффект и его измеримость</div>
+            <div>Техническая осуществимость на уровне идеи</div>
+          </div>
+          <div style="font-family:'PT Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#7c8798;font-weight:700;margin-bottom:8px">НА ЧЁМ ОСНОВАНО РЕШЕНИЕ</div>
+          <div style="font-size:15px;color:#4a5568;line-height:1.45;margin-bottom:16px">
+            Решение и обоснование руководителя, оценка похожих инициатив в системе,
+            заключение команды цифровой трансформации о выполнимости
+          </div>
+          <div style="font-family:'PT Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:#7c8798;font-weight:700;margin-bottom:8px">ЧТО ФИКСИРУЕТСЯ ПРИ GO</div>
+          <div style="font-size:15px;color:#24508f;line-height:1.45;font-weight:700">
+            Показатели, по которым позже будет оцениваться пилот
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;background:#eff5fd;border-radius:9px;padding:15px 22px;font-size:15px;color:#24508f;line-height:1.5">
+      <b>Оценка ведётся по каждому критерию отдельно, баллами.</b> Оценки сохраняются в карточке инициативы
+      вместе с обоснованием — решение нельзя свести к «не подходит».
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">6</span></div>
+</div>
+</x-dc>
+</body>
+</html>

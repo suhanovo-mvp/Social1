@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:54px 64px 0">
+    <div class="eyebrow">Внедрение</div>
+    <h2 style="margin-top:16px">Поэтапно: сначала несколько учреждений, потом сеть</h2>
+    <p class="lede" style="margin:16px 0 0;max-width:940px;font-size:19px">
+      Внедрение — прежде всего организационный проект. Технология готова; предмет работы —
+      изменение практики руководителей и сотрудников.
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:38px;align-items:stretch">
+      <div style="border-top:4px solid #1b3a6b;padding-top:18px">
+        <div style="font-family:'PT Mono',monospace;font-size:13px;color:#1b3a6b;font-weight:700;letter-spacing:.08em;margin-bottom:10px">ЭТАП 1</div>
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:9px">Пилотная группа</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">3–5 мотивированных учреждений. Отрабатываются не только платформа, но и процессы, коммуникация, мотивация</div>
+      </div>
+      <div style="border-top:4px solid #24508f;padding-top:18px">
+        <div style="font-family:'PT Mono',monospace;font-size:13px;color:#24508f;font-weight:700;letter-spacing:.08em;margin-bottom:10px">ЭТАП 2</div>
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:9px">Коммуникация</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Объяснить суть и пользу, снять опасение «ещё одна форма отчётности». Сообщение идёт от руководства Департамента</div>
+      </div>
+      <div style="border-top:4px solid #2f66b5;padding-top:18px">
+        <div style="font-family:'PT Mono',monospace;font-size:13px;color:#2f66b5;font-weight:700;letter-spacing:.08em;margin-bottom:10px">ЭТАП 3</div>
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:9px">Обучение</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Сотрудникам — как формулировать инициативу, руководителям — как принимать решения, экспертам — как оценивать быстро</div>
+      </div>
+      <div style="border-top:4px solid #3d80d8;padding-top:18px">
+        <div style="font-family:'PT Mono',monospace;font-size:13px;color:#3d80d8;font-weight:700;letter-spacing:.08em;margin-bottom:10px">ЭТАП 4</div>
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:9px">Итеративный запуск</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Расширение волнами, с обратной связью и корректировкой процесса после каждой волны</div>
+      </div>
+      <div style="border-top:4px solid #1a7f52;padding-top:18px">
+        <div style="font-family:'PT Mono',monospace;font-size:13px;color:#1a7f52;font-weight:700;letter-spacing:.08em;margin-bottom:10px">ЭТАП 5</div>
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:9px">Рынок практик</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Внедрённые решения собираются в библиотеку и распространяются между учреждениями по их инициативе</div>
+      </div>
+    </div>
+
+    <div style="margin-top:38px;background:#f9fafc;border-left:3px solid #1b3a6b;padding:18px 24px;font-size:16px;color:#4a5568;line-height:1.5">
+      Сроки этапов определяются после утверждения состава пилотной группы — <b style="color:#141b28">[уточнить на защите]</b>.
+      Обучение и методические материалы для всех ролей уже встроены в платформу.
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">14</span></div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,686 @@
+// Наполнение платформы демонстрационными данными: учреждения, участники,
+// инициативы на всех стадиях жизненного цикла с реальной историей решений.
+import { q, tx, db } from './db.js';
+import { hashPassword } from './auth.js';
+import { ensureWorkflow, stageConfig, dueDate, grantAward, LAST_STAGE } from './workflow.js';
+import { logAction } from './audit.js';
+import { classify } from './ai.js';
+
+const RESET = process.argv.includes('--reset');
+const NOW = Date.now();
+const ts = (daysAgo, hour = 10) => {
+  const d = new Date(NOW - daysAgo * 864e5);
+  d.setHours(hour, Math.floor(Math.random() * 55), 0, 0);
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+};
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+if (RESET) {
+  // Журнал аудита неизменяем и ссылается на пользователей — на время очистки
+  // отключаем проверку внешних ключей, сам журнал при этом сохраняется.
+  db.exec('PRAGMA foreign_keys = OFF');
+  for (const t of ['survey_answers','survey_responses','survey_questions','surveys','pilot_kpis','pilots',
+    'pilot_applications','board_items','sprints','documents','projects','forum_posts','forum_topics',
+    'best_practices','rollouts','awards','comments','attachments','gate_decisions','stage_transitions',
+    'notifications','tasks','initiatives','sessions','users','institutions','workflow_config']) {
+    try { db.exec(`DELETE FROM ${t}`); } catch {}
+  }
+  try { db.exec("DELETE FROM sqlite_sequence WHERE name != 'audit_log'"); } catch {}
+  db.exec('PRAGMA foreign_keys = ON');
+  console.log('Данные очищены (журнал аудита сохранён — он неизменяем).');
+}
+
+ensureWorkflow();
+if (q.get('SELECT COUNT(*) AS c FROM users').c > 0 && !RESET) {
+  console.log('Данные уже загружены. Для пересоздания: npm run reset');
+  process.exit(0);
+}
+
+// ── Учреждения ───────────────────────────────────────────────
+const INSTITUTIONS = [
+  ['Департамент труда и социальной защиты населения города Москвы', 'ДТСЗН', 'dtszn', 'Центральный', 340, 0],
+  ['Территориальный центр социального обслуживания «Ярославский»', 'ТЦСО «Ярославский»', 'institution', 'СВАО', 285, 1],
+  ['Территориальный центр социального обслуживания «Бибирево»', 'ТЦСО «Бибирево»', 'institution', 'СВАО', 240, 1],
+  ['Центр социальной помощи семье и детям «Гармония»', 'ЦСПСиД «Гармония»', 'institution', 'ЮВАО', 130, 1],
+  ['Центр содействия семейному воспитанию «Кунцевский»', 'ЦССВ «Кунцевский»', 'institution', 'ЗАО', 165, 0],
+  ['Психоневрологический интернат № 11', 'ПНИ № 11', 'institution', 'ЮАО', 310, 0],
+  ['Реабилитационный центр для инвалидов «Преодоление»', 'РЦ «Преодоление»', 'institution', 'САО', 145, 1],
+  ['Центр социальной адаптации имени Е. П. Глинки', 'ЦСА «Люблино»', 'institution', 'ЮВАО', 190, 0],
+  ['Государственное бюджетное учреждение «Моя карьера»', 'ГБУ «Моя карьера»', 'institution', 'ЦАО', 95, 1],
+  ['Ресурсный центр по поддержке семьи «Отрадное»', 'РЦ «Отрадное»', 'institution', 'СВАО', 110, 0],
+  ['ООО «Цифровые социальные технологии»', 'ЦСТ', 'vendor', '—', 0, 0],
+  ['АНО «Лаборатория доступной среды»', 'ЛДС', 'vendor', '—', 0, 0],
+];
+const inst = {};
+for (const [name, short, kind, district, staff, pilot] of INSTITUTIONS) {
+  const id = q.insert(`INSERT INTO institutions (name, short_name, kind, district, staff_count, is_pilot_site)
+                       VALUES (?,?,?,?,?,?)`, name, short, kind, district, staff, pilot);
+  inst[short] = id;
+}
+
+// ── Участники ────────────────────────────────────────────────
+const USERS = [
+  // email, ФИО, роль, учреждение, должность, экспертиза
+  ['smirnova@social1.mos.ru', 'Смирнова Анна Викторовна', 'employee', 'ТЦСО «Ярославский»', 'Социальный работник', 'Надомное обслуживание'],
+  ['petrov@social1.mos.ru', 'Петров Игорь Сергеевич', 'employee', 'ТЦСО «Ярославский»', 'Специалист по социальной работе', 'Приём заявлений'],
+  ['ivanova@social1.mos.ru', 'Иванова Мария Дмитриевна', 'employee', 'ЦСПСиД «Гармония»', 'Психолог', 'Работа с семьями'],
+  ['kuznecov@social1.mos.ru', 'Кузнецов Павел Андреевич', 'employee', 'ПНИ № 11', 'Специалист по реабилитации', 'Абилитация'],
+  ['orlova@social1.mos.ru', 'Орлова Екатерина Павловна', 'employee', 'РЦ «Преодоление»', 'Инструктор-методист', 'Доступная среда'],
+  ['fedorov@social1.mos.ru', 'Фёдоров Дмитрий Олегович', 'employee', 'ТЦСО «Бибирево»', 'Специалист по социальной работе', 'Меры поддержки'],
+  ['nikitina@social1.mos.ru', 'Никитина Ольга Романовна', 'employee', 'ЦССВ «Кунцевский»', 'Воспитатель', 'Семейное устройство'],
+  ['larina@social1.mos.ru', 'Ларина Светлана Игоревна', 'employee', 'ГБУ «Моя карьера»', 'Карьерный консультант', 'Трудоустройство'],
+
+  ['volkov@social1.mos.ru', 'Волков Сергей Николаевич', 'head', 'ТЦСО «Ярославский»', 'Директор', null],
+  ['sokolova@social1.mos.ru', 'Соколова Ирина Львовна', 'head', 'ЦСПСиД «Гармония»', 'Директор', null],
+  ['morozov@social1.mos.ru', 'Морозов Артём Викторович', 'head', 'ПНИ № 11', 'Директор', null],
+  ['belova@social1.mos.ru', 'Белова Наталья Юрьевна', 'head', 'ТЦСО «Бибирево»', 'Директор', null],
+  ['gusev@social1.mos.ru', 'Гусев Роман Аркадьевич', 'head', 'РЦ «Преодоление»', 'Директор', null],
+  ['pavlova@social1.mos.ru', 'Павлова Елена Сергеевна', 'head', 'ЦССВ «Кунцевский»', 'Директор', null],
+  ['zaharov@social1.mos.ru', 'Захаров Михаил Ильич', 'head', 'ГБУ «Моя карьера»', 'Директор', null],
+
+  ['lebedeva@social1.mos.ru', 'Лебедева Татьяна Анатольевна', 'expert', 'ДТСЗН', 'Начальник управления развития', 'Стратегия, методология соцуслуг'],
+  ['grigoriev@social1.mos.ru', 'Григорьев Антон Юрьевич', 'expert', 'ДТСЗН', 'Главный аналитик', 'Оценка эффектов, КПЭ'],
+  ['romanova@social1.mos.ru', 'Романова Вера Константиновна', 'expert', 'ДТСЗН', 'Эксперт по социальным технологиям', 'Реабилитация, доступная среда'],
+
+  ['tihonov@social1.mos.ru', 'Тихонов Алексей Валерьевич', 'developer', 'ДТСЗН', 'Руководитель команды цифровой трансформации', 'Архитектура, интеграции'],
+  ['makarova@social1.mos.ru', 'Макарова Юлия Денисовна', 'developer', 'ДТСЗН', 'Продакт-менеджер', 'Продуктовая аналитика'],
+  ['sorokin@social1.mos.ru', 'Сорокин Кирилл Максимович', 'developer', 'ЦСТ', 'Ведущий разработчик', 'Backend, мобильные решения'],
+
+  ['ershova@social1.mos.ru', 'Ершова Полина Андреевна', 'pilot_coordinator', 'ДТСЗН', 'Координатор пилотных площадок', 'Организация пилотов'],
+  ['danilov@social1.mos.ru', 'Данилов Егор Петрович', 'pilot_coordinator', 'ДТСЗН', 'Специалист по внедрению', 'Обучение и сопровождение'],
+
+  ['vendor@cst.ru', 'Абрамов Виктор Тимурович', 'supplier', 'ЦСТ', 'Руководитель проектов', 'Платформенные решения'],
+  ['lab@lds.ru', 'Королёва Дарья Максимовна', 'supplier', 'ЛДС', 'Эксперт по доступной среде', 'ТСР, адаптация помещений'],
+
+  ['director@social1.mos.ru', 'Ковалёв Андрей Витальевич', 'dtszn', 'ДТСЗН', 'Заместитель руководителя Департамента', 'Портфель инициатив'],
+  ['coordinator@social1.mos.ru', 'Жукова Алиса Германовна', 'dtszn', 'ДТСЗН', 'Координатор экосистемы Social1', 'Управление экосистемой'],
+];
+
+const U = {};
+for (const [email, name, role, institution, position, expertise] of USERS) {
+  const { hash, salt } = hashPassword('social1');
+  const id = q.insert(`INSERT INTO users (email, full_name, password_hash, password_salt, role, institution_id, position, expertise, created_at)
+                       VALUES (?,?,?,?,?,?,?,?,?)`,
+    email, name, hash, salt, role, inst[institution], position, expertise, ts(200));
+  U[email] = { id, role, institution_id: inst[institution], full_name: name };
+}
+const byRole = (r, n = 0) => Object.values(U).filter((u) => u.role === r)[n];
+
+// ── Инициативы ───────────────────────────────────────────────
+// history: последовательность решений на Gate; итоговый этап рассчитывается автоматически
+const INITIATIVES = [
+  {
+    author: 'smirnova@social1.mos.ru', created: 148,
+    title: 'Мобильное приложение социального работника для надомного обслуживания',
+    problem: 'Социальный работник при надомном обслуживании ведёт бумажный журнал посещений: отмечает время прихода, перечень оказанных услуг, подпись получателя. Вечером он возвращается в центр и вручную переносит записи в информационную систему. На это уходит 40–60 минут ежедневно у каждого из 68 сотрудников отделения. Записи теряются, почерк не всегда разборчив, при проверках возникают расхождения между журналом и системой.',
+    solution: 'Мобильное приложение с офлайн-режимом: работник отмечает визит на смартфоне, выбирает оказанные услуги из справочника, получатель расписывается пальцем на экране. При появлении связи данные автоматически синхронизируются с учётной системой. Геометка подтверждает факт визита, повторный ввод не требуется.',
+    effect: 'Экономия 45 минут рабочего времени ежедневно на каждого социального работника, устранение двойного ввода данных, исключение расхождений при проверках.',
+    effect_type: 'time', effect_value: 45, effect_unit: 'мин/день на сотрудника',
+    history: [
+      { gate: 1, d: 145, dec: 'go', by: 'volkov@social1.mos.ru', why: 'Проблема подтверждается данными хронометража по отделению. Экономия времени очевидна, решение не требует изменения регламентов обслуживания. Направляю на экспертизу Департамента.' },
+      { gate: 2, d: 141, dec: 'go', by: 'lebedeva@social1.mos.ru', why: 'Инициатива соответствует приоритету цифровизации надомного обслуживания. Потенциал масштабирования — все 34 ТЦСО. Эффект измерим. Техническая осуществимость подтверждена командой цифровой трансформации.' },
+      { gate: 3, d: 82, dec: 'go', by: 'tihonov@social1.mos.ru', why: 'MVP собран за 4 спринта: офлайн-режим, справочник услуг, электронная подпись получателя, синхронизация. Демонстрация пройдена, замечания устранены. Готовы к пилоту.' },
+      { gate: 4, d: 38, dec: 'go', by: 'ershova@social1.mos.ru', why: 'Пилот в ТЦСО «Ярославский», 22 социальных работника, 31 день. Фактическая экономия — 47 минут в день, что выше прогноза. Удовлетворённость 4,6 из 5. Критических сбоев не зафиксировано, требования к защите персональных данных соблюдены.' },
+      { gate: 5, d: 24, dec: 'go', by: 'director@social1.mos.ru', why: 'Эффект подтверждён пилотом, экономия в масштабе города оценивается в 21 тысячу человеко-часов в год. Ресурсы на тиражирование выделены. Утверждаю масштабирование на все территориальные центры.' },
+    ],
+    pilot: { inst: 'ТЦСО «Ярославский»', start: 68, end: 37, participants: 22 },
+    scaled: true,
+  },
+  {
+    author: 'petrov@social1.mos.ru', created: 120, pending: 8,
+    title: 'Предварительная проверка комплектности документов при записи на приём',
+    problem: 'Около трети граждан приходят на приём с неполным пакетом документов. Специалист вынужден отказать в приёме заявления и назначить повторный визит. Гражданин теряет время, очередь растёт, а показатели по срокам предоставления услуги ухудшаются. За квартал по отделению — 412 повторных визитов.',
+    solution: 'При онлайн-записи на приём система показывает персонализированный чек-лист документов в зависимости от выбранной услуги и категории заявителя. За день до визита приходит SMS-напоминание со списком. Специалист видит отметку гражданина о готовности пакета.',
+    effect: 'Сокращение доли повторных визитов с 33% до 10%, снижение нагрузки на приёме, сокращение очереди.',
+    effect_type: 'quality', effect_value: 23, effect_unit: '% сокращения повторных визитов',
+    history: [
+      { gate: 1, d: 117, dec: 'go', by: 'volkov@social1.mos.ru', why: 'Повторные визиты — системная проблема отделения приёма. Решение не требует дополнительных штатных единиц. Поддерживаю.' },
+      { gate: 2, d: 112, dec: 'go', by: 'grigoriev@social1.mos.ru', why: 'Эффект для граждан прямой и измеримый. Требуется интеграция со справочником услуг, что технически осуществимо. Рекомендую к разработке с приоритетом.' },
+      { gate: 3, d: 64, dec: 'go', by: 'tihonov@social1.mos.ru', why: 'Реализованы чек-листы по 18 массовым услугам, SMS-уведомления и отметка готовности. MVP протестирован, готов к пилотированию.' },
+      { gate: 4, d: 22, dec: 'go', by: 'ershova@social1.mos.ru', why: 'Пилот в двух ТЦСО. Доля повторных визитов снизилась с 33% до 12%. Граждане отмечают удобство напоминаний. Рекомендую к масштабированию.' },
+    ],
+    pilot: { inst: 'ТЦСО «Бибирево»', start: 53, end: 22, participants: 14 },
+    stage: 6,
+  },
+  {
+    author: 'orlova@social1.mos.ru', created: 96,
+    title: 'Единый цифровой маршрут реабилитации для получателя услуг',
+    problem: 'Индивидуальная программа реабилитации ведётся на бумаге и распределена между специалистами: инструктор ЛФК, психолог, эрготерапевт заполняют свои разделы отдельно. Никто не видит полной картины динамики. Родственники не понимают, что происходит с реабилитацией и какие результаты достигнуты.',
+    solution: 'Цифровой маршрут: все специалисты вносят результаты занятий в единую карточку получателя. Формируется наглядная динамика по каждому направлению. Родственники получают доступ к сводке через личный кабинет.',
+    effect: 'Сокращение времени на согласование программы между специалистами, повышение прозрачности для семьи, рост удовлетворённости получателей услуг.',
+    effect_type: 'quality', effect_value: 30, effect_unit: '% сокращения времени согласования',
+    history: [
+      { gate: 1, d: 93, dec: 'go', by: 'gusev@social1.mos.ru', why: 'Разрозненность документации по реабилитации — известная проблема центра. Инициатива снимает её и повышает прозрачность для семей. Одобряю.' },
+      { gate: 2, d: 87, dec: 'go', by: 'romanova@social1.mos.ru', why: 'Соответствует направлению развития реабилитационных услуг. Масштабируется на все реабилитационные центры. Необходимо предусмотреть требования к защите данных о здоровье.' },
+      { gate: 3, d: 30, dec: 'go', by: 'tihonov@social1.mos.ru', why: 'Прототип реализован: единая карточка, динамика по направлениям, ограниченный доступ для родственников. Требования к персональным данным учтены.' },
+    ],
+    pilot: { inst: 'РЦ «Преодоление»', start: 26, end: 5, participants: 18, status: 'analysis' },
+    stage: 5,
+  },
+  {
+    author: 'ivanova@social1.mos.ru', created: 72,
+    title: 'Скрининг риска семейного неблагополучия на основе обращений',
+    problem: 'Специалисты выявляют семьи в кризисе поздно — как правило, после обращения из школы или поликлиники, когда ситуация уже запущена. Сигналы копятся в разных журналах: пропуски занятий, обращения за материальной помощью, жалобы соседей. Никто не сводит их воедино.',
+    solution: 'Карточка семьи, объединяющая сигналы из разных источников, с прозрачной шкалой риска по понятным критериям. При накоплении сигналов специалист получает уведомление о необходимости профилактического визита. Решение о вмешательстве принимает человек, а не алгоритм.',
+    effect: 'Более раннее выявление кризисных ситуаций, снижение числа случаев, дошедших до изъятия ребёнка из семьи.',
+    effect_type: 'quality', effect_value: 20, effect_unit: '% раннего выявления',
+    history: [
+      { gate: 1, d: 69, dec: 'go', by: 'sokolova@social1.mos.ru', why: 'Раннее выявление — приоритет центра. Инициатива требует внимательной проработки этики и защиты данных, но потенциал высокий. Направляю экспертам.' },
+      { gate: 2, d: 62, dec: 'go', by: 'lebedeva@social1.mos.ru', why: 'Стратегически значимо. Обязательное условие — решение об вмешательстве принимает специалист, шкала риска носит вспомогательный характер и должна быть объяснимой. С этой оговоркой — Go.' },
+    ],
+    stage: 4, project: true,
+  },
+  {
+    author: 'kuznecov@social1.mos.ru', created: 54,
+    title: 'Видеоинструкции по уходу для родственников проживающих в ПНИ',
+    problem: 'Родственники забирают проживающих домой на выходные и праздники, но не владеют навыками ухода: перемещение маломобильного человека, кормление, профилактика пролежней. Персонал объясняет устно при каждой выписке, информация забывается. Возвраты после выходных сопровождаются осложнениями.',
+    solution: 'Библиотека коротких видеоинструкций, снятых персоналом интерната по стандартным ситуациям ухода. QR-код в памятке при выписке ведёт на нужный ролик. Библиотека доступна с телефона без регистрации.',
+    effect: 'Снижение числа осложнений после домашних отпусков, сокращение времени персонала на повторные объяснения.',
+    effect_type: 'quality', effect_value: 25, effect_unit: '% снижения осложнений',
+    history: [
+      { gate: 1, d: 51, dec: 'go', by: 'morozov@social1.mos.ru', why: 'Проблема реальная, решение не требует существенных затрат — съёмка силами персонала. Поддерживаю и выделяю методиста для подготовки сценариев.' },
+      { gate: 2, d: 44, dec: 'hold', by: 'romanova@social1.mos.ru', why: 'Идея полезная, но требуется согласование медицинской корректности инструкций с профильными специалистами и решение вопроса о согласии проживающих на съёмку. Приостанавливаю до предоставления этой информации.' },
+    ],
+    stage: 3, status: 'hold',
+  },
+  {
+    author: 'fedorov@social1.mos.ru', created: 41, pending: 3,
+    title: 'Автоматическое формирование пакета межведомственных запросов',
+    problem: 'При назначении мер социальной поддержки специалист формирует до семи межведомственных запросов вручную: в СФР, налоговую, Росреестр, органы ЗАГС. На один комплект уходит около 25 минут, при этом реквизиты заявителя вводятся повторно в каждую форму. Ошибки в реквизитах приводят к отказам и повторным запросам.',
+    solution: 'Единая форма: специалист один раз вводит данные заявителя и выбирает вид меры поддержки. Система сама формирует и отправляет весь необходимый комплект запросов, отслеживает поступление ответов и уведомляет о готовности пакета.',
+    effect: 'Сокращение времени формирования запросов с 25 до 5 минут, снижение доли ошибок в реквизитах.',
+    effect_type: 'time', effect_value: 20, effect_unit: 'мин на комплект',
+    history: [
+      { gate: 1, d: 38, dec: 'go', by: 'belova@social1.mos.ru', why: 'Ручное дублирование реквизитов — очевидная потеря времени специалистов. Инициатива хорошо проработана автором, есть хронометраж. Одобряю.' },
+    ],
+    stage: 3,
+  },
+  {
+    author: 'larina@social1.mos.ru', created: 33, pending: 2,
+    title: 'Наставничество для сотрудников в первые три месяца работы',
+    problem: 'Новые специалисты уходят в первые полгода: доля увольнений среди принятых в текущем году — 28%. Новичок получает регламенты в виде папки документов и учится методом проб и ошибок. Опытные коллеги помогают неформально, но эта работа никак не организована и не учитывается.',
+    solution: 'Программа наставничества: за каждым новым сотрудником закрепляется наставник, есть чек-лист адаптации на 90 дней с контрольными точками, а наставник получает признание и надбавку. Ход адаптации виден руководителю.',
+    effect: 'Снижение текучести среди новых сотрудников, сокращение срока выхода на полную производительность.',
+    effect_type: 'quality', effect_value: 15, effect_unit: '% снижения текучести',
+    history: [
+      { gate: 1, d: 30, dec: 'go', by: 'zaharov@social1.mos.ru', why: 'Текучесть новичков — болевая точка учреждения. Инициатива опирается на наш собственный неформальный опыт и предлагает его закрепить. Поддерживаю.' },
+      { gate: 2, d: 24, dec: 'redirect', by: 'lebedeva@social1.mos.ru', why: 'Инициатива ценная, но относится к кадровой политике, а не к цифровым сервисам. Прошу автора дополнить расчётом стоимости надбавок наставникам и согласовать с управлением кадров, после чего вернуть на экспертизу.' },
+    ],
+    stage: 2,
+  },
+  {
+    author: 'nikitina@social1.mos.ru', created: 26, pending: 2,
+    title: 'Цифровой дневник подготовки к самостоятельной жизни выпускника',
+    problem: 'Подготовка выпускника центра содействия семейному воспитанию к самостоятельной жизни ведётся бессистемно. Нет единого понимания, какие навыки уже освоены: приготовление еды, оплата счетов, запись к врачу, планирование бюджета. При выпуске обнаруживаются пробелы, которые уже поздно закрывать.',
+    solution: 'Дневник навыков с понятными для подростка формулировками. Воспитатель и сам подросток отмечают освоенные умения, видна общая картина готовности. За полгода до выпуска формируется список пробелов для целевой работы.',
+    effect: 'Системная подготовка к выпуску, снижение числа выпускников с критическими пробелами в бытовых навыках.',
+    effect_type: 'quality', effect_value: 40, effect_unit: '% охвата навыков',
+    history: [
+      { gate: 1, d: 23, dec: 'go', by: 'pavlova@social1.mos.ru', why: 'Подготовка к самостоятельной жизни — ключевая задача центра, а системного инструмента у нас нет. Инициатива закрывает реальный пробел. Направляю на экспертизу.' },
+    ],
+    stage: 3,
+  },
+  {
+    author: 'smirnova@social1.mos.ru', created: 18, pending: 9,
+    title: 'Электронная очередь на выдачу технических средств реабилитации',
+    problem: 'Получатели ТСР приезжают в пункт выдачи и ждут в живой очереди по 2–3 часа, не зная, поступило ли их средство реабилитации на склад. Часть визитов оказывается напрасной. Маломобильным гражданам такие поездки даются особенно тяжело.',
+    solution: 'Уведомление о поступлении ТСР на склад с возможностью записаться на конкретное время выдачи. Гражданин приезжает к назначенному времени и не ждёт в очереди.',
+    effect: 'Исключение напрасных визитов, сокращение времени ожидания с 2–3 часов до 15 минут.',
+    effect_type: 'time', effect_value: 150, effect_unit: 'мин ожидания на визит',
+    history: [
+      { gate: 1, d: 15, dec: 'go', by: 'volkov@social1.mos.ru', why: 'Проблема очередей на выдаче ТСР поднимается регулярно, в том числе в обращениях граждан. Решение простое и понятное. Одобряю.' },
+    ],
+    stage: 3,
+  },
+  {
+    author: 'ivanova@social1.mos.ru', created: 12, pending: 1,
+    title: 'Чат-бот для первичной консультации по мерам поддержки семей',
+    problem: 'Значительная часть обращений на телефон центра — типовые вопросы о том, какие меры поддержки положены семье и какие документы нужны. Специалист тратит на них до трети рабочего дня, при этом граждане долго не могут дозвониться.',
+    solution: 'Чат-бот в мессенджере проводит по короткому опроснику о составе семьи и ситуации, после чего показывает перечень доступных мер поддержки и список документов. Сложные случаи переводятся на специалиста.',
+    effect: 'Освобождение до 30% времени специалистов от типовых консультаций, круглосуточная доступность справочной информации.',
+    effect_type: 'time', effect_value: 30, effect_unit: '% времени специалиста',
+    history: [],
+    stage: 2,
+  },
+  {
+    author: 'orlova@social1.mos.ru', created: 7, pending: 1,
+    title: 'Адаптация маршрутов внутри центра для незрячих посетителей',
+    problem: 'Незрячие и слабовидящие посетители не могут самостоятельно перемещаться по зданию центра. Каждого приходится сопровождать сотруднику, что отвлекает персонал и лишает посетителей самостоятельности.',
+    solution: 'Тактильная разметка основных маршрутов, звуковые маяки у ключевых точек и аудионавигация через приложение по QR-меткам на входе.',
+    effect: 'Самостоятельное перемещение посетителей, высвобождение времени сопровождающих сотрудников.',
+    effect_type: 'quality', effect_value: 60, effect_unit: '% самостоятельных визитов',
+    history: [],
+    stage: 2,
+  },
+  {
+    author: 'kuznecov@social1.mos.ru', created: 88,
+    title: 'Замена бумажных журналов дежурств на общий экран в холле',
+    problem: 'Информация о дежурных специалистах ведётся в бумажном журнале на посту. Проживающие и родственники не знают, к кому обращаться в конкретный момент.',
+    solution: 'Экран в холле с актуальным составом дежурной смены и контактами.',
+    effect: 'Снижение числа обращений не по адресу.',
+    effect_type: 'other', effect_value: null, effect_unit: null,
+    history: [
+      { gate: 1, d: 85, dec: 'go', by: 'morozov@social1.mos.ru', why: 'Решение простое, поддерживаю. Направляю на экспертизу для оценки целесообразности тиражирования.' },
+      { gate: 2, d: 79, dec: 'kill', by: 'grigoriev@social1.mos.ru', why: 'Инициатива решает локальную задачу одного учреждения и не требует централизованной разработки: экран с расписанием реализуется силами учреждения в рамках текущей деятельности. Рекомендую внедрить самостоятельно, без централизованного проекта. Опыт полезен и будет размещён в библиотеке практик.' },
+    ],
+    stage: 3, status: 'killed',
+  },
+  {
+    author: 'fedorov@social1.mos.ru', created: 63,
+    title: 'Единый реестр отказов в предоставлении услуг с анализом причин',
+    problem: 'Причины отказов в предоставлении мер поддержки нигде не накапливаются системно. Невозможно понять, какие требования чаще всего оказываются невыполнимыми для граждан и где регламент нуждается в корректировке.',
+    solution: 'Реестр отказов с обязательным указанием кодифицированной причины и ежеквартальный анализ структуры причин для пересмотра избыточных требований.',
+    effect: 'Обоснованный пересмотр требований, снижение доли отказов.',
+    effect_type: 'quality', effect_value: 12, effect_unit: '% снижения отказов',
+    history: [
+      { gate: 1, d: 60, dec: 'go', by: 'belova@social1.mos.ru', why: 'Аналитика причин отказов действительно отсутствует. Инициатива даёт основу для пересмотра регламентов. Одобряю.' },
+      { gate: 2, d: 54, dec: 'go', by: 'grigoriev@social1.mos.ru', why: 'Инициатива создаёт управленческую аналитику, которой сейчас нет ни на одном уровне. Прямо поддерживает задачу выявления узких мест. Go, с приоритетом на реализацию отчётности.' },
+      { gate: 3, d: 12, dec: 'redirect', by: 'makarova@social1.mos.ru', why: 'Прототип реестра работает, но справочник причин отказа получился слишком дробным — 64 позиции, специалисты выбирают наугад. Возвращаю на доработку: требуется укрупнить классификатор до 12–15 позиций совместно с методологами.' },
+    ],
+    stage: 4, project: true,
+  },
+  {
+    author: 'larina@social1.mos.ru', created: 78,
+    title: 'Подбор вакансий для соискателей с инвалидностью по доступности рабочего места',
+    problem: 'Соискатели с инвалидностью получают предложения вакансий без учёта доступности рабочего места: подъёма к офису, наличия лифта, приспособленного санузла. Значительная часть собеседований оказывается бессмысленной, соискатели теряют мотивацию.',
+    solution: 'Карточка вакансии дополняется проверенными параметрами доступности рабочего места. Подбор учитывает эти параметры и сопоставляет их с потребностями соискателя.',
+    effect: 'Рост доли результативных собеседований, сокращение времени поиска работы.',
+    effect_type: 'quality', effect_value: 35, effect_unit: '% результативных собеседований',
+    history: [
+      { gate: 1, d: 75, dec: 'go', by: 'zaharov@social1.mos.ru', why: 'Инициатива напрямую отвечает профилю учреждения. Данные о доступности можно собирать при верификации работодателей. Поддерживаю.' },
+      { gate: 2, d: 69, dec: 'go', by: 'romanova@social1.mos.ru', why: 'Соответствует задачам содействия занятости инвалидов. Требует методики оценки доступности — рекомендую привлечь профильную организацию. Go.' },
+      { gate: 3, d: 20, dec: 'go', by: 'tihonov@social1.mos.ru', why: 'Реализована карточка доступности из 11 параметров и алгоритм сопоставления. Методика оценки согласована с АНО «Лаборатория доступной среды». Готово к пилоту.' },
+    ],
+    pilot: { inst: 'ГБУ «Моя карьера»', start: 16, end: 14, participants: 9, status: 'running' },
+    stage: 5,
+  },
+  {
+    author: 'nikitina@social1.mos.ru', created: 4, pending: 6,
+    title: 'Сокращение времени оформления временной передачи ребёнка в семью',
+    problem: 'Оформление документов на временную передачу ребёнка в семью гражданина занимает до 14 дней. Значительная часть времени уходит на последовательный сбор согласований, хотя многие из них можно получать параллельно.',
+    solution: 'Параллельная схема согласований с контролем сроков по каждому участнику и единым статусом заявки, видимым принимающей семье.',
+    effect: 'Сокращение срока оформления с 14 до 6 дней.',
+    effect_type: 'time', effect_value: 8, effect_unit: 'дней',
+    history: [],
+    stage: 2,
+  },
+];
+
+// ── Загрузка инициатив с воспроизведением истории ────────────
+let seq = 0;
+const year = new Date().getFullYear();
+const created = [];
+
+for (const spec of INITIATIVES) {
+  const author = U[spec.author];
+  const ai = classify(`${spec.title} ${spec.problem} ${spec.solution}`);
+  seq += 1;
+  const number = `SOC-${year}-${String(seq).padStart(4, '0')}`;
+  const createdAt = ts(spec.created);
+
+  const id = q.insert(`INSERT INTO initiatives
+    (number, title, problem, solution, expected_effect, effect_type, effect_value, effect_unit,
+     category, tags, author_id, institution_id, stage, status, stage_entered_at, created_at, updated_at,
+     ai_category, ai_score, ai_rationale)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,'active',?,?,?,?,?,?)`,
+    number, spec.title, spec.problem, spec.solution, spec.effect,
+    spec.effect_type, spec.effect_value, spec.effect_unit,
+    ai.category, JSON.stringify([]), author.id, author.institution_id,
+    createdAt, createdAt, createdAt, ai.category, ai.confidence, ai.rationale);
+
+  // Этап 1 → 2 автоматически
+  q.run(`INSERT INTO stage_transitions (initiative_id, from_stage, to_stage, at, by_user, reason)
+         VALUES (?,1,2,?,?,?)`, id, createdAt, author.id, 'Автоматический переход: этап 1 не содержит точки принятия решения');
+  let stage = 2;
+  let enteredAt = createdAt;
+  let firstDecision = null;
+
+  for (const h of spec.history) {
+    const cfg = stageConfig(stage);
+    const decidedAt = ts(h.d, 11 + (h.gate % 5));
+    const decider = U[h.by];
+    const slaDue = dueDate(enteredAt, cfg.sla_value, cfg.sla_unit);
+    const durationHours = (new Date(decidedAt.replace(' ', 'T') + 'Z') - new Date(enteredAt.replace(' ', 'T') + 'Z')) / 36e5;
+    const slaMet = slaDue ? (new Date(decidedAt.replace(' ', 'T') + 'Z') <= new Date(slaDue.replace(' ', 'T') + 'Z') ? 1 : 0) : null;
+
+    const scores = {};
+    for (const c of cfg.criteria) scores[c] = h.dec === 'go' ? pick([4, 4, 5]) : pick([2, 3]);
+
+    q.insert(`INSERT INTO gate_decisions
+      (initiative_id, gate_no, stage_no, decision, rationale, criteria_scores, decided_by, decided_at, sla_due_at, sla_met, duration_hours)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+      id, cfg.gate_no, stage, h.dec, h.why, JSON.stringify(scores), decider.id, decidedAt, slaDue, slaMet, durationHours);
+
+    if (!firstDecision) firstDecision = decidedAt;
+
+    if (h.dec === 'go') {
+      if (stage === LAST_STAGE) { enteredAt = decidedAt; continue; } // Gate 5: цикл завершён
+      const next = stage + 1;
+      q.run(`INSERT INTO stage_transitions (initiative_id, from_stage, to_stage, at, by_user, reason, hours_in_stage)
+             VALUES (?,?,?,?,?,?,?)`, id, stage, next, decidedAt, decider.id, `Go на ${cfg.gate_name}`, durationHours);
+      stage = next; enteredAt = decidedAt;
+    } else if (h.dec === 'redirect') {
+      const back = Math.max(1, stage - 1);
+      q.run(`INSERT INTO stage_transitions (initiative_id, from_stage, to_stage, at, by_user, reason, hours_in_stage)
+             VALUES (?,?,?,?,?,?,?)`, id, stage, back, decidedAt, decider.id, `Redirect с ${cfg.gate_name}`, durationHours);
+      stage = back; enteredAt = decidedAt;
+    }
+  }
+
+  const finalStage = spec.stage || stage;
+  const status = spec.status || (spec.scaled ? 'scaled' : 'active');
+  const cfgFinal = stageConfig(finalStage);
+
+  // Инициатива, ожидающая решения, «зашла» на текущий этап spec.pending дней назад.
+  // Синхронизируем последнее решение и переход, чтобы хронология оставалась связной.
+  if (status === 'active' && spec.pending !== undefined) {
+    const entered = ts(spec.pending, 14);
+    if (spec.history.length) {
+      const lastGate = q.get('SELECT id FROM gate_decisions WHERE initiative_id=? ORDER BY id DESC LIMIT 1', id);
+      if (lastGate) q.run('UPDATE gate_decisions SET decided_at=? WHERE id=?', entered, lastGate.id);
+      const lastTr = q.get('SELECT id FROM stage_transitions WHERE initiative_id=? ORDER BY id DESC LIMIT 1', id);
+      if (lastTr) q.run('UPDATE stage_transitions SET at=? WHERE id=?', entered, lastTr.id);
+      if (firstDecision && spec.history.length === 1) firstDecision = entered;
+    }
+    enteredAt = entered;
+  }
+
+  const slaDueFinal = status === 'active' ? dueDate(enteredAt, cfgFinal?.sla_value, cfgFinal?.sla_unit) : null;
+
+  q.run(`UPDATE initiatives SET stage=?, status=?, stage_entered_at=?, sla_due_at=?, first_decision_at=?,
+         scaled_at=?, closed_at=?, updated_at=? WHERE id=?`,
+    finalStage, status, enteredAt, slaDueFinal, firstDecision,
+    spec.scaled ? ts(spec.history.at(-1).d) : null,
+    (status === 'scaled' || status === 'killed') ? ts(spec.history.at(-1)?.d ?? spec.created) : null,
+    enteredAt, id);
+
+  created.push({ id, number, spec, stage: finalStage, status, author });
+}
+
+console.log(`Загружено инициатив: ${created.length}`);
+
+// ── Проекты разработки для инициатив, дошедших до этапа 4 ────
+const SPRINT_GOALS = [
+  'Каркас решения и базовая модель данных',
+  'Основной сценарий пользователя',
+  'Интеграции и синхронизация',
+  'Стабилизация, безопасность, подготовка к пилоту',
+];
+const TASK_POOL = [
+  ['Спроектировать модель данных', 'story', 5], ['Экран основного сценария', 'story', 8],
+  ['Офлайн-режим и синхронизация', 'story', 13], ['Роли и разграничение доступа', 'task', 5],
+  ['Журналирование действий пользователя', 'task', 3], ['Нагрузочное тестирование', 'task', 5],
+  ['Исправить сброс формы при потере связи', 'bug', 2], ['Инструкция для пользователей', 'task', 3],
+  ['Согласовать требования по персональным данным', 'task', 5], ['Демонстрация заказчику', 'task', 2],
+];
+
+for (const it of created.filter((c) => c.stage >= 4 || c.spec.project)) {
+  const pid = q.insert(`INSERT INTO projects (initiative_id, name, product_owner_id, team_lead_id, created_at)
+                        VALUES (?,?,?,?,?)`,
+    it.id, it.spec.title, U['makarova@social1.mos.ru'].id, U['tihonov@social1.mos.ru'].id, ts(it.spec.created - 5));
+
+  const devs = [U['tihonov@social1.mos.ru'], U['sorokin@social1.mos.ru'], U['makarova@social1.mos.ru']];
+  const sprintCount = it.stage >= 5 ? 4 : (it.stage === 4 ? 2 : 1);
+  for (let s = 1; s <= 4; s++) {
+    const active = s === sprintCount;
+    const sid = q.insert(`INSERT INTO sprints (project_id, number, name, goal, starts_at, ends_at, status)
+                          VALUES (?,?,?,?,?,?,?)`,
+      pid, s, `Спринт ${s}`, SPRINT_GOALS[s - 1],
+      ts(it.spec.created - 5 - (s - 1) * -14).slice(0, 10), ts(it.spec.created - 19 - (s - 1) * -14).slice(0, 10),
+      s < sprintCount ? 'closed' : (active ? 'active' : 'planned'));
+
+    for (let k = 0; k < 3; k++) {
+      const [title, type, est] = TASK_POOL[(s * 3 + k) % TASK_POOL.length];
+      const done = s < sprintCount;
+      const statuses = ['todo', 'in_progress', 'review'];
+      q.run(`INSERT INTO board_items (project_id, sprint_id, title, type, status, priority, estimate, assignee_id, order_idx)
+             VALUES (?,?,?,?,?,?,?,?,?)`,
+        pid, sid, title, type, done ? 'done' : (s > sprintCount ? 'backlog' : pick(statuses)),
+        pick(['normal', 'normal', 'high']), est, pick(devs).id, s * 10 + k);
+    }
+  }
+  // Бэклог продукта
+  for (const [title, type, est] of TASK_POOL.slice(0, 4)) {
+    q.run(`INSERT INTO board_items (project_id, sprint_id, title, type, status, priority, estimate, order_idx)
+           VALUES (?,NULL,?,?, 'backlog', ?, ?, ?)`, pid, `${title} (расширение)`, type, 'low', est, 99);
+  }
+
+  q.run(`INSERT INTO documents (initiative_id, project_id, title, kind, body, created_by, created_at)
+         VALUES (?,?,?,?,?,?,?)`,
+    it.id, pid, 'Архитектурное решение', 'arch',
+    'Компонентная схема, модель данных, требования к защите персональных данных и журналированию действий пользователей.',
+    U['tihonov@social1.mos.ru'].id, ts(it.spec.created - 10));
+  q.run(`INSERT INTO documents (initiative_id, project_id, title, kind, body, created_by, created_at)
+         VALUES (?,?,?,?,?,?,?)`,
+    it.id, pid, 'Протокол приёмочного тестирования', 'test',
+    'Сценарии проверки основного пользовательского пути, результаты прогонов, перечень выявленных и устранённых замечаний.',
+    U['sorokin@social1.mos.ru'].id, ts(Math.max(1, it.spec.created - 40)));
+}
+
+// ── Пилоты, KPI, опросы ──────────────────────────────────────
+const FEEDBACK_POSITIVE = [
+  'Стало заметно удобнее, экономит время в конце дня',
+  'Хорошее решение, больше не нужно переписывать журнал вечером',
+  'Понятный интерфейс, разобралась за один день',
+  'Очень помогает, особенно на участках с большим числом визитов',
+  'Полезная вещь, рекомендую распространить на другие отделения',
+  'Быстро работает, подпись получателя оформляется просто',
+];
+const FEEDBACK_MIXED = [
+  'В целом удобно, но иногда долго синхронизируется в подвалах',
+  'Сложно было разобраться в первый день, потом привыкла',
+  'Не всегда понятно, сохранилась запись или нет',
+  'Неудобно вводить длинные комментарии с телефона',
+];
+
+for (const it of created.filter((c) => c.spec.pilot)) {
+  const p = it.spec.pilot;
+  const pilotId = q.insert(`INSERT INTO pilots (initiative_id, institution_id, coordinator_id, plan, status, starts_at, ends_at, participants_count, created_at)
+                            VALUES (?,?,?,?,?,?,?,?,?)`,
+    it.id, inst[p.inst], U['ershova@social1.mos.ru'].id,
+    'Внедрение прототипа в реальную работу отделения на срок 1 месяц с еженедельным снятием показателей и сбором обратной связи.',
+    p.status || 'finished', ts(p.start).slice(0, 10), ts(p.end).slice(0, 10), p.participants, ts(p.start + 3));
+
+  q.run(`INSERT INTO pilot_applications (initiative_id, institution_id, applicant_id, message, status, created_at)
+         VALUES (?,?,?,?,'approved',?)`,
+    it.id, inst[p.inst], byRole('head').id, 'Готовы предоставить площадку и выделить участников из числа сотрудников отделения.', ts(p.start + 6));
+
+  const kpiSets = {
+    time: [['Время на оформление визита', 'мин', 12, 5], ['Время переноса данных в систему', 'мин/день', 45, 5]],
+    quality: [['Доля обращений без повторного визита', '%', 67, 90], ['Удовлетворённость сотрудников', 'балл', 3.4, 4.5]],
+    other: [['Удовлетворённость сотрудников', 'балл', 3.5, 4.3]],
+  };
+  const set = kpiSets[it.spec.effect_type] || kpiSets.quality;
+  for (const [name, unit, baseline, target] of set) {
+    const finished = (p.status || 'finished') === 'finished';
+    const actual = finished ? target * (0.92 + Math.random() * 0.16) : baseline + (target - baseline) * 0.55;
+    q.run(`INSERT INTO pilot_kpis (pilot_id, name, unit, baseline, target, actual, direction)
+           VALUES (?,?,?,?,?,?,?)`,
+      pilotId, name, unit, baseline, target, Math.round(actual * 10) / 10, target > baseline ? 'up' : 'down');
+  }
+
+  // Опрос сотрудников с ответами
+  const surveyId = q.insert(`INSERT INTO surveys (pilot_id, initiative_id, title, audience, is_open, created_by, created_at)
+                             VALUES (?,?,?,?,?,?,?)`,
+    pilotId, it.id, 'Оценка решения участниками пилота', 'staff', p.status === 'finished' ? 0 : 1,
+    U['ershova@social1.mos.ru'].id, ts(p.end + 2));
+  const qIds = [];
+  for (const [i, [text, type, options]] of [
+    ['Насколько удобно пользоваться решением?', 'scale', []],
+    ['Экономит ли решение ваше рабочее время?', 'choice', ['Да, заметно', 'Незначительно', 'Нет']],
+    ['Что стоит улучшить в решении?', 'text', []],
+  ].entries()) {
+    qIds.push(q.insert(`INSERT INTO survey_questions (survey_id, text, type, options, order_idx) VALUES (?,?,?,?,?)`,
+      surveyId, text, type, JSON.stringify(options), i));
+  }
+  const respondents = Object.values(U).filter((u) => u.role === 'employee' || u.role === 'head');
+  const n = Math.min(respondents.length, Math.max(4, Math.round(p.participants / 2)));
+  for (let i = 0; i < n; i++) {
+    const rid = q.insert('INSERT INTO survey_responses (survey_id, respondent_id, submitted_at) VALUES (?,?,?)',
+      surveyId, respondents[i % respondents.length].id, ts(Math.max(1, p.end - 1)));
+    const good = i % 4 !== 3;
+    q.run('INSERT INTO survey_answers (response_id, question_id, value_num) VALUES (?,?,?)', rid, qIds[0], good ? pick([4, 5, 5]) : pick([2, 3]));
+    q.run('INSERT INTO survey_answers (response_id, question_id, value_text) VALUES (?,?,?)', rid, qIds[1], good ? 'Да, заметно' : 'Незначительно');
+    q.run('INSERT INTO survey_answers (response_id, question_id, value_text) VALUES (?,?,?)', rid, qIds[2],
+      good ? pick(FEEDBACK_POSITIVE) : pick(FEEDBACK_MIXED));
+  }
+}
+
+// ── Масштабирование и лучшие практики ────────────────────────
+const scaledInit = created.find((c) => c.status === 'scaled');
+if (scaledInit) {
+  const sites = ['ТЦСО «Бибирево»', 'ЦСПСиД «Гармония»', 'РЦ «Отрадное»', 'ЦСА «Люблино»', 'ПНИ № 11'];
+  sites.forEach((s, i) => {
+    q.run(`INSERT INTO rollouts (initiative_id, institution_id, status, bottom_up, started_at, completed_at, created_at)
+           VALUES (?,?,?,?,?,?,?)`,
+      scaledInit.id, inst[s], i < 3 ? 'deployed' : (i === 3 ? 'training' : 'planned'),
+      i === 2 || i === 4 ? 1 : 0, ts(20 - i * 2), i < 3 ? ts(8 - i) : null, ts(22 - i * 2));
+  });
+  q.insert(`INSERT INTO best_practices (initiative_id, title, summary, materials, effect_text, published_by, published_at)
+            VALUES (?,?,?,?,?,?,?)`,
+    scaledInit.id, 'Мобильное приложение социального работника',
+    'Отказ от бумажного журнала посещений при надомном обслуживании. Работник отмечает визит на смартфоне, получатель расписывается на экране, данные синхронизируются автоматически.',
+    'Методические рекомендации по внедрению, инструкция пользователя, программа обучения (4 часа), типовой приказ о переходе на электронный учёт визитов.',
+    'Пилот в ТЦСО «Ярославский»: экономия 47 минут рабочего времени в день на сотрудника при прогнозе 45. Удовлетворённость 4,6 из 5. В масштабе города — около 21 тыс. человеко-часов в год.',
+    U['lebedeva@social1.mos.ru'].id, ts(20));
+  grantAward(scaledInit.author.id, scaledInit.id, 'scaled', 'Автор масштабированной инициативы', U['director@social1.mos.ru'].id);
+  grantAward(scaledInit.author.id, scaledInit.id, 'author', 'Практика включена в библиотеку лучших решений', U['lebedeva@social1.mos.ru'].id);
+}
+const secondScaled = created.find((c) => c.stage === 6 && c.status === 'active');
+if (secondScaled) {
+  q.insert(`INSERT INTO best_practices (initiative_id, title, summary, materials, effect_text, published_by, published_at)
+            VALUES (?,?,?,?,?,?,?)`,
+    secondScaled.id, 'Чек-лист документов при записи на приём',
+    'Персонализированный перечень документов при онлайн-записи и SMS-напоминание за день до визита.',
+    'Шаблоны чек-листов по 18 массовым услугам, тексты уведомлений, порядок актуализации перечней.',
+    'Доля повторных визитов снизилась с 33% до 12% в двух территориальных центрах.',
+    U['grigoriev@social1.mos.ru'].id, ts(15));
+}
+
+// ── Комментарии к инициативам ────────────────────────────────
+const COMMENTS = [
+  ['grigoriev@social1.mos.ru', 'Прошу автора уточнить, как измерялись 45 минут: это оценка или результат хронометража? От этого зависит расчёт эффекта при масштабировании.'],
+  ['smirnova@social1.mos.ru', 'Это результат хронометража: две недели, 12 сотрудников отделения, замеры вечернего переноса данных. Диапазон 38–61 минута, среднее — 45.'],
+  ['tihonov@social1.mos.ru', 'С технической стороны ограничение одно — устойчивая работа офлайн. Заложим локальное хранилище и очередь синхронизации, это стандартная задача.'],
+  ['ershova@social1.mos.ru', 'Готовы взять площадку под пилот. Предлагаю ТЦСО «Ярославский» — там инициатива и родилась, сотрудники мотивированы.'],
+];
+if (created[0]) {
+  COMMENTS.forEach(([email, body], i) => {
+    q.run('INSERT INTO comments (initiative_id, author_id, body, created_at) VALUES (?,?,?,?)',
+      created[0].id, U[email].id, body, ts(140 - i * 3));
+  });
+}
+if (created[3]) {
+  q.run('INSERT INTO comments (initiative_id, author_id, body, created_at) VALUES (?,?,?,?)',
+    created[3].id, U['romanova@social1.mos.ru'].id,
+    'Ключевой момент — шкала риска должна оставаться вспомогательной. Решение о профилактическом визите принимает специалист и фиксирует основание. Прошу заложить это в требования.', ts(60));
+  q.run('INSERT INTO comments (initiative_id, author_id, body, created_at) VALUES (?,?,?,?)',
+    created[3].id, U['ivanova@social1.mos.ru'].id,
+    'Согласна. В прототипе шкала показывает, из каких именно сигналов сложилась оценка, — специалист видит основания, а не итоговый балл.', ts(58));
+}
+
+// ── Голоса и подписки ────────────────────────────────────────
+// Поддержка распределена неравномерно: у решений с очевидной болью — больше голосов.
+const voterPool = Object.values(U).filter((u) => ['employee', 'head', 'expert', 'developer', 'pilot_coordinator'].includes(u.role));
+const SUPPORT = {  // доля пула, поддержавшая инициативу, и доля голосов против
+  1: [0.92, 0.00], 2: [0.78, 0.04], 3: [0.62, 0.04], 4: [0.55, 0.12],
+  5: [0.40, 0.08], 6: [0.70, 0.00], 7: [0.48, 0.08], 8: [0.36, 0.04],
+  9: [0.66, 0.00], 10: [0.44, 0.12], 11: [0.30, 0.04], 12: [0.16, 0.20],
+  13: [0.52, 0.08], 14: [0.58, 0.04], 15: [0.26, 0.00],
+};
+let votesPlaced = 0;
+created.forEach((it, idx) => {
+  const [upShare, downShare] = SUPPORT[idx + 1] || [0.3, 0.05];
+  const shuffled = [...voterPool].sort(() => Math.random() - 0.5);
+  const ups = Math.round(shuffled.length * upShare);
+  const downs = Math.round(shuffled.length * downShare);
+  shuffled.slice(0, ups + downs).forEach((u, i) => {
+    if (u.id === it.author.id) return;              // автор не голосует за себя
+    const value = i < ups ? 1 : -1;
+    try {
+      q.run('INSERT INTO votes (initiative_id, user_id, value, created_at) VALUES (?,?,?,?)',
+        it.id, u.id, value, ts(Math.max(1, it.spec.created - 2 - Math.floor(Math.random() * 20))));
+      votesPlaced += 1;
+    } catch {}
+  });
+  // Подписки: часть проголосовавших следит за судьбой инициативы
+  shuffled.slice(0, Math.round(ups * 0.5)).forEach((u) => {
+    if (u.id === it.author.id) return;
+    try {
+      q.run('INSERT INTO follows (initiative_id, user_id, created_at) VALUES (?,?,?)',
+        it.id, u.id, ts(Math.max(1, it.spec.created - 3)));
+    } catch {}
+  });
+  // Автор всегда следит за своей инициативой
+  try { q.run('INSERT INTO follows (initiative_id, user_id, created_at) VALUES (?,?,?)', it.id, it.author.id, ts(it.spec.created)); } catch {}
+});
+console.log(`Расставлено голосов: ${votesPlaced}`);
+
+// ── Форум ────────────────────────────────────────────────────
+const TOPICS = [
+  ['Как правильно измерить эффект инициативы до пилота?', 'methodology', 'grigoriev@social1.mos.ru',
+   'Частая причина возврата инициативы на доработку — эффект заявлен словами «станет удобнее», без чисел. Делюсь простым подходом: выберите один показатель, замерьте его текущее значение хотя бы за неделю и укажите, каким оно станет. Даже грубая оценка на основе хронометража работает лучше, чем общие формулировки.',
+   [['smirnova@social1.mos.ru', 'Именно так и делала: две недели замеров перед подачей. Экспертиза прошла без вопросов, а на пилоте цифра почти совпала с прогнозом.'],
+    ['fedorov@social1.mos.ru', 'А если эффект в качестве услуги, а не во времени? У нас снижение доли отказов — как это правильно посчитать?'],
+    ['grigoriev@social1.mos.ru', 'Так же: текущая доля отказов за квартал и целевая. Главное — показатель должен считаться из данных, которые у вас уже есть.']]],
+  ['Опыт пилотирования: чего мы не учли в первый раз', 'pilots', 'ershova@social1.mos.ru',
+   'Собрала наблюдения по завершённым пилотам. Первое: обучение нужно проводить до начала пилота, а не в первый день — иначе первая неделя уходит на освоение и портит статистику. Второе: назначайте в учреждении ответственного за сбор обратной связи, иначе анкеты остаются незаполненными. Третье: снимайте базовые значения показателей заранее, до внедрения.',
+   [['volkov@social1.mos.ru', 'Подтверждаю по нашему пилоту. Базовые замеры сделали за две недели до старта, это сильно упростило защиту результатов на Gate 4.'],
+    ['danilov@social1.mos.ru', 'Добавлю: полезно заранее договориться, что считается критическим сбоем. Иначе спор о том, останавливать пилот или нет, возникает в самый неподходящий момент.']]],
+  ['Инициатива получила Kill — что дальше?', 'general', 'kuznecov@social1.mos.ru',
+   'Мою инициативу про экран дежурств остановили на экспертизе с формулировкой «решается силами учреждения». Сначала расстроился, потом перечитал обоснование: эксперт прямо написал, что идея рабочая, просто не требует централизованного проекта. Внедрили сами за две недели. Вопрос к коллегам: стоит ли такие локальные решения оформлять через платформу вообще?',
+   [['lebedeva@social1.mos.ru', 'Обязательно стоит. Kill в этом случае означает «не нужен централизованный проект», а не «идея плохая». Ваш опыт мы разместим в библиотеке практик — другие учреждения смогут повторить.'],
+    ['morozov@social1.mos.ru', 'Поддерживаю. У нас после вашего примера сделали то же самое, ушло десять дней.']]],
+  ['Что делать, если инициатива дублирует уже существующую?', 'methodology', 'nikitina@social1.mos.ru',
+   'При подаче система показала похожую инициативу из другого центра — совпадение 62%. Правильно ли объединять усилия или подавать отдельно, если контекст всё-таки различается?',
+   [['romanova@social1.mos.ru', 'Если проблема одна, а контекст разный — лучше присоединиться к существующей и описать свою специфику в комментариях. Так решение сразу проектируется под несколько типов учреждений и легче масштабируется.']]],
+];
+for (const [title, cat, author, body, replies] of TOPICS) {
+  const tid = q.insert(`INSERT INTO forum_topics (title, category, author_id, created_at) VALUES (?,?,?,?)`,
+    title, cat, U[author].id, ts(30 + TOPICS.indexOf(TOPICS.find((t) => t[0] === title)) * 4));
+  q.run('INSERT INTO forum_posts (topic_id, author_id, body, created_at) VALUES (?,?,?,?)', tid, U[author].id, body, ts(30));
+  replies.forEach(([email, text], i) => {
+    q.run('INSERT INTO forum_posts (topic_id, author_id, body, created_at) VALUES (?,?,?,?)', tid, U[email].id, text, ts(28 - i * 2));
+  });
+}
+
+// ── Задачи и уведомления по текущим ожидающим Gate ───────────
+for (const it of created.filter((c) => c.status === 'active')) {
+  const cfg = stageConfig(it.stage);
+  if (!cfg?.gate_no) continue;
+  const row = q.get('SELECT * FROM initiatives WHERE id=?', it.id);
+  q.run(`INSERT INTO tasks (role_target, institution_id, initiative_id, type, title, due_at, created_at)
+         VALUES (?,?,?,'gate',?,?,?)`,
+    cfg.role_required, cfg.gate_no === 1 ? it.author.institution_id : null, it.id,
+    `${cfg.gate_name}: ${it.spec.title}`, row.sla_due_at, row.stage_entered_at);
+}
+for (const it of created.slice(0, 6)) {
+  q.run(`INSERT INTO notifications (user_id, initiative_id, type, title, body, is_read, created_at)
+         VALUES (?,?,?,?,?,?,?)`,
+    it.author.id, it.id, 'status', `Инициатива ${it.number}: изменение статуса`,
+    `Текущий этап — «${stageConfig(it.stage)?.stage_name}».`, it.stage > 3 ? 1 : 0, ts(Math.max(1, it.spec.created - 30)));
+}
+
+// Награды активным экспертам и участникам
+grantAward(U['lebedeva@social1.mos.ru'].id, null, 'expert', 'Эксперт года по числу рассмотренных инициатив', U['director@social1.mos.ru'].id);
+grantAward(U['petrov@social1.mos.ru'].id, created[1]?.id, 'author', 'Инициатива дошла до пилотирования', U['director@social1.mos.ru'].id);
+
+logAction(U['coordinator@social1.mos.ru'].id, 'system.seed', 'system', null,
+  { initiatives: created.length, users: Object.keys(U).length }, 'system');
+
+console.log(`
+  Демонстрационные данные загружены
+  ─────────────────────────────────
+  Учреждений:    ${q.get('SELECT COUNT(*) AS c FROM institutions').c}
+  Участников:    ${q.get('SELECT COUNT(*) AS c FROM users').c}
+  Инициатив:     ${q.get('SELECT COUNT(*) AS c FROM initiatives').c}
+  Решений Gate:  ${q.get('SELECT COUNT(*) AS c FROM gate_decisions').c}
+  Проектов:      ${q.get('SELECT COUNT(*) AS c FROM projects').c}
+  Пилотов:       ${q.get('SELECT COUNT(*) AS c FROM pilots').c}
+  Тем форума:    ${q.get('SELECT COUNT(*) AS c FROM forum_topics').c}
+  Голосов:       ${q.get('SELECT COUNT(*) AS c FROM votes').c}
+
+  Вход: любой e-mail из списка, пароль social1
+  Например: director@social1.mos.ru (ДТСЗН), volkov@social1.mos.ru (руководитель),
+            smirnova@social1.mos.ru (сотрудник), lebedeva@social1.mos.ru (эксперт)
+`);

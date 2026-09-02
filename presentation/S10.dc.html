@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:54px 64px 0">
+    <div class="eyebrow">Участники</div>
+    <h2 style="margin-top:16px">Семь ролей, у каждой — своя зона ответственности</h2>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px">
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px">Сотрудник учреждения</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Находит проблему, формулирует инициативу, работает на пилоте</div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px">Руководитель учреждения</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Владелец процессов, первый уровень контроля</div>
+        <div style="display:inline-block;margin-top:11px;background:#eff5fd;color:#24508f;font-family:'PT Mono',monospace;font-size:12px;padding:3px 8px;border-radius:4px;font-weight:700">Gate 1</div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px">Эксперт ДТСЗН</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Оценивает стратегическую значимость и масштабируемость</div>
+        <div style="display:inline-block;margin-top:11px;background:#eff5fd;color:#24508f;font-family:'PT Mono',monospace;font-size:12px;padding:3px 8px;border-radius:4px;font-weight:700">Gate 2</div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px">Команда разработки и ЦТ</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Превращает идею в работающий прототип</div>
+        <div style="display:inline-block;margin-top:11px;background:#eff5fd;color:#24508f;font-family:'PT Mono',monospace;font-size:12px;padding:3px 8px;border-radius:4px;font-weight:700">Gate 3</div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px">Координатор пилотов</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Ведёт проверку в реальных условиях и сбор доказательств</div>
+        <div style="display:inline-block;margin-top:11px;background:#eff5fd;color:#24508f;font-family:'PT Mono',monospace;font-size:12px;padding:3px 8px;border-radius:4px;font-weight:700">Gate 4</div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px">Пилотное учреждение</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Площадка проверки: внедряет прототип и даёт обратную связь</div>
+      </div>
+      <div style="border:1px solid #dfe4ed;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px">Поставщик технологий</div>
+        <div style="font-size:14.5px;color:#4a5568;line-height:1.45">Даёт готовые компоненты и компетенции</div>
+      </div>
+      <div style="border:1px solid #12294c;background:#12294c;border-radius:9px;padding:18px 18px 16px">
+        <div style="font-size:17px;font-weight:700;line-height:1.25;margin-bottom:8px;color:#ffffff">ДТСЗН</div>
+        <div style="font-size:14.5px;color:rgba(255,255,255,.75);line-height:1.45">Координатор экосистемы: портфель, приоритеты, ресурсы</div>
+        <div style="display:inline-block;margin-top:11px;background:rgba(255,255,255,.16);color:#ffffff;font-family:'PT Mono',monospace;font-size:12px;padding:3px 8px;border-radius:4px;font-weight:700">Gate 5</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">10</span></div>
+</div>
+</x-dc>
+</body>
+</html>

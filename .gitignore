@@ -1,0 +1,11 @@
+# Runtime-сгенерированная база данных (пересоздаётся: npm run seed)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Системные файлы
+.DS_Store
+node_modules/
+
+# Скретч-каталоги сборки презентации (pptxgenjs ставился вне проекта)
+*.log

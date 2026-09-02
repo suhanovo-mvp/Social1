@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:52px 64px 0">
+    <div class="eyebrow">Механика решения</div>
+    <h2 style="margin-top:14px">Четыре решения — и у каждого свой маршрут</h2>
+    <p class="lede" style="margin:14px 0 0;max-width:1000px;font-size:18px">
+      На любых воротах доступен один и тот же набор. Отличается только то, куда инициатива уходит дальше
+      и что происходит с вложенным в неё ресурсом.
+    </p>
+
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:28px">
+      <div style="display:grid;grid-template-columns:190px 1fr 300px;align-items:center;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#e3f5ec;padding:18px 22px;height:100%;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-family:'PT Serif',Georgia,serif;font-size:22px;font-weight:700;color:#1a7f52">Go</div>
+          <div style="font-size:13px;color:#4a5568;margin-top:3px">продолжить</div>
+        </div>
+        <div style="padding:16px 24px;font-size:15px;color:#4a5568;line-height:1.5">
+          Инициатива переходит на следующий этап. Система назначает нового ответственного,
+          создаёт ему задачу и запускает отсчёт срока
+        </div>
+        <div style="padding:16px 22px;font-size:14px;color:#7c8798;line-height:1.45;border-left:1px solid #dfe4ed;height:100%;display:flex;align-items:center">
+          Автор получает уведомление о продвижении
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:190px 1fr 300px;align-items:center;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#fbe7e7;padding:18px 22px;height:100%;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-family:'PT Serif',Georgia,serif;font-size:22px;font-weight:700;color:#b32b2b">Kill</div>
+          <div style="font-size:13px;color:#4a5568;margin-top:3px">остановить</div>
+        </div>
+        <div style="padding:16px 24px;font-size:15px;color:#4a5568;line-height:1.5">
+          Работа прекращается, ресурс освобождается. Обоснование сохраняется в архиве
+          и доступно при рассмотрении похожих инициатив в будущем
+        </div>
+        <div style="padding:16px 22px;font-size:14px;color:#7c8798;line-height:1.45;border-left:1px solid #dfe4ed;height:100%;display:flex;align-items:center">
+          Автор получает отказ с объяснением причины
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:190px 1fr 300px;align-items:center;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#fdf0dd;padding:18px 22px;height:100%;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-family:'PT Serif',Georgia,serif;font-size:22px;font-weight:700;color:#a8620a">Hold</div>
+          <div style="font-size:13px;color:#4a5568;margin-top:3px">приостановить</div>
+        </div>
+        <div style="padding:16px 24px;font-size:15px;color:#4a5568;line-height:1.5">
+          Инициатива остаётся на этапе, отсчёт срока останавливается. Возобновить может
+          автор, ответственный за ворота или координатор — срок начинается заново
+        </div>
+        <div style="padding:16px 22px;font-size:14px;color:#7c8798;line-height:1.45;border-left:1px solid #dfe4ed;height:100%;display:flex;align-items:center">
+          Автор видит, каких именно сведений не хватает
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:190px 1fr 300px;align-items:center;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#f0e9f9;padding:18px 22px;height:100%;display:flex;flex-direction:column;justify-content:center">
+          <div style="font-family:'PT Serif',Georgia,serif;font-size:22px;font-weight:700;color:#6b3fa0">Redirect</div>
+          <div style="font-size:13px;color:#4a5568;margin-top:3px">на доработку</div>
+        </div>
+        <div style="padding:16px 24px;font-size:15px;color:#4a5568;line-height:1.5">
+          Инициатива возвращается на выбранный предыдущий этап с замечаниями.
+          Частый случай — объединение с уже существующей похожей инициативой
+        </div>
+        <div style="padding:16px 22px;font-size:14px;color:#7c8798;line-height:1.45;border-left:1px solid #dfe4ed;height:100%;display:flex;align-items:center">
+          Автор получает перечень того, что требуется доработать
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;font-size:15px;color:#4a5568;line-height:1.5">
+      Перечень допустимых решений задаётся для каждых ворот отдельно: например, на Gate 5 доступны только Go и Kill —
+      возвращать на доработку решение, прошедшее пилот, поздно.
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">8</span></div>
+</div>
+</x-dc>
+</body>
+</html>

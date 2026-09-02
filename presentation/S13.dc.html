@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule"></div>
+  <div style="padding:54px 64px 0">
+    <div class="eyebrow">Риски</div>
+    <h2 style="margin-top:16px">Главные риски — организационные, и они сняты механизмами</h2>
+
+    <div style="margin-top:36px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:grid;grid-template-columns:340px 1fr;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#f9fafc;padding:20px 22px;border-right:1px solid #dfe4ed">
+          <div style="font-size:17px;font-weight:700;line-height:1.25">Бюрократический застой</div>
+          <div style="font-size:14.5px;color:#7c8798;margin-top:7px;line-height:1.4">Сроки игнорируются из-за загрузки персонала</div>
+        </div>
+        <div style="padding:20px 24px;font-size:15.5px;color:#4a5568;line-height:1.5">
+          Контроль сроков встроен в систему и работает без участия человека: просрочка эскалируется
+          автоматически, публичная отчётность по скорости обработки, персональная ответственность
+          руководителей за своевременность решений
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:340px 1fr;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#f9fafc;padding:20px 22px;border-right:1px solid #dfe4ed">
+          <div style="font-size:17px;font-weight:700;line-height:1.25">Страх ошибки</div>
+          <div style="font-size:14.5px;color:#7c8798;margin-top:7px;line-height:1.4">Сотрудник боится, что идею раскритикуют</div>
+        </div>
+        <div style="padding:20px 24px;font-size:15.5px;color:#4a5568;line-height:1.5">
+          Закрепляется явная политика: участие в Social1 не влияет на аттестацию, а неудачная,
+          но продуманная инициатива считается частью учебного процесса. Каждый отказ приходит
+          с обоснованием и попадает в архив опыта
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:340px 1fr;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#f9fafc;padding:20px 22px;border-right:1px solid #dfe4ed">
+          <div style="font-size:17px;font-weight:700;line-height:1.25">Информационная изоляция</div>
+          <div style="font-size:14.5px;color:#7c8798;margin-top:7px;line-height:1.4">Учреждения вне пилота остаются в стороне</div>
+        </div>
+        <div style="padding:20px 24px;font-size:15.5px;color:#4a5568;line-height:1.5">
+          Библиотека проверенных практик открыта всем: любое учреждение берёт готовое решение
+          с методическими материалами самостоятельно, без директивы сверху
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:340px 1fr;border:1px solid #dfe4ed;border-radius:10px;overflow:hidden">
+        <div style="background:#f9fafc;padding:20px 22px;border-right:1px solid #dfe4ed">
+          <div style="font-size:17px;font-weight:700;line-height:1.25">Зависимость от поставщика</div>
+          <div style="font-size:14.5px;color:#7c8798;margin-top:7px;line-height:1.4">Привязка к одному исполнителю</div>
+        </div>
+        <div style="padding:20px 24px;font-size:15.5px;color:#4a5568;line-height:1.5">
+          Платформа построена на открытых стандартах, без внешних зависимостей,
+          с открытым программным интерфейсом для интеграции с системами Департамента
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Экосистема системных инноваций ДТСЗН</span><span class="num">13</span></div>
+</div>
+</x-dc>
+</body>
+</html>
