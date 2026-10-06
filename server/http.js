@@ -70,7 +70,10 @@ const MIME = {
   '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json',
 };
 
-export async function serveStatic(res, webRoot, urlPath) {
+// spaFallback: неизвестный путь отдаётся в index.html для клиентского роутера.
+// Для каталога общих модулей фолбэк выключен — иначе отсутствующий модуль вернулся бы
+// разметкой с типом text/html, и браузер сообщил бы о непонятной ошибке импорта.
+export async function serveStatic(res, webRoot, urlPath, { spaFallback = true } = {}) {
   const clean = normalize(urlPath).replace(/^(\.\.[/\\])+/, '');
   let file = join(webRoot, clean === '/' ? 'index.html' : clean);
   if (!file.startsWith(webRoot)) throw new HttpError(403, 'Доступ запрещён');
@@ -78,7 +81,7 @@ export async function serveStatic(res, webRoot, urlPath) {
   try {
     data = await readFile(file);
   } catch {
-    // SPA: неизвестные пути отдаём в index.html для клиентского роутера
+    if (!spaFallback) throw new HttpError(404, 'Не найдено');
     file = join(webRoot, 'index.html');
     try { data = await readFile(file); } catch { throw new HttpError(404, 'Не найдено'); }
   }

@@ -12,6 +12,12 @@ import { projectsList, projectDetail } from './views/projects.js';
 import { pilotsList, pilotDetail, surveyDetail } from './views/pilots.js';
 import { communityView, topicDetail, practicesView, profileView, processView } from './views/community.js';
 import { processesView } from './views/processes.js';
+import { changesBoard, changeDetail, changeEditor } from './views/changes.js';
+import { knowledgeView, documentView } from './views/knowledge.js';
+import { formsList, formEditor } from './views/forms.js';
+import { formFill, publicForm } from './views/form-fill.js';
+import { formResults } from './views/form-results.js';
+import { providersView, providerDetail, providerEditor } from './views/providers.js';
 import { adminView } from './views/admin.js';
 
 const root = document.getElementById('root');
@@ -24,7 +30,7 @@ const ROUTES = [
   [/^\/ideas\/new$/,          'Новая идея',              (v) => ideaCreate(v)],
   [/^\/ideas\/(\d+)$/,        'Идея',                    (v, m) => ideaDetail(v, m[1])],
   [/^\/review$/,              'Ревью предложений',       (v, m, q) => reviewView(v, q)],
-  [/^\/rating$/,              'Рейтинг советчиков',      (v, m, q) => ratingView(v, q)],
+  [/^\/rating$/,              'Рейтинг социальных советников',      (v, m, q) => ratingView(v, q)],
   [/^\/moderation$/,          'Модерация идей',          (v, m, q) => moderationView(v, q)],
   [/^\/incentives$/,          'Рекомендации к поощрению',(v, m, q) => incentivesView(v, q)],
   [/^\/initiatives$/,         'Инициативы',              (v, m, q) => initiativesList(v, q)],
@@ -32,11 +38,24 @@ const ROUTES = [
   [/^\/initiatives\/(\d+)$/,  'Инициатива',              (v, m) => initiativeDetail(v, m[1])],
   [/^\/process$/,             'Процесс Stage-Gate',      (v) => processView(v)],
   [/^\/processes$/,           'Схемы процессов',         (v, m, q) => processesView(v, q)],
+  [/^\/changes$/,              'Изменения процессов',     (v, m, q) => changesBoard(v, q)],
+  [/^\/changes\/(\d+)$/,        'Предложение об изменении',(v, m) => changeDetail(v, m[1])],
+  [/^\/changes\/(\d+)\/edit$/,   'Правка схемы процесса',   (v, m) => changeEditor(v, m[1])],
+  [/^\/knowledge$/,           'База знаний',             (v, m, q) => knowledgeView(v, q)],
+  [/^\/knowledge\/(\d+)$/,     'Документ базы знаний',    (v, m) => documentView(v, m[1])],
   [/^\/projects$/,            'Разработка прототипов',   (v) => projectsList(v)],
   [/^\/projects\/(\d+)$/,     'Проект разработки',       (v, m) => projectDetail(v, m[1])],
   [/^\/pilots$/,              'Пилотирование',           (v) => pilotsList(v)],
   [/^\/pilots\/(\d+)$/,       'Пилотный проект',         (v, m) => pilotDetail(v, m[1])],
   [/^\/surveys\/(\d+)$/,      'Опрос',                   (v, m) => surveyDetail(v, m[1])],
+  [/^\/forms$/,               'Формы и опросы',          (v, m, q) => formsList(v, q)],
+  [/^\/forms\/(\d+)$/,         'Конструктор формы',       (v, m) => formEditor(v, m[1])],
+  [/^\/forms\/(\d+)\/fill$/,    'Заполнение формы',        (v, m) => formFill(v, m[1])],
+  [/^\/forms\/(\d+)\/results$/, 'Результаты формы',        (v, m, q) => formResults(v, m[1], q)],
+  [/^\/providers$/,           'Каталог разработчиков ИИ-решений',  (v, m, q) => providersView(v, q)],
+  [/^\/providers\/new$/,      'Новый разработчик',       (v) => providerEditor(v, null)],
+  [/^\/providers\/(\d+)$/,    'Разработчик ИИ-решений',             (v, m, q) => providerDetail(v, m[1], q)],
+  [/^\/providers\/(\d+)\/edit$/, 'Редактирование разработчика', (v, m) => providerEditor(v, m[1])],
   [/^\/analytics$/,           'Аналитика и КПЭ',         (v, m, q) => analyticsView(v, q)],
   [/^\/sla$/,                 'Контроль SLA',            (v) => slaView(v)],
   [/^\/community$/,           'Сообщество',              (v, m, q) => communityView(v, q)],
@@ -49,6 +68,15 @@ const ROUTES = [
 let lastShellKey = null;
 
 async function render(route) {
+  // Форма, открытая по ссылке, живёт до входа в систему: её заполняют сотрудники
+  // учреждений, у которых учётной записи в Social1 может и не быть. Страница
+  // рисуется без каркаса портала — на ней нет ничего, кроме самой анкеты.
+  if (route.path.startsWith('/f/')) {
+    lastShellKey = null;
+    await publicForm(root, route.path.slice(3));
+    return;
+  }
+
   // Экран входа
   if (!state.user) {
     if (route.path !== '/login') { navigate('/login', true); return; }

@@ -1,4 +1,4 @@
-// Модуль «Идеи и решения»: рейтинг советчиков, страница модерации,
+// Модуль «Идеи и решения»: рейтинг социальных советников, страница модерации,
 // рекомендации к поощрению и вклад участника в профиле.
 import { api, esc, html, avatar, can, navigate, toast, modal, confirmDialog,
          nl2br, num, fmtDate, fmtAgo, plural } from '../core.js';
@@ -22,7 +22,7 @@ const CATEGORY_TITLES = {
 const ICON_MEDAL = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="15" r="6"/><path d="M8.2 10L5 2h5l2.5 6M15.8 10L19 2h-5l-1.2 3"/></svg>';
 
 // ══════════════════════════════════════════════════════════════
-// Рейтинг советчиков
+// Рейтинг социальных советников
 // ══════════════════════════════════════════════════════════════
 export async function ratingView(view, query) {
   const period = query.get('period') || 'month';
@@ -46,7 +46,7 @@ export async function ratingView(view, query) {
     <div class="page-head">
       <div class="page-head__row">
         <div style="flex:1;min-width:260px">
-          <h2>Рейтинг советчиков</h2>
+          <h2>Рейтинг социальных советников</h2>
           <p>Вклад сотрудников в решение проблем коллег: очки начисляются за предложенные решения,
              подтверждённый опыт и внедрённые улучшения. Рейтинг — основание для рекомендаций
              к поощрению, а не автоматическая выдача мер.</p>
@@ -89,7 +89,7 @@ export async function ratingView(view, query) {
 
       ${rest.length ? html`
       <div class="card">
-        <div class="card__head"><h3>Все советчики</h3>
+        <div class="card__head"><h3>Все социальные советники</h3>
           <span class="card__hint spacer">Период: ${esc(data.label)}</span></div>
         <div class="table-wrap"><table class="table">
           <thead><tr>
@@ -324,7 +324,7 @@ function experienceQueue(panel, items, reload) {
             ${p.risks ? `<div class="prop__field"><span>Риски и ограничения</span><div class="prose">${nl2br(p.risks)}</div></div>` : ''}
           </div>
           <div class="card__foot row">
-            <span class="fs-12 text-3">Подтверждение даёт советчику очки и знак отличия «Проверенный опыт»</span>
+            <span class="fs-12 text-3">Подтверждение даёт социальному советнику очки и знак отличия «Проверенный опыт»</span>
             <div class="row spacer">
               <a class="btn btn--sm" href="/ideas/${p.idea_id}">Открыть идею</a>
               <button class="btn btn--sm btn--danger" data-decide="${p.id}" data-action="reject">Отклонить</button>
@@ -338,7 +338,7 @@ function experienceQueue(panel, items, reload) {
     title: b.dataset.action === 'verify' ? 'Подтвердить проверенный опыт' : 'Отклонить описание опыта',
     body: html`
       <p class="prose" style="margin-bottom:14px">${b.dataset.action === 'verify'
-        ? 'Подтверждаю, что решение применялось и дало результат. Советчику начисляются очки за проверенный опыт.'
+        ? 'Подтверждаю, что решение применялось и дало результат. Социальному советнику начисляются очки за проверенный опыт.'
         : 'Комментарий увидит автор. Очки за проверенный опыт не начисляются.'}</p>
       <div class="field">
         <label class="field__label" for="ex-note">Комментарий${b.dataset.action === 'reject' ? ' <span class="req">*</span>' : ''}</label>
@@ -569,7 +569,7 @@ export async function incentivesView(view, query) {
       </div>` : html`
       <div class="card"><div class="empty">
         <h4>Рекомендаций нет</h4>
-        <p>Рекомендации формируются по итогам периода на основании рейтинга советчиков
+        <p>Рекомендации формируются по итогам периода на основании рейтинга социальных советников
            или добавляются руководителем вручную.</p>
       </div></div>`}`;
 
@@ -697,7 +697,7 @@ export async function advisorPanel(userId) {
   return html`
     <div class="grid grid--kpi" style="margin-bottom:16px">
       <div class="kpi kpi--ok">
-        <div class="kpi__label">Очки советчика</div>
+        <div class="kpi__label">Очки социального советника</div>
         <div class="kpi__value">${num(s.points)}</div>
         <div class="kpi__meta">За весь период участия</div>
       </div>

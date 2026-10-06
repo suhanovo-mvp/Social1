@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+  <style>
+    body { margin: 0; }
+    .sl { width: 1280px; height: 720px; position: relative; overflow: hidden;
+          font-family: "PT Sans", "Segoe UI", system-ui, sans-serif; color: #141b28;
+          background: #ffffff; }
+    .rule { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #1b3a6b; }
+    .eyebrow { font-family: "PT Mono", ui-monospace, monospace; font-size: 15px;
+               letter-spacing: .14em; text-transform: uppercase; color: #7c8798; }
+    h2 { font-family: "PT Serif", Georgia, serif; font-size: 44px; font-weight: 700;
+         line-height: 1.14; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+    h3 { font-family: "PT Serif", Georgia, serif; font-size: 19px; font-weight: 700;
+         letter-spacing: -.01em; margin: 0; }
+    .lede { font-size: 21px; line-height: 1.5; color: #4a5568; }
+    .card { background: #f9fafc; border: 1px solid #dfe4ed; border-radius: 10px; padding: 17px 19px; }
+    .card p { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: #4a5568; }
+    .tag { font-family: "PT Mono", ui-monospace, monospace; font-size: 12px;
+           letter-spacing: .09em; text-transform: uppercase; color: #7c8798; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .tbl th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+              color: #7c8798; font-weight: 700; padding: 0 16px 8px 0; border-bottom: 1px solid #dfe4ed; }
+    .tbl td { padding: 6px 16px 6px 0; border-bottom: 1px solid #eef1f6; color: #4a5568; }
+    .tbl td b { color: #141b28; font-weight: 700; }
+    .foot { position: absolute; left: 64px; right: 64px; bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: #a3adbd; border-top: 1px solid #dfe4ed; padding-top: 12px; }
+    .num { font-family: "PT Mono", monospace; }
+    a { color: #24508f; } a:hover { color: #12294c; }
+  </style>
+</helmet>
+<div class="sl">
+  <div class="rule" style="background:#1a7f52"></div>
+  <div style="padding:48px 64px 0">
+    <div class="eyebrow" style="color:#1a7f52">Компонент 4 · Конструктор форм</div>
+    <h2 style="margin-top:14px">Анкета собирается в интерфейсе, а не в коде</h2>
+    <p class="lede" style="margin:14px 0 0;max-width:1030px;font-size:18px">
+      Одиннадцать видов вопросов. Длинные перечни — учреждения, роли, направления —
+      заводятся справочником один раз и дальше подставляются в анкеты вариантами ответа.
+    </p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:24px">
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Короткий текст</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Длинный текст</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Один вариант</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Несколько вариантов</span>
+      <span style="background:#e3f5ec;border:1px solid #c7e8d8;padding:6px 13px;border-radius:7px;font-size:14px;color:#1a7f52;font-weight:700">Выпадающий список · справочник</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Шкала</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Число</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Дата</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Электронная почта</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Телефон</span>
+      <span style="background:#f9fafc;border:1px solid #dfe4ed;padding:6px 13px;border-radius:7px;font-size:14px">Разделы блоков</span>
+      <span style="background:#f9fafc;border:1px dashed #c4ccda;padding:6px 13px;border-radius:7px;font-size:14px;color:#7c8798">«Другое» со своим текстом</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px">
+      <div class="card" style="border-top:3px solid #1a7f52">
+        <h3 style="font-size:17px">Условие показа — у самого вопроса</h3>
+        <p>«Уточните, где именно» видит только тот, кто поставил оценку 3 и выше. Правило работает
+        одинаково в браузере и на сервере: скрытый вопрос не считается обязательным, а ответ на него
+        не сохраняется — оценка, изменённая в последний момент, не оставляет следов.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #1a7f52">
+        <h3 style="font-size:17px">Публикация внутрь и наружу</h3>
+        <p>Участникам платформы или ссылкой: страница по ссылке открывается без входа в систему,
+        поэтому её можно разослать в учреждения, у сотрудников которых нет учётной записи.
+        Настраиваются анонимность, один ответ, срок сбора и текст после отправки.</p>
+      </div>
+      <div class="card" style="border-top:3px solid #1a7f52">
+        <h3 style="font-size:17px">Результаты сводятся сразу</h3>
+        <p>Распределение по вариантам, среднее и медиана по шкалам, свободные ответы целиком,
+        таблица анкет построчно, выгрузка в CSV. У условных вопросов рядом с числом ответов
+        показан охват — иначе доля отвечающих врёт.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;background:#eff5fd;border:1px solid #dde9f9;border-radius:10px;padding:15px 20px;display:flex;gap:24px;align-items:center">
+      <div class="tag" style="color:#24508f;flex-shrink:0;width:172px">Образец в поставке</div>
+      <div style="font-size:15.5px;line-height:1.5;color:#1b3a6b">
+        Опросник ДЗМ «Оценка потенциала переиспользования ИИ-решений в учреждениях ДТСЗН»:
+        пять блоков, 25 вопросов, оценка пяти решений по шкале и восемь условных уточнений об эффектах.
+        <b>Собран целиком в конструкторе</b> — это и есть проверка того, что движок покрывает реальные требования.
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Social1 · Управление реинжинирингом и коммуникациями</span><span class="num">7</span></div>
+</div>
+</x-dc>
+</body>
+</html>

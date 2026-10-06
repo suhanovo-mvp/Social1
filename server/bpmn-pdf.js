@@ -1,8 +1,10 @@
 // Отрисовка BPMN-схем в PDF. Геометрия берётся из того же модуля, что и в браузере,
 // поэтому бумажная версия совпадает с экранной шаг в шаг.
 import { PdfDoc, Canvas } from './pdf.js';
-import { GEO, layout, routeFlow, wrapText, numberAnchor } from '../web/js/bpmn-layout.js';
-import { DIAGRAMS, SCENARIOS, scenarioOf } from '../web/js/processes-data.js';
+import { GEO, layout, routeFlow, wrapLabel, numberAnchor } from '../shared/bpmn/layout.js';
+// Схемы берутся из репозитория: бумажная версия печатает то же, что действует
+// на платформе, включая изменения, принятые сообществом и опубликованные.
+import { album, SCENARIOS, scenarioOf } from './process-repo.js';
 
 // Стандартные листы в альбомной ориентации, пункты
 const SHEETS = {
@@ -112,7 +114,7 @@ function drawDiagram(cv, diagram, seq, area) {
         cv.lineWidth(Math.max(0.4, S(1.4)));
         cv.circle(X(b.cx), Y(b.cy), S(GEO.EVENT_R - 3.5), 'S');
       }
-      const lines = wrapText(n.label, 24, 3);
+      const lines = wrapLabel(n.label, 'event');
       lines.forEach((line, i) =>
         cv.text(line, X(b.cx), Y(b.cy + GEO.EVENT_R + 14) - i * fs * 1.15,
           { size: Math.max(4.5, S(10.5)), align: 'center', color: C.text2 }));
@@ -130,7 +132,7 @@ function drawDiagram(cv, diagram, seq, area) {
         cv.polyline([[X(b.cx) - g * 0.8, Y(b.cy) - g * 0.8], [X(b.cx) + g * 0.8, Y(b.cy) + g * 0.8]], 'S');
         cv.polyline([[X(b.cx) + g * 0.8, Y(b.cy) - g * 0.8], [X(b.cx) - g * 0.8, Y(b.cy) + g * 0.8]], 'S');
       }
-      const lines = wrapText(n.label, 24, 2);
+      const lines = wrapLabel(n.label, 'gateway');
       lines.forEach((line, i) =>
         cv.text(line, X(b.cx), Y(b.cy - h - 12) + (lines.length - 1 - i) * fs * 1.1,
           { size: Math.max(4.5, S(10.5)), align: 'center', color: C.text2 }));
@@ -138,7 +140,7 @@ function drawDiagram(cv, diagram, seq, area) {
       cv.rgb(tone.fill === C.surface ? C.surface : tone.fill).rgb(tone.stroke, true);
       cv.lineWidth(Math.max(0.5, S(1.4)));
       cv.roundRect(X(b.x), Y(b.y + b.h), S(b.w), S(b.h), S(7), 'B');
-      const lines = wrapText(n.label, 23, 3);
+      const lines = wrapLabel(n.label, 'task');
       const top = Y(b.cy) + ((lines.length - 1) * fs * 1.18) / 2 - fs * 0.35;
       lines.forEach((line, i) =>
         cv.text(line, X(b.cx), top - i * fs * 1.18, { size: fs, align: 'center', color: C.text }));
@@ -227,9 +229,11 @@ function drawWalkthrough(cv, block, x, top, width) {
       cv.rgb(C.brand);
       cv.rect(cx, y - 2.5, nw, WT.title + 2, 'f');
       cv.text(item.num, cx + nw / 2, y, { size: WT.body, align: 'center', color: '#ffffff', font: 'bold' });
-      // Заголовок шага
+      // Заголовок шага. Двузначный номер шага («22.10») шире плашки по умолчанию —
+      // отступ растёт вместе с ним, иначе номер наезжает на заголовок
+      const indent = Math.max(WT.numW, nw + 5);
       item.titleLines.forEach((line, i) =>
-        cv.text(line, cx + WT.numW, y - i * (WT.lh + 1), { size: WT.title, font: 'bold', color: C.text }));
+        cv.text(line, cx + indent, y - i * (WT.lh + 1), { size: WT.title, font: 'bold', color: C.text }));
       y -= item.titleLines.length * (WT.lh + 1) + WT.split;
       // Описание
       item.bodyLines.forEach((line, i) =>
@@ -309,36 +313,91 @@ function pickSheet(diagram) {
   return fit(SHEETS.A3) >= 0.45 ? SHEETS.A3 : SHEETS.A2;
 }
 
-/** PDF одной схемы. Формат листа подбирается по размеру схемы. */
-export function diagramPdf(diagram) {
-  const seq = DIAGRAMS.indexOf(diagram) + 1;
+/**
+ * Листы одной схемы для вставки в любой документ: сначала узнаём, сколько их будет,
+ * потом рисуем с номерами страниц этого документа. Так инструкция печатает схему
+ * тем же кодом, что и альбом, — номера шагов на бумаге не могут разойтись.
+ */
+export function diagramSheets(diagram, seq, { walkthrough = true } = {}) {
   const sheet = pickSheet(diagram);
+  // Без разбора — когда документ печатает его сам, крупнее и в своей вёрстке
+  const source = walkthrough ? diagram : { ...diagram, walkthrough: [] };
+  const probe = new Canvas(new PdfDoc());
+  const count = planPage(probe, source, seq, sheet).separate ? 2 : 1;
+  const render = (doc, firstPage, total) => {
+    const cv = new Canvas(doc);
+    const plan = planPage(cv, source, seq, sheet);
+    const chrome = { seq, title: diagram.title, sla: diagram.sla, group: diagram.group,
+                     scenario: scenarioOf(diagram.scenario).short, total, sheet };
+    drawChrome(cv, { ...chrome, page: firstPage });
+    drawDiagram(cv, source, seq, plan.diagramArea);
+    drawLegend(cv, FOOTER_H + 8, sheet);
+    if (plan.wt && !plan.separate) drawWalkthrough(cv, plan.wt, MARGIN, plan.wtTop, sheet.w - MARGIN * 2);
+    doc.addPage(sheet.w, sheet.h, cv.toString());
+    if (plan.separate) {
+      const cv2 = new Canvas(doc);
+      drawChrome(cv2, { ...chrome, page: firstPage + 1 });
+      drawWalkthrough(cv2, plan.wt, MARGIN, sheet.h - HEADER_H, sheet.w - MARGIN * 2);
+      doc.addPage(sheet.w, sheet.h, cv2.toString());
+    }
+  };
+  return { count, sheet, render };
+}
+
+/**
+ * PDF одной схемы. Формат листа подбирается по размеру схемы.
+ * @param seq номер раздела в сквозной нумерации альбома
+ */
+export function diagramPdf(diagram, seq) {
+  const sheets = diagramSheets(diagram, seq);
   const doc = new PdfDoc({
     title: `Раздел ${seq}. ${diagram.title}`,
-    subject: `Схема процесса в нотации BPMN — Social1, лист ${sheet.name}`,
+    subject: `Схема процесса в нотации BPMN — Social1, лист ${sheets.sheet.name}`,
   });
-  const cv = new Canvas(doc);
-  const plan = planPage(cv, diagram, seq, sheet);
-  const total = plan.separate ? 2 : 1;
-  drawChrome(cv, { seq, title: diagram.title, sla: diagram.sla, group: diagram.group,
-                   scenario: scenarioOf(diagram.scenario).short, page: 1, total, sheet });
-  drawDiagram(cv, diagram, seq, plan.diagramArea);
-  drawLegend(cv, FOOTER_H + 8, sheet);
-  if (plan.wt && !plan.separate) drawWalkthrough(cv, plan.wt, MARGIN, plan.wtTop, sheet.w - MARGIN * 2);
-  doc.addPage(sheet.w, sheet.h, cv.toString());
-
-  if (plan.separate) {
-    const cv2 = new Canvas(doc);
-    drawChrome(cv2, { seq, title: diagram.title, sla: diagram.sla, group: diagram.group,
-                      scenario: scenarioOf(diagram.scenario).short, page: 2, total, sheet });
-    drawWalkthrough(cv2, plan.wt, MARGIN, sheet.h - HEADER_H, sheet.w - MARGIN * 2);
-    doc.addPage(sheet.w, sheet.h, cv2.toString());
-  }
+  sheets.render(doc, 1, sheets.count);
   return doc.build();
 }
 
+const TOC_TOP = A3.h - 84, TOC_BOTTOM = FOOTER_H + 24;
+
+/**
+ * Раскладка оглавления по страницам: заголовки путей, групп и строки схем.
+ * Считается до отрисовки — от числа страниц оглавления зависят номера страниц
+ * схем. Заголовок пути или группы не остаётся внизу листа без строк под ним.
+ */
+export function tocLayout(diagrams) {
+  const items = [];
+  let lastGroup = null;
+  let lastScenario = null;
+  diagrams.forEach((d, i) => {
+    if (d.scenario !== lastScenario) {
+      lastScenario = d.scenario;
+      lastGroup = null;
+      items.push({ kind: 'scenario', h: 34, title: scenarioOf(d.scenario).title });
+    }
+    if (d.group !== lastGroup) {
+      lastGroup = d.group;
+      items.push({ kind: 'group', h: 25, title: d.group });
+    }
+    items.push({ kind: 'row', h: 20, d, i });
+  });
+  const pages = [[]];
+  let room = TOC_TOP - TOC_BOTTOM;
+  items.forEach((it, k) => {
+    const keep = it.kind === 'row' ? it.h
+      : it.h + (items[k + 1]?.kind === 'group' ? items[k + 1].h : 0) + 20;
+    if (keep > room && pages.at(-1).length) { pages.push([]); room = TOC_TOP - TOC_BOTTOM; }
+    pages.at(-1).push(it);
+    room -= it.h;
+  });
+  return pages;
+}
+
+export const TOC_HEIGHT = TOC_TOP - TOC_BOTTOM;
+
 /** Альбом всех схем: титул, оглавление, по странице на схему. */
 export function albumPdf() {
+  const DIAGRAMS = album();
   const doc = new PdfDoc({
     title: 'Social1 — схемы процессов',
     subject: 'Модели процессов в нотации BPMN по ролям участников',
@@ -350,7 +409,7 @@ export function albumPdf() {
   t.text('Social1', MARGIN, A3.h - 70, { size: 30, font: 'bold', color: '#ffffff' });
   t.text('Платформа системных инноваций ДТСЗН', MARGIN, A3.h - 96, { size: 13, color: '#dde9f9' });
   t.text('Схемы процессов', MARGIN, A3.h - 230, { size: 40, font: 'bold', color: C.text });
-  t.text('Детализированные модели в нотации BPMN: два пользовательских пути',
+  t.text(`Детализированные модели в нотации BPMN: пользовательских путей — ${SCENARIOS.length}`,
     MARGIN, A3.h - 262, { size: 14, color: C.text2 });
   let ty = A3.h - 306;
   SCENARIOS.forEach((sc, i) => {
@@ -372,46 +431,49 @@ export function albumPdf() {
     MARGIN, FOOTER_H + 4, { size: 9, color: C.text3 });
   doc.addPage(A3.w, A3.h, t.toString());
 
+  // Оглавление раскладывается по страницам заранее: от числа его страниц зависят
+  // номера страниц схем. Раньше оно рисовалось на одном листе, и всё, что не
+  // помещалось, уходило за нижний край.
+  const tocPages = tocLayout(DIAGRAMS);
+
   // Сколько страниц займёт каждая схема — нужно до отрисовки оглавления
   const probe = new Canvas(doc);
   const plans = DIAGRAMS.map((d, i) => planPage(probe, d, i + 1, A3));
   const startPage = [];
-  let cursor = 3;
+  let cursor = 2 + tocPages.length;
   plans.forEach((pl) => { startPage.push(cursor); cursor += pl.separate ? 2 : 1; });
   const totalPages = cursor - 1;
 
   // Оглавление
-  const c = new Canvas(doc);
-  c.rgb(C.brand).rect(0, A3.h - 4, A3.w, 4, 'f');
-  c.text('Содержание', MARGIN, A3.h - 44, { size: 20, font: 'bold', color: C.text });
-  let y = A3.h - 84;
-  let lastGroup = null;
-  let lastScenario = null;
-  DIAGRAMS.forEach((d, i) => {
-    if (d.scenario !== lastScenario) {
-      lastScenario = d.scenario;
-      lastGroup = null;
-      y -= 6;
-      c.rgb(C.brand).rect(MARGIN, y - 4, A3.w - MARGIN * 2, 20, 'f');
-      c.text(scenarioOf(d.scenario).title, MARGIN + 8, y + 1, { size: 10.5, font: 'bold', color: '#ffffff' });
-      y -= 28;
+  tocPages.forEach((items, pi) => {
+    const c = new Canvas(doc);
+    c.rgb(C.brand).rect(0, A3.h - 4, A3.w, 4, 'f');
+    c.text(pi ? 'Содержание (продолжение)' : 'Содержание', MARGIN, A3.h - 44, { size: 20, font: 'bold', color: C.text });
+    let y = TOC_TOP;
+    for (const it of items) {
+      if (it.kind === 'scenario') {
+        y -= 6;
+        c.rgb(C.brand).rect(MARGIN, y - 4, A3.w - MARGIN * 2, 20, 'f');
+        c.text(it.title, MARGIN + 8, y + 1, { size: 10.5, font: 'bold', color: '#ffffff' });
+        y -= 28;
+      } else if (it.kind === 'group') {
+        y -= 8;
+        c.text(it.title.toUpperCase(), MARGIN, y, { size: 8.5, font: 'bold', color: C.text3 });
+        y -= 17;
+      } else {
+        const { d, i } = it;
+        c.text(`${i + 1}.`, MARGIN + 12, y, { size: 11, font: 'bold', color: C.brand });
+        c.text(d.title, MARGIN + 34, y, { size: 11, color: C.text });
+        if (d.sla) c.text(`SLA: ${d.sla}`, MARGIN + 430, y, { size: 9, color: C.text3 });
+        c.text(String(startPage[i]), A3.w - MARGIN, y, { size: 10, align: 'right', color: C.text3 });
+        c.rgb(C.border, true).lineWidth(0.4);
+        c.polyline([[MARGIN + 12, y - 5], [A3.w - MARGIN, y - 5]], 'S');
+        y -= 20;
+      }
     }
-    if (d.group !== lastGroup) {
-      lastGroup = d.group;
-      y -= 8;
-      c.text(d.group.toUpperCase(), MARGIN, y, { size: 8.5, font: 'bold', color: C.text3 });
-      y -= 17;
-    }
-    c.text(`${i + 1}.`, MARGIN + 12, y, { size: 11, font: 'bold', color: C.brand });
-    c.text(d.title, MARGIN + 34, y, { size: 11, color: C.text });
-    if (d.sla) c.text(`SLA: ${d.sla}`, MARGIN + 430, y, { size: 9, color: C.text3 });
-    c.text(String(startPage[i]), A3.w - MARGIN, y, { size: 10, align: 'right', color: C.text3 });
-    c.rgb(C.border, true).lineWidth(0.4);
-    c.polyline([[MARGIN + 12, y - 5], [A3.w - MARGIN, y - 5]], 'S');
-    y -= 20;
+    c.text(`${2 + pi} из ${totalPages}`, A3.w - MARGIN, FOOTER_H - 13, { size: 8, align: 'right', color: C.text3 });
+    doc.addPage(A3.w, A3.h, c.toString());
   });
-  c.text(`2 из ${totalPages}`, A3.w - MARGIN, FOOTER_H - 13, { size: 8, align: 'right', color: C.text3 });
-  doc.addPage(A3.w, A3.h, c.toString());
 
   // Схемы
   DIAGRAMS.forEach((d, i) => {

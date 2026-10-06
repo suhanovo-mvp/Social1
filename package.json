@@ -9,6 +9,9 @@
     "start": "node --no-warnings server/index.js",
     "seed": "node --no-warnings server/seed.js",
     "reset": "node --no-warnings server/seed.js --reset",
+    "seed:providers": "node --no-warnings server/seed-providers.js",
+    "seed:providers:remove": "node --no-warnings server/seed-providers.js --remove",
+    "screens": "node --no-warnings scripts/presentation-screens.mjs",
     "test": "node --no-warnings --test \"tests/**/*.test.js\""
   }
 }

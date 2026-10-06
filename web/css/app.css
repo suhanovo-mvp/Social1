@@ -37,6 +37,9 @@
   --shadow-lg:0 12px 36px rgba(0,0,0,.5);
 }
 *,*::before,*::after{box-sizing:border-box}
+/* Скрытие атрибутом hidden должно работать и там, где элементу задан свой display:
+   иначе .badge с display:inline-flex остаётся на экране, хотя разметка его прячет */
+[hidden]{display:none !important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);
   font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -635,7 +638,7 @@ a:hover{text-decoration:underline}
 .track__item.is-stopped{color:var(--danger); font-weight:600}
 .track__item.is-stopped i{background:var(--danger); border-color:var(--danger)}
 
-/* Рейтинг советчиков */
+/* Рейтинг социальных советников */
 .podium{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-bottom:16px}
 .podium__item{
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
@@ -1042,7 +1045,7 @@ a:hover{text-decoration:underline}
 }
 
 /* Переключатель пользовательских сценариев альбома */
-.scen-switch{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:11px; margin-top:16px}
+.scen-switch{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:11px; margin-top:16px}
 .scen-switch__item{
   display:block; text-align:left; padding:14px 16px; border-radius:var(--radius);
   border:1px solid var(--border); background:var(--surface); cursor:pointer;
@@ -1052,6 +1055,7 @@ a:hover{text-decoration:underline}
 .scen-switch__item.is-on{border-color:var(--brand-700); background:var(--brand-50); box-shadow:var(--shadow-sm)}
 .scen-switch__item b{display:block; font-size:14px; font-weight:650; letter-spacing:-.01em; line-height:1.35}
 .scen-switch__item.is-on b{color:var(--brand-800)}
+[data-theme="dark"] .scen-switch__item.is-on b{color:var(--brand-600)}
 .scen-switch__item span{display:block; font-size:12.5px; color:var(--text-2); margin-top:5px; line-height:1.5}
 .scen-switch__item small{
   display:block; font-size:11px; color:var(--text-3); margin-top:8px;
@@ -1081,3 +1085,278 @@ a:hover{text-decoration:underline}
 .bp-svg.is-walking .bp-node.is-current .bp-num rect{fill:var(--brand-600)}
 .proc-item__num{font-family:var(--mono); font-size:11.5px; opacity:.65; font-weight:700}
 .proc-item.is-on .proc-item__num{opacity:.85}
+
+/* ── Редактор схем процессов ──────────────────────────────────
+   Схема остаётся тем же SVG, что и в просмотре: правка ничего не подменяет,
+   поэтому редактор наследует всю типографику и цвета фигур. */
+.ed { display: flex; flex-direction: column; gap: 12px; }
+.ed__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; }
+.ed__title { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; }
+.ed__hint { font-size: 12.5px; color: var(--text-3); }
+.ed__palette { display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 10px 12px; }
+.ed__palette-label { font-size: 12.5px; color: var(--text-3); margin-right: 2px; }
+.ed__shape { font: inherit; font-size: 12.5px; padding: 6px 11px; cursor: pointer;
+  background: var(--surface); color: var(--text-2);
+  border: 1px solid var(--border); border-radius: 999px; }
+.ed__shape:hover { border-color: var(--border-strong); color: var(--text); }
+.ed__shape.is-on { background: var(--brand-600); border-color: var(--brand-600); color: #fff; }
+
+.ed__body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; align-items: start; }
+@media (max-width: 1100px) { .ed__body { grid-template-columns: minmax(0, 1fr); } }
+
+/* Подсказка курсором о том, что произойдёт по щелчку */
+.ed__canvas.is-placing { cursor: copy; }
+.ed__canvas.is-connecting { cursor: crosshair; }
+
+.ed__side { position: sticky; top: calc(var(--header-h) + 12px); }
+.ed__panel { background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px; max-height: calc(100vh - var(--header-h) - 40px);
+  overflow: auto; }
+.ed__panel h4 { margin: 0 0 10px; font-size: 14px; }
+.ed__panel-head { display: flex; align-items: center; gap: 8px; }
+.ed__panel-head h4 { flex: 1; margin-bottom: 10px; }
+.ed__panel .field__label { margin-top: 12px; }
+.ed__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+.ed__stats div { background: var(--surface-2); border-radius: var(--radius-sm); padding: 8px;
+  text-align: center; display: flex; flex-direction: column; }
+.ed__stats b { font-size: 18px; }
+.ed__stats span { font-size: 11.5px; color: var(--text-3); }
+.ed__group { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 8px; }
+.ed__group--stage { background: var(--brand-50); margin: 16px -14px 0; padding: 14px;
+  border-top: 2px solid var(--brand-500); }
+.ed__group-title { font-size: 11.5px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text-3); }
+.ed__note { font-size: 12.5px; color: var(--text-3); line-height: 1.5; margin: 0; }
+.ed__warn { background: var(--warn-bg); color: var(--warn); border-radius: var(--radius-sm);
+  padding: 9px 11px; font-size: 12.5px; line-height: 1.5; }
+.ed__list { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.65; color: var(--text-2); }
+.ed__list--warn { color: var(--warn); }
+.ed__list button { font: inherit; color: inherit; background: none; border: none; padding: 0;
+  text-align: left; cursor: pointer; text-decoration: underline dotted; }
+.ed__stage, .ed__flow { display: flex; flex-direction: column; gap: 2px; text-align: left;
+  font: inherit; cursor: pointer; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 10px; }
+.ed__stage:hover, .ed__flow:hover { border-color: var(--brand-500); }
+.ed__stage b, .ed__flow span { font-size: 13px; color: var(--text); }
+.ed__stage small, .ed__flow small { font-size: 11.5px; color: var(--text-3); }
+.ed__checks { display: flex; flex-direction: column; gap: 6px; }
+.ed__lanes { display: flex; flex-direction: column; gap: 8px; }
+.ed__lane-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; }
+
+/* Состояния фигур при правке и при сравнении версий */
+.bp-node.is-selected .bp-task, .bp-node.is-selected .bp-gateway, .bp-node.is-selected .bp-event {
+  stroke: var(--brand-600); stroke-width: 3; }
+.bp-node.is-source .bp-task, .bp-node.is-source .bp-gateway, .bp-node.is-source .bp-event {
+  stroke: var(--purple); stroke-width: 3; stroke-dasharray: 5 3; }
+.bp-node.is-added .bp-task, .bp-node.is-added .bp-gateway, .bp-node.is-added .bp-event {
+  stroke: var(--ok); stroke-width: 2.6; }
+.bp-node.is-edited .bp-task, .bp-node.is-edited .bp-gateway, .bp-node.is-edited .bp-event {
+  stroke: var(--warn); stroke-width: 2.6; }
+
+/* Метка обсуждения на шаге схемы */
+.bp-comment { cursor: pointer; }
+.bp-comment circle { fill: var(--warn); stroke: var(--surface); stroke-width: 1.5; }
+.bp-comment text { fill: #fff; font-size: 10px; font-weight: 700; }
+
+/* ── Предложения об изменении процессов ────────────────────── */
+.chg-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .chg-layout { grid-template-columns: minmax(0, 1fr); } }
+.chg-card__head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.chg-card__title { margin: 0 0 4px; font-size: 16px; }
+.chg-card__proc { font-size: 12.5px; color: var(--text-3); margin-bottom: 8px; }
+.chg-card__why { margin: 0 0 12px; font-size: 13.5px; line-height: 1.6; color: var(--text-2);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.chg-card__foot { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-3); }
+.chg-card__stat { white-space: nowrap; }
+.chg-summary { margin: 0; padding-left: 20px; line-height: 1.75; font-size: 14px; }
+.chg-summary li::marker { color: var(--brand-600); }
+.chg-issues { margin-top: 14px; background: var(--warn-bg); color: var(--warn);
+  border-radius: var(--radius-sm); padding: 11px 13px; font-size: 13px; line-height: 1.6; }
+.chg-issues ul { margin: 6px 0 0; padding-left: 18px; }
+.chg-effect { margin-top: 12px; background: var(--ok-bg); color: var(--ok);
+  border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; line-height: 1.6; }
+.chg-anchor { font-size: 12px; color: var(--brand-600); margin: 2px 0 4px; }
+.chg-votes { display: flex; gap: 8px; }
+.chg-votes .btn { flex: 1; justify-content: center; }
+.chg-decide { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 13px; }
+.appr { display: flex; flex-direction: column; gap: 10px; }
+.appr__row { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px;
+  background: var(--surface-2); border-radius: var(--radius-sm); padding: 10px 12px; }
+.appr__who b { font-size: 13.5px; display: block; }
+.appr__who small { font-size: 11.5px; color: var(--text-3); }
+.appr__verdict { justify-self: end; }
+.appr__comment { grid-column: 1 / -1; font-size: 12.5px; line-height: 1.55; color: var(--text-2); }
+.appr__by { grid-column: 1 / -1; font-size: 11.5px; color: var(--text-3); }
+
+/* ── База знаний ──────────────────────────────────────────────
+   Поиск стоит выше списка: раздел существует, чтобы найденное решение избавляло
+   от повторного разбора, а не чтобы листать каталог. */
+.kb-search { position: relative; margin-top: 16px; }
+.kb-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--text-3); pointer-events: none; }
+.kb-search .input { padding-left: 36px; font-size: 15px; height: 44px; }
+.kb-card__head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.kb-card__title { margin: 0 0 10px; font-size: 16px; }
+.kb-card__foot { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-3); }
+.kb-excerpt { margin-top: 6px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
+.kb-excerpt mark { background: var(--warn-bg); color: var(--warn); padding: 0 2px; border-radius: 2px; }
+.kb-section .card__head h3 { font-size: 14px; }
+.kb-text { white-space: normal; line-height: 1.7; }
+.kb-comments { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 10px; }
+.kb-comment { background: var(--surface-2); border-radius: var(--radius-sm); padding: 10px 12px;
+  font-size: 13px; line-height: 1.6; }
+.kb-comment__who { font-weight: 600; font-size: 12.5px; margin-bottom: 3px; }
+
+/* ── Формы и опросы ───────────────────────────────────────────
+   Заполнение и конструктор пользуются одними и теми же полями: вопрос выглядит
+   в редакторе так же, как его увидит респондент, — иначе автор формы узнаёт о
+   тесноте вариантов только от тех, кто уже заполнил анкету. */
+.form-card__title { margin: 8px 0 6px; font-size: 16px; letter-spacing: -.015em; }
+.form-card__lead { font-size: 13px; line-height: 1.55; color: var(--text-2); }
+.form-card__stats { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px;
+  font-size: 12.5px; color: var(--text-3); }
+.form-card__stats b { color: var(--text); font-weight: 650; }
+.form-card__foot { display: flex; align-items: center; gap: 8px; margin-top: 14px;
+  padding-top: 12px; border-top: 1px solid var(--border); }
+
+/* Заполнение */
+.form-page { max-width: 780px; }
+.form-intro h2 { font-size: 21px; letter-spacing: -.025em; }
+.form-intro { border-top: 3px solid var(--brand-600); }
+.form-progress { display: flex; align-items: center; gap: 12px; margin: 14px 0;
+  font-size: 12px; color: var(--text-3); }
+.form-progress__track { flex: 1; height: 5px; background: var(--surface-3);
+  border-radius: 100px; overflow: hidden; }
+.form-progress i { display: block; width: 0; height: 100%; border-radius: 100px;
+  background: var(--brand-600); transition: width .3s ease; }
+.form-progress span { white-space: nowrap; }
+
+.fq { padding: 18px 0; border-bottom: 1px solid var(--border); }
+.fq:first-child { padding-top: 0; }
+.fq:last-child { border-bottom: none; padding-bottom: 0; }
+.fq__title { display: flex; gap: 10px; font-size: 14.5px; font-weight: 560; line-height: 1.45; }
+.fq__no { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-3);
+  color: var(--text-3); font-size: 12px; font-weight: 650; display: grid; place-items: center; }
+.fq__req { color: var(--danger); font-style: normal; margin-left: 3px; }
+.fq__hint { font-size: 12.5px; color: var(--text-3); line-height: 1.5; margin: 6px 0 0 34px; }
+.fq__control { margin: 12px 0 0 34px; }
+.fq__error { margin: 8px 0 0 34px; font-size: 12.5px; color: var(--danger); font-weight: 550; }
+.fq.is-error { background: var(--danger-bg); border-radius: var(--radius-sm);
+  margin: 0 -12px; padding: 18px 12px; }
+.fq--section { border-bottom: none; padding-bottom: 4px; }
+.fq--section h3 { font-size: 16.5px; font-weight: 650; letter-spacing: -.02em;
+  padding-bottom: 7px; border-bottom: 2px solid var(--brand-600); display: inline-block; }
+.fq--section p { margin-top: 8px; font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+.opts { display: flex; flex-direction: column; gap: 2px; }
+.opt { display: flex; align-items: center; gap: 10px; padding: 7px 9px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 13.5px; line-height: 1.45; }
+.opt:hover { background: var(--surface-2); }
+.opt input[type=radio], .opt input[type=checkbox] { width: 16px; height: 16px; flex-shrink: 0;
+  accent-color: var(--brand-600); cursor: pointer; }
+.opt--other { flex-wrap: wrap; }
+.opt__text { max-width: 320px; padding: 5px 9px; font-size: 13px; }
+
+.scale { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.scale__edge { font-size: 12px; color: var(--text-3); max-width: 150px; line-height: 1.35; }
+.scale__points { display: flex; gap: 6px; }
+.scale__point { width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface); font-size: 15px; font-weight: 600; color: var(--text-2); cursor: pointer;
+  transition: all .12s ease; }
+.scale__point:hover { border-color: var(--brand-500); color: var(--brand-600); }
+.scale__point.is-on { background: var(--brand-700); border-color: var(--brand-700); color: #fff; }
+
+.form-done { max-width: 560px; margin: 40px auto; text-align: center; }
+.form-done h2 { font-size: 20px; margin: 14px 0 8px; }
+.form-done__mark { width: 58px; height: 58px; border-radius: 50%; margin: 0 auto;
+  background: var(--ok-bg); color: var(--ok); display: grid; place-items: center; }
+
+/* Публичная страница формы: без каркаса портала */
+.public { min-height: 100vh; background: var(--bg); padding: 28px 16px 40px; }
+.public__head { max-width: 780px; margin: 0 auto 20px; display: flex; align-items: center; gap: 11px; }
+.public__mark { width: 36px; height: 36px; border-radius: 10px; background: var(--brand-800); color: #fff;
+  display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.public__head b { display: block; font-size: 15px; font-weight: 650; }
+.public__head small { color: var(--text-3); font-size: 12px; }
+.public__box { max-width: 780px; margin: 0 auto; }
+.public__foot { max-width: 780px; margin: 22px auto 0; font-size: 12px; color: var(--text-3); text-align: center; }
+
+/* Конструктор */
+.builder { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .builder { grid-template-columns: minmax(0, 1fr); } }
+.builder__main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.qlist { display: flex; flex-direction: column; gap: 10px; }
+.qcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); overflow: hidden; }
+.qcard.is-open { border-color: var(--brand-500); box-shadow: var(--shadow); }
+.qcard--section { border-left: 3px solid var(--brand-600); }
+.qcard__head { display: flex; align-items: flex-start; gap: 11px; padding: 12px 14px; cursor: pointer; }
+.qcard__head:hover { background: var(--surface-2); }
+.qcard__no { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-3);
+  color: var(--text-3); font-size: 12px; font-weight: 650; display: grid; place-items: center; }
+.qcard__main { min-width: 0; flex: 1; }
+.qcard__title { font-size: 13.5px; font-weight: 570; line-height: 1.45; }
+.qcard__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.qcard__cond { font-size: 11.5px; color: var(--purple); background: var(--purple-bg);
+  padding: 2px 8px; border-radius: 100px; }
+.qcard__tools { display: flex; gap: 2px; flex-shrink: 0; }
+.qcard__tools .icon-btn { color: var(--text-3); font-size: 14px; line-height: 1; width: 26px; height: 26px; }
+.qcard__tools .icon-btn:hover { background: var(--surface-3); color: var(--text); }
+.qcard__tools .icon-btn:disabled { opacity: .3; cursor: not-allowed; }
+.qcard__edit { padding: 4px 14px 16px 49px; border-top: 1px solid var(--border); }
+.opt-edit { display: flex; flex-direction: column; gap: 6px; }
+.opt-edit__row { display: flex; align-items: center; gap: 6px; }
+.opt-edit__row .input { padding: 6px 10px; font-size: 13px; }
+.cond { margin-top: 14px; padding: 12px 13px; background: var(--purple-bg); border-radius: var(--radius-sm); }
+.cond .field__label { color: var(--purple); }
+.cond .field__hint { margin-top: 8px; }
+.add-q .field__label { margin-bottom: 9px; }
+
+/* Результаты */
+.res-split { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+.res-donut { flex-shrink: 0; }
+.res-stats { display: flex; gap: 20px; flex-shrink: 0; }
+.res-stats div { text-align: center; }
+.res-stats b { display: block; font-size: 21px; font-weight: 700; letter-spacing: -.03em; }
+.res-stats span { font-size: 11.5px; color: var(--text-3); }
+.res-texts { display: flex; flex-direction: column; gap: 7px; max-height: 340px; overflow-y: auto; }
+.res-text { background: var(--surface-2); border-left: 2px solid var(--border-strong);
+  border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
+.res-table { max-height: 70vh; overflow-y: auto; }
+.res-table th { position: sticky; top: 0; z-index: 1; }
+.res-table td { max-width: 320px; }
+
+/* ══ Реестр исполнителей ИИ-решений ══ */
+.pv-tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.pv-tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11.5px;
+  background:var(--brand-50);color:var(--brand-600);border:1px solid transparent;line-height:1.5;white-space:nowrap}
+.pv-tag--tech{background:var(--surface-3);color:var(--text-2)}
+.pv-tag--more{background:none;border-color:var(--border);color:var(--text-3)}
+.pv-tag--gap{background:var(--surface);color:var(--warn);border-color:var(--border)}
+button.pv-tag{cursor:pointer;font:inherit;font-size:11.5px}
+button.pv-tag:hover{border-color:var(--brand-500)}
+.pv-gaps{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.pv-table td{vertical-align:top}
+.pv-name{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pv-fill{display:flex;align-items:center;gap:8px;min-width:110px;font-size:12px;color:var(--text-3)}
+.pv-fill .progress{flex:1;height:5px}
+.pv-stars{color:var(--warn);font-weight:650;white-space:nowrap}
+.pv-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.pv-checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2px 16px}
+.pv-cmp{font-size:12.5px;padding:1px 0}
+.pv-cmp.is-no{color:var(--text-3)}
+.pv-cmp.is-yes{color:var(--ok)}
+.pv-compare tbody th{white-space:nowrap}
+.pv-compare thead th{text-transform:none;font-size:13px;letter-spacing:0;min-width:180px}
+.pv-compare td{vertical-align:top;min-width:180px}
+.pv-sol__title{font-size:15px;font-weight:650;margin-bottom:4px}
+.pv-result{margin-top:8px;padding:8px 11px;background:var(--ok-bg);border-radius:var(--radius-sm);font-size:13px}
+.pv-form{max-width:920px}
+.clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:900px){ .pv-layout{grid-template-columns:1fr} }

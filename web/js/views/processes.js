@@ -1,11 +1,21 @@
 // Страница BPMN-схем: процессы каждой роли с пошаговым разбором прямо на схеме.
-import { api, state, esc, html, can, navigate, toast, modal, plural, ROLE_TITLES } from '../core.js';
+import { api, state, esc, html, can, navigate, toast, modal, confirmDialog, plural,
+         fmtAgo, ROLE_TITLES } from '../core.js';
 import { renderDiagram, LEGEND } from '../bpmn.js';
-import { layout } from '../bpmn-layout.js';
-import { DIAGRAMS, ROLE_ORDER, SCENARIOS, scenarioOf } from '../processes-data.js';
+import { layout } from '/shared/bpmn/layout.js';
 
-// Сквозная нумерация: номер схемы не зависит от выбранного фильтра ролей
-const seqOf = (d) => DIAGRAMS.indexOf(d) + 1;
+// Альбом приходит с сервера: схемы живут в репозитории версиями, а не в исходниках
+// клиента. Загружается один раз за сеанс — схемы меняются публикацией, не поминутно.
+let album = null;
+async function loadAlbum() {
+  if (!album) album = await api.get('/api/processes');
+  return album;
+}
+/** Сбросить кэш альбома — после публикации новой версии. */
+export function forgetAlbum() { album = null; }
+
+// Сквозная нумерация проставлена сервером: номер раздела не зависит от фильтра ролей
+const seqOf = (d) => d.seq;
 
 // Внутри сценария «все» означает весь его набор схем, а не только сквозную
 const ROLE_TAB = { all: 'Все схемы пути', ...ROLE_TITLES };
@@ -27,6 +37,9 @@ function legendIcon(type) {
 }
 
 export async function processesView(view, query) {
+  const { diagrams: DIAGRAMS, scenarios: SCENARIOS, roleOrder: ROLE_ORDER } = await loadAlbum();
+  const scenarioOf = (id) => SCENARIOS.find((s) => s.id === id) || SCENARIOS[0];
+
   const scenarioId = SCENARIOS.some((s) => s.id === query.get('s')) ? query.get('s') : SCENARIOS[0].id;
   const scenario = scenarioOf(scenarioId);
   const inScenario = DIAGRAMS.filter((d) => d.scenario === scenarioId);
@@ -55,7 +68,8 @@ export async function processesView(view, query) {
           <h2>Схемы процессов</h2>
           <p>Детализированные модели в нотации BPMN: кто что делает, где проходят границы
              ответственности, какие сроки действуют и как принимаются решения. Альбом разделён
-             на два пользовательских пути — подача полноценной инициативы и обсуждение идей.
+             на пользовательские пути: подача полноценной инициативы, обсуждение идей, работа
+             с каталогом разработчиков ИИ-решений и совместная работа с процессами, знаниями и опросами.
              Разделы и шаги пронумерованы сквозным образом: на шаг «${seqOf(current)}.3» можно
              сослаться в регламенте, и он однозначно находится.</p>
         </div>
@@ -133,6 +147,12 @@ export async function processesView(view, query) {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                   Разобрать по шагам
+                </button>` : ''}
+              ${can('process.propose') ? html`
+                <button class="btn" data-propose-change title="Предложить изменение этого процесса">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+                  Предложить изменение
                 </button>` : ''}
               <a class="btn" href="/api/processes/${esc(current.id)}/pdf" data-native download
                  title="Скачать схему в PDF, лист A3">
@@ -231,6 +251,139 @@ export async function processesView(view, query) {
 
   // ── Пошаговый разбор схемы ──
   view.querySelectorAll('[data-walk]').forEach((b) => b.onclick = () => startWalkthrough(view, current));
+
+  // ── Обсуждение шагов схемы ──
+  // Замечание привязано к фигуре, а не к процессу целиком: разговор о конкретном
+  // шаге не тонет в общей ленте, а на схеме видно, где именно жмёт.
+  await mountComments(view, current);
+
+  view.querySelector('[data-propose-change]')?.addEventListener('click', () => proposeChange(current));
+}
+
+/** Метки обсуждения на фигурах и панель замечаний по выбранному шагу. */
+async function mountComments(view, diagram) {
+  const svg = view.querySelector('.bp-svg');
+  if (!svg) return;
+  let data;
+  try { data = await api.get(`/api/processes/${diagram.id}/comments`); }
+  catch { return; }
+
+  const { boxes } = layout(diagram, diagram.seq);
+  const marks = Object.entries(data.counts)
+    .filter(([id]) => boxes[id])
+    .map(([id, n]) => {
+      const b = boxes[id];
+      const x = b.x + b.w - 4, y = b.y + 4;
+      return `<g class="bp-comment" data-comment-node="${esc(id)}" role="button" tabindex="0"
+                 aria-label="Замечаний к шагу: ${n}">
+                <circle cx="${x}" cy="${y}" r="9"/>
+                <text x="${x}" y="${y + 3.5}" text-anchor="middle">${n}</text>
+              </g>`;
+    }).join('');
+  if (marks) svg.insertAdjacentHTML('beforeend', marks);
+
+  // Шаг называется сквозным номером вида «1.8»: именно на него ссылаются регламенты
+  const open = (nodeId) => openNodeComments(diagram, nodeId, boxes[nodeId]?.num,
+    data.comments.filter((c) => c.node_id === nodeId));
+  svg.querySelectorAll('[data-comment-node]').forEach((g) => {
+    g.onclick = (e) => { e.stopPropagation(); open(g.dataset.commentNode); };
+  });
+  // Замечание можно оставить и на шаге, где их ещё нет
+  if (can('process.comment')) {
+    svg.querySelectorAll('.bp-node').forEach((el) => {
+      el.ondblclick = () => open(el.dataset.node);
+    });
+  }
+}
+
+function openNodeComments(diagram, nodeId, stepNumber, list) {
+  const node = diagram.nodes.find((n) => n.id === nodeId);
+  const body = html`
+    <p class="prose" style="margin-bottom:14px">Шаг <b>${esc(stepNumber || nodeId)}</b> —
+       «${esc(node?.label || nodeId)}»</p>
+    ${list.length ? html`
+      <div class="list">
+        ${list.map((c) => html`
+          <div class="list__item">
+            <div class="list__main">
+              <div class="list__title">${esc(c.author_name)}
+                <span class="text-3 fs-12">· ${esc(ROLE_TITLES[c.author_role] || c.author_role)}
+                  · ${esc(fmtAgo(c.created_at))}</span></div>
+              <div class="list__body">${esc(c.body)}</div>
+              <div class="list__meta">
+                <button class="btn btn--sm btn--ghost" data-useful="${c.id}">Полезно · ${c.useful}</button>
+              </div>
+            </div>
+          </div>`)}
+      </div>` : '<p class="prose text-3">Замечаний к этому шагу пока нет.</p>'}
+    ${can('process.comment') ? html`
+      <div style="margin-top:14px">
+        <label class="field__label" for="node-comment">Что не так на этом шаге?</label>
+        <textarea class="textarea" id="node-comment" rows="3"
+          placeholder="Например: здесь теряется два дня — согласование идёт вне платформы."></textarea>
+      </div>` : ''}`;
+
+  modal({
+    title: 'Обсуждение шага', body, wide: true,
+    footer: can('process.comment')
+      ? '<button class="btn" data-close>Закрыть</button><button class="btn btn--primary" data-send>Отправить замечание</button>'
+      : '<button class="btn" data-close>Закрыть</button>',
+    onMount: (el, close) => {
+      el.querySelector('[data-send]')?.addEventListener('click', async () => {
+        const text = el.querySelector('#node-comment').value.trim();
+        if (!text) { toast('Напишите замечание', 'warn'); return; }
+        try {
+          await api.post(`/api/processes/${diagram.id}/comments`, { node_id: nodeId, body: text });
+          close();
+          toast('Замечание добавлено — оно видно всем на схеме', 'ok');
+          navigate(`/processes?s=${diagram.scenario}&d=${diagram.id}`);
+        } catch (e) { toast(e.message, 'danger'); }
+      });
+      el.querySelectorAll('[data-useful]').forEach((b) => b.onclick = async () => {
+        try {
+          const c = await api.post(`/api/process-comments/${b.dataset.useful}/useful`);
+          b.textContent = `Полезно · ${c.useful}`;
+          toast('Отмечено. Автору замечания начислены очки', 'ok');
+        } catch (e) { toast(e.message, 'warn'); }
+      });
+    },
+  });
+}
+
+/** Завести предложение об изменении процесса и уйти в редактор схемы. */
+function proposeChange(diagram) {
+  modal({
+    title: 'Предложить изменение процесса',
+    body: html`
+      <p class="prose" style="margin-bottom:14px">
+        Вы получите черновую копию действующей схемы «${esc(diagram.title)}» и сможете править её
+        в редакторе. Действующая версия не изменится, пока предложение не пройдёт согласование.
+      </p>
+      <label class="field__label" for="pc-title">Что предлагаете изменить</label>
+      <input class="input" id="pc-title" placeholder="Например: убрать отдельный шаг проверки дублей">
+      <label class="field__label" for="pc-why" style="margin-top:12px">Обоснование</label>
+      <textarea class="textarea" id="pc-why" rows="4"
+        placeholder="Почему так работать нельзя и что изменится. Согласующие читают именно это."></textarea>
+      <label class="field__label" for="pc-effect" style="margin-top:12px">Ожидаемый эффект — необязательно</label>
+      <input class="input" id="pc-effect" placeholder="Например: путь подачи короче на один экран">`,
+    footer: '<button class="btn" data-close>Отмена</button><button class="btn btn--primary" data-ok>Создать и открыть редактор</button>',
+    onMount: (el, close) => {
+      el.querySelector('[data-ok]').onclick = async () => {
+        const title = el.querySelector('#pc-title').value.trim();
+        const rationale = el.querySelector('#pc-why').value.trim();
+        if (!title) { toast('Укажите, что предлагается изменить', 'warn'); return; }
+        if (rationale.length < 20) { toast('Обоснование — не менее 20 символов', 'warn'); return; }
+        try {
+          const c = await api.post('/api/process-changes', {
+            process: diagram.id, title, rationale,
+            expected_effect: el.querySelector('#pc-effect').value.trim() || null,
+          });
+          close();
+          navigate(`/changes/${c.id}/edit`);
+        } catch (e) { toast(e.message, 'danger', 'Не получилось'); }
+      };
+    },
+  });
 }
 
 /** Собирает обучающий сценарий из данных схемы и запускает его на самой схеме. */
@@ -240,7 +393,7 @@ async function startWalkthrough(view, diagram) {
   if (!svg) return;
 
   const nodeById = Object.fromEntries(diagram.nodes.map((n) => [n.id, n]));
-  const { boxes } = layout(diagram, DIAGRAMS.indexOf(diagram) + 1);
+  const { boxes } = layout(diagram, diagram.seq);
   const highlight = (id, visited) => {
     svg.classList.add('is-walking');
     svg.querySelectorAll('.bp-node').forEach((el) => {

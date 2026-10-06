@@ -1,8 +1,9 @@
 // Модуль «Идеи и решения»: доменная логика.
 // Статусы идей и предложений, начисление очков по настраиваемым правилам,
-// защита от накруток, рейтинг советчиков, знаки отличия и рекомендации к поощрению.
+// защита от накруток, рейтинг социальных советников, знаки отличия и рекомендации к поощрению.
 import { q, tx } from './db.js';
 import { logAction } from './audit.js';
+import { notify as sendNotification } from './notify.js';
 
 // ── Словари статусов ─────────────────────────────────────────
 export const IDEA_STATUS = {
@@ -49,7 +50,7 @@ export const DEFAULT_POINTS_RULES = [
   { code: 'idea.approved',       title: 'Идея прошла модерацию',                      points: 2,  cap: null,
     description: 'Начисляется автору идеи после того, как модератор принял её к обсуждению.' },
   { code: 'proposal.created',    title: 'Предложено решение',                         points: 3,  cap: null,
-    description: 'Начисляется советчику за опубликованное предложение по чужой идее.' },
+    description: 'Начисляется социальному советнику за опубликованное предложение по чужой идее.' },
   { code: 'proposal.useful',     title: 'Решение отмечено автором идеи как полезное',  points: 5,  cap: null,
     description: 'Отмечает только автор идеи. Самооценка не начисляется.' },
   { code: 'proposal.endorsed',   title: 'Решение поддержано другими пользователями',   points: 1,  cap: 10,
@@ -58,11 +59,22 @@ export const DEFAULT_POINTS_RULES = [
     description: 'Начисляется после подтверждения модератором или руководителем.' },
   { code: 'proposal.accepted',   title: 'Предложение принято в работу',                points: 15, cap: null },
   { code: 'proposal.implemented',title: 'Предложение внедрено и дало эффект',          points: 25, cap: null },
+
+  // Вклад в перестройку самих процессов. Очки те же и рейтинг тот же: замечание к шагу
+  // схемы и предложение решения по чужой идее — разные способы одного и того же участия.
+  { code: 'process.comment.useful', title: 'Замечание к шагу процесса признано полезным', points: 2, cap: 6,
+    description: 'Начисляется автору замечания на схеме, отмеченного коллегами как полезное, но не более 6 очков за одно замечание.' },
+  { code: 'process.change.proposed', title: 'Предложено изменение процесса',            points: 5,  cap: null,
+    description: 'Начисляется, когда предложение об изменении схемы вынесено на обсуждение.' },
+  { code: 'process.change.accepted', title: 'Изменение процесса согласовано',            points: 20, cap: null,
+    description: 'Начисляется автору после того, как все согласующие поддержали изменение.' },
+  { code: 'process.change.published',title: 'Изменение процесса вступило в силу',        points: 30, cap: null,
+    description: 'Начисляется после публикации версии: процесс работает по предложению автора.' },
 ];
 
 // ── Знаки отличия ────────────────────────────────────────────
 export const BADGES = [
-  { code: 'active_advisor',  title: 'Активный советчик',
+  { code: 'active_advisor',  title: 'Активный социальный советник',
     hint: 'Пять и более предложений по идеям коллег',
     test: (s) => s.proposals >= 5 },
   { code: 'solution_expert', title: 'Эксперт решений',
@@ -115,7 +127,7 @@ export const INCENTIVE_TYPES = [
   ['public_praise',    'Публичное признание на собрании подразделения', 'recognition', null],
   ['fast_track_review','Внеочередное рассмотрение заявки на обучение или аттестацию', 'development',
    'Если это не нарушает общий порядок рассмотрения.'],
-  ['advisor_of_month', 'Сертификат «Лучший советчик месяца»', 'recognition',
+  ['advisor_of_month', 'Сертификат «Лучший социальный советник месяца»', 'recognition',
    'Без материальной ценности, подходит для портфолио сотрудника.'],
 ];
 
@@ -142,6 +154,51 @@ const DEFAULT_SETTINGS = {
 };
 
 /** Первичное наполнение справочников модуля. Идемпотентно. */
+// ── Переименование сущности: «советчик» → «социальный советник» ──
+// Значения по умолчанию записываются только в пустые таблицы, поэтому у работающей
+// установки названия правил, знаков отличия и мер поощрения остались бы прежними.
+// Журналы — начисления, уведомления и аудит — не переписываются: это запись о том,
+// что было сказано в своё время, а не действующая надпись в интерфейсе.
+const ADVISOR_FORMS = {
+  '':    ['социальный',  'советник'],
+  'а':   ['социального', 'советника'],
+  'у':   ['социальному', 'советнику'],
+  'ом':  ['социальным',  'советником'],
+  'е':   ['социальном',  'советнике'],
+  'и':   ['социальные',  'советники'],
+  'ов':  ['социальных',  'советников'],
+  'ам':  ['социальным',  'советникам'],
+  'ами': ['социальными', 'советниками'],
+  'ах':  ['социальных',  'советниках'],
+};
+// Длинные окончания проверяются первыми: иначе «советчиками» разберётся как «советчикам»
+const ADVISOR_RX = /([Сс])оветчик(ами|ах|ам|ов|ом|е|у|а|и|)(?![а-яё])/g;
+
+export const renameAdvisor = (text) => String(text ?? '').replace(ADVISOR_RX, (_, first, suffix) => {
+  const [adj, noun] = ADVISOR_FORMS[suffix];
+  return (first === 'С' ? adj[0].toUpperCase() + adj.slice(1) : adj) + ' ' + noun;
+});
+
+/** Обновляет справочные надписи, оставшиеся от прежнего названия сущности. */
+export function renameAdvisorWording() {
+  const targets = [
+    ['points_rules', 'code', ['title', 'description']],
+    ['incentive_types', 'code', ['title', 'description', 'legal_note']],
+    ['advisor_badges', 'id', ['title']],
+  ];
+  let updated = 0;
+  for (const [table, key, columns] of targets) {
+    const where = columns.map((c) => `${c} LIKE '%оветчик%'`).join(' OR ');
+    for (const row of q.all(`SELECT ${key}, ${columns.join(', ')} FROM ${table} WHERE ${where}`)) {
+      const sets = columns.map((c) => `${c}=?`).join(', ');
+      q.run(`UPDATE ${table} SET ${sets} WHERE ${key}=?`,
+        ...columns.map((c) => (row[c] === null ? null : renameAdvisor(row[c]))), row[key]);
+      updated += 1;
+    }
+  }
+  return updated;
+}
+
 export function ensureIdeaHub() {
   for (const r of DEFAULT_POINTS_RULES) {
     if (q.get('SELECT code FROM points_rules WHERE code=?', r.code)) continue;
@@ -160,6 +217,7 @@ export function ensureIdeaHub() {
       q.run('INSERT INTO ideahub_settings (key, value) VALUES (?,?)', key, value);
     }
   }
+  renameAdvisorWording();
 }
 
 // ── Настройки ────────────────────────────────────────────────
@@ -209,15 +267,20 @@ export function rule(code) {
   return q.get('SELECT * FROM points_rules WHERE code=? AND is_active=1', code);
 }
 
-const dedupKey = (userId, code, ideaId, proposalId, sourceUserId) =>
-  [userId, code, ideaId ?? '', proposalId ?? '', sourceUserId ?? ''].join(':');
+// Ключ намеренно не меняет вид для начислений модуля идей: приписка добавляется
+// только у начислений за процессы, иначе уже выданные очки перестали бы
+// опознаваться и были бы начислены повторно.
+const dedupKey = (userId, code, ideaId, proposalId, sourceUserId, changeId = null) => {
+  const base = [userId, code, ideaId ?? '', proposalId ?? '', sourceUserId ?? ''].join(':');
+  return changeId ? `${base}:change=${changeId}` : base;
+};
 
 /**
- * Начисление очков советчику.
+ * Начисление очков социальному советнику.
  * Возвращает { awarded, points, reason } — начисление может быть отклонено:
  * правило выключено, действие уже оплачено, достигнут предел или это самооценка.
  */
-export function awardPoints({ userId, code, ideaId = null, proposalId = null,
+export function awardPoints({ userId, code, ideaId = null, proposalId = null, changeId = null,
                               sourceUserId = null, reason = null, awardedBy = null }) {
   if (!userId) return { awarded: false, points: 0, reason: 'Получатель не указан' };
   const r = rule(code);
@@ -230,8 +293,8 @@ export function awardPoints({ userId, code, ideaId = null, proposalId = null,
 
   // Предел очков по одному объекту
   if (r.cap_per_target != null) {
-    const target = proposalId ? 'proposal_id' : 'idea_id';
-    const targetId = proposalId ?? ideaId;
+    const target = changeId ? 'process_change_id' : proposalId ? 'proposal_id' : 'idea_id';
+    const targetId = changeId ?? proposalId ?? ideaId;
     const earned = q.get(
       `SELECT COALESCE(SUM(points),0) AS s FROM points_ledger
        WHERE user_id=? AND rule_code=? AND ${target}=? AND status='approved'`,
@@ -241,19 +304,20 @@ export function awardPoints({ userId, code, ideaId = null, proposalId = null,
     }
   }
 
-  const key = dedupKey(userId, code, ideaId, proposalId, sourceUserId);
+  const key = dedupKey(userId, code, ideaId, proposalId, sourceUserId, changeId);
   if (q.get('SELECT id FROM points_ledger WHERE dedup_key=?', key)) {
     return { awarded: false, points: 0, reason: 'Очки за это действие уже начислены' };
   }
 
   q.run(`INSERT INTO points_ledger
-         (user_id, rule_code, points, idea_id, proposal_id, source_user_id, reason, awarded_by, dedup_key)
-         VALUES (?,?,?,?,?,?,?,?,?)`,
-    userId, code, r.points, ideaId, proposalId, sourceUserId, reason || r.title, awardedBy, key);
+         (user_id, rule_code, points, idea_id, proposal_id, process_change_id,
+          source_user_id, reason, awarded_by, dedup_key)
+         VALUES (?,?,?,?,?,?,?,?,?,?)`,
+    userId, code, r.points, ideaId, proposalId, changeId, sourceUserId, reason || r.title, awardedBy, key);
 
   refreshBadges(userId);
-  notifyIdea(userId, ideaId, 'points',
-    `Начислено ${r.points} ${pluralPoints(r.points)}`, reason || r.title);
+  sendNotification(userId, 'points', `Начислено ${r.points} ${pluralPoints(r.points)}`,
+    reason || r.title, { idea_id: ideaId, process_change_id: changeId });
   return { awarded: true, points: r.points, reason: r.title };
 }
 
@@ -302,7 +366,7 @@ export function periodBounds(period = 'month', ref = new Date()) {
 }
 const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-/** Рейтинг советчиков за период. institutionId ограничивает выборку учреждением. */
+/** Рейтинг социальных советников за период. institutionId ограничивает выборку учреждением. */
 export function rating({ period = 'month', institutionId = null, limit = 100 } = {}) {
   const b = periodBounds(period);
   const args = [b.from, b.to];
@@ -560,7 +624,7 @@ export function buildIncentiveRecommendations({ period = 'month', proposedBy = n
       (user_id, type_code, period, period_label, points_at_creation, rank_at_creation, note, proposed_by)
       VALUES (?,?,?,?,?,?,?,?)`,
       person.id, type.code, r.period, r.label, person.points, person.rank,
-      `${person.points} ${pluralPoints(person.points)} за период, ${person.rank} место в рейтинге советчиков.`,
+      `${person.points} ${pluralPoints(person.points)} за период, ${person.rank} место в рейтинге социальных советников.`,
       proposedBy);
     created.push({ id, user_id: person.id, type_code: type.code });
     notifyIdea(person.id, null, 'incentive_proposed', 'Ваш вклад направлен руководителю',

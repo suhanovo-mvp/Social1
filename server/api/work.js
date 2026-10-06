@@ -3,6 +3,7 @@ import { route, readJson, HttpError } from '../http.js';
 import { q } from '../db.js';
 import { can } from '../auth.js';
 import { logAction } from '../audit.js';
+import { emit } from '../events.js';
 import { slaState, notify } from '../workflow.js';
 
 // ── Задачи ───────────────────────────────────────────────────
@@ -120,8 +121,18 @@ route.patch('/api/board-items/:id', async ({ req, user, params, ip, sendJson }) 
   const sets = [], args = [];
   for (const f of fields) if (b[f] !== undefined) { sets.push(`${f}=?`); args.push(b[f]); }
   if (!sets.length) throw new HttpError(400, 'Нет полей для обновления');
+  const was = q.get('SELECT status FROM board_items WHERE id=?', Number(params.id));
   q.run(`UPDATE board_items SET ${sets.join(', ')}, updated_at=datetime('now') WHERE id=?`, ...args, Number(params.id));
   logAction(user.id, 'board.item.update', 'board_item', Number(params.id), b, ip);
+
+  // Завершение задачи — не только смена колонки на доске: если задача выросла из
+  // проекта решения, платформа предложит зафиксировать, что в итоге решили
+  if (b.status && b.status !== was?.status) {
+    emit(b.status === 'done' ? 'task.completed' : 'task.status.changed', {
+      subjectType: 'task', subjectId: Number(params.id), actorId: user.id,
+      from: was?.status ?? null, to: b.status,
+    });
+  }
   sendJson(200, q.get('SELECT * FROM board_items WHERE id=?', Number(params.id)));
 });
 

@@ -1,6 +1,6 @@
 import { route, readJson, HttpError } from '../http.js';
 import { q } from '../db.js';
-import { ROLES, createSession, destroySession, verifyPassword, publicUser, permissionsOf } from '../auth.js';
+import { roleMap, roleTitle, createSession, destroySession, verifyPassword, publicUser, permissionsOf } from '../auth.js';
 import { logAction } from '../audit.js';
 
 route.post('/api/auth/login', async ({ req, res, ip, sendJson }) => {
@@ -38,7 +38,7 @@ route.get('/api/auth/me', async ({ user, sendJson }) => {
 }, { public: true });
 
 route.get('/api/auth/roles', async ({ sendJson }) => {
-  sendJson(200, Object.entries(ROLES).map(([key, v]) => ({ key, ...v, permissions: permissionsOf(key) })));
+  sendJson(200, Object.entries(roleMap()).map(([key, v]) => ({ key, ...v, permissions: permissionsOf(key) })));
 }, { public: true });
 
 // Демонстрационные учётные записи для быстрого входа под разными ролями
@@ -51,5 +51,5 @@ route.get('/api/auth/demo-accounts', async ({ sendJson }) => {
                       ELSE 7 END, u.id`);
   const seen = new Set();
   const picked = rows.filter((r) => (seen.has(r.role) ? false : seen.add(r.role)));
-  sendJson(200, picked.map((r) => ({ ...r, role_title: ROLES[r.role]?.title, password: 'social1' })));
+  sendJson(200, picked.map((r) => ({ ...r, role_title: roleTitle(r.role), password: 'social1' })));
 }, { public: true });

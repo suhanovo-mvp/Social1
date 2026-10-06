@@ -6,21 +6,140 @@ export async function adminView(view, query) {
   const tab = query.get('tab') || 'workflow';
   view.innerHTML = html`
     <div class="page-head">
-      <h2>Настройки платформы</h2>
-      <p>Конфигурация экосистемы: маршруты движения инициатив, SLA и критерии Gate настраиваются
-         без изменения кода — это обеспечивает адаптивность процесса к меняющимся условиям.</p>
+      <div class="page-head__row">
+        <div style="flex:1;min-width:280px">
+          <h2>Настройки платформы</h2>
+          <p>Конфигурация экосистемы: маршруты движения инициатив, SLA и критерии Gate настраиваются
+             без изменения кода — это обеспечивает адаптивность процесса к меняющимся условиям.</p>
+        </div>
+        <a class="btn" href="/api/admin/presentation.pdf" download data-native data-tour="admin-presentation"
+           title="Слайды 16:9: как работают компоненты, цели платформы, каждый компонент со скриншотами и схемой совместной работы">
+          Презентация платформы (PDF)</a>
+      </div>
     </div>
     <div class="tabs">
-      ${[['workflow', 'Процесс Stage-Gate'], ['ideahub', 'Идеи и решения'], ['users', 'Участники'],
-         ['audit', 'Журнал аудита'], ['system', 'Состояние системы']]
+      ${[['workflow', 'Процесс Stage-Gate'], ['ideahub', 'Идеи и решения'], ['roles', 'Роли и права'],
+         ['users', 'Участники'], ['audit', 'Журнал аудита'], ['system', 'Состояние системы']]
         .map(([k, t]) => `<button class="tab ${tab === k ? 'is-active' : ''}" data-tab="${k}">${t}</button>`)}
     </div>
     <div id="admin-panel"><div class="skeleton" style="height:300px"></div></div>`;
 
   view.querySelectorAll('.tab').forEach((t) => t.onclick = () => navigate(`/admin?tab=${t.dataset.tab}`));
   const panel = view.querySelector('#admin-panel');
-  ({ workflow: workflowPanel, ideahub: ideaHubPanel, users: usersPanel,
+  ({ workflow: workflowPanel, ideahub: ideaHubPanel, roles: rolesPanel, users: usersPanel,
      audit: auditPanel, system: systemPanel }[tab] || workflowPanel)(panel);
+}
+
+// ── Роли и права ─────────────────────────────────────────────
+// Роли и полномочия — данные, а не код. Здесь их и правят: передать право,
+// завести новую роль, дать участнику вторую роль сверх основной.
+async function rolesPanel(panel) {
+  const { roles, catalog } = await api.get('/api/admin/roles');
+  const groups = [];
+  for (const p of catalog) {
+    let g = groups.find((x) => x.title === p.group_title);
+    if (!g) groups.push(g = { title: p.group_title, items: [] });
+    g.items.push(p);
+  }
+
+  panel.innerHTML = html`
+    <div class="card">
+      <div class="card__head">
+        <div>
+          <h3>Роли платформы</h3>
+          <div class="card__hint">Полномочия хранятся в базе: изменение действует сразу,
+            без перезапуска и правки кода. Участник может держать несколько ролей — права складываются.</div>
+        </div>
+        <button class="btn btn--primary btn--sm spacer" data-new-role>Завести роль</button>
+      </div>
+      <div class="card__body--flush">
+        <div class="table-wrap"><table class="table">
+          <thead><tr>
+            <th>Роль</th><th>Код</th><th>Участников</th><th>Прав</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${roles.map((r) => html`
+              <tr>
+                <td>
+                  <b>${esc(r.title)}</b>
+                  ${r.kind === 'custom' ? '<span class="badge badge--outline" style="margin-left:6px">своя</span>' : ''}
+                  ${r.description ? `<div class="fs-12 text-3">${esc(r.description)}</div>` : ''}
+                </td>
+                <td><span class="mono fs-12">${esc(r.code)}</span></td>
+                <td>${r.users}${r.extra_users ? ` <span class="text-3 fs-12">+${r.extra_users} доп.</span>` : ''}</td>
+                <td>${r.permissions.length}</td>
+                <td><button class="btn btn--sm" data-edit-role="${esc(r.code)}">Права</button></td>
+              </tr>`)}
+          </tbody>
+        </table></div>
+      </div>
+    </div>`;
+
+  panel.querySelectorAll('[data-edit-role]').forEach((b) => b.onclick = () => {
+    const role = roles.find((r) => r.code === b.dataset.editRole);
+    editRoleModal(role, groups, () => rolesPanel(panel));
+  });
+  panel.querySelector('[data-new-role]').onclick = () => newRoleModal(() => rolesPanel(panel));
+}
+
+function editRoleModal(role, groups, done) {
+  const has = new Set(role.permissions);
+  modal({
+    title: `Права роли «${role.title}»`, wide: true,
+    body: html`
+      <p class="prose" style="margin-bottom:14px">Право проверяется на сервере при каждом запросе.
+         Снятое право исчезает из интерфейса участника при следующем действии.</p>
+      ${groups.map((g) => html`
+        <div class="ed__group">
+          <div class="ed__group-title">${esc(g.title)}</div>
+          <div class="ed__checks">
+            ${g.items.map((p) => html`
+              <label class="checkbox">
+                <input type="checkbox" data-perm="${esc(p.code)}" ${has.has(p.code) ? 'checked' : ''}>
+                <span>${esc(p.title)} <span class="mono fs-12 text-3">${esc(p.code)}</span></span>
+              </label>`)}
+          </div>
+        </div>`)}`,
+    footer: '<button class="btn" data-close>Отмена</button><button class="btn btn--primary" data-ok>Сохранить</button>',
+    onMount: (el, close) => {
+      el.querySelector('[data-ok]').onclick = async () => {
+        const permissions = [...el.querySelectorAll('[data-perm]')]
+          .filter((c) => c.checked).map((c) => c.dataset.perm);
+        try {
+          await api.put(`/api/admin/roles/${role.code}/permissions`, { permissions });
+          close(); toast('Права роли обновлены', 'ok'); done();
+        } catch (e) { toast(e.message, 'danger', 'Не получилось'); }
+      };
+    },
+  });
+}
+
+function newRoleModal(done) {
+  modal({
+    title: 'Новая роль',
+    body: html`
+      <p class="prose" style="margin-bottom:14px">Новая роль создаётся без прав — выдайте их
+         следующим шагом. Назначить её участнику можно на вкладке «Участники».</p>
+      <label class="field__label" for="nr-code">Код — латиницей</label>
+      <input class="input" id="nr-code" placeholder="например, auditor">
+      <label class="field__label" for="nr-title" style="margin-top:12px">Название</label>
+      <input class="input" id="nr-title" placeholder="например, Внутренний аудитор">
+      <label class="field__label" for="nr-short" style="margin-top:12px">Краткое название</label>
+      <input class="input" id="nr-short" placeholder="например, Аудитор">`,
+    footer: '<button class="btn" data-close>Отмена</button><button class="btn btn--primary" data-ok>Завести</button>',
+    onMount: (el, close) => {
+      el.querySelector('[data-ok]').onclick = async () => {
+        try {
+          await api.post('/api/admin/roles', {
+            code: el.querySelector('#nr-code').value.trim(),
+            title: el.querySelector('#nr-title').value.trim(),
+            short: el.querySelector('#nr-short').value.trim(),
+          });
+          close(); toast('Роль заведена', 'ok'); done();
+        } catch (e) { toast(e.message, 'danger', 'Не получилось'); }
+      };
+    },
+  });
 }
 
 // ── Модуль «Идеи и решения» ──────────────────────────────────
@@ -61,7 +180,7 @@ async function ideaHubPanel(panel) {
         </label>
         <label class="checkbox" style="margin-bottom:14px">
           <input type="checkbox" id="s-rating" ${s.rating_visible === '1' ? 'checked' : ''}>
-          <span><b>Рейтинг советчиков виден всем участникам</b><br>
+          <span><b>Рейтинг социальных советников виден всем участникам</b><br>
             <span class="fs-12 text-3">При выключении рейтинг остаётся доступен только модераторам,
               руководителям и администраторам — этого требуют политики некоторых организаций.</span></span>
         </label>
@@ -356,9 +475,12 @@ function editStageModal(s, onDone) {
 
 // ── Участники ────────────────────────────────────────────────
 async function usersPanel(panel) {
-  const [users, institutions] = await Promise.all([
-    api.get('/api/admin/users'), api.get('/api/institutions'),
+  // Роли берутся из базы, а не из словаря в коде: заведённая администратором
+  // роль должна появляться и здесь, иначе назначить её было бы некуда
+  const [users, institutions, { roles }] = await Promise.all([
+    api.get('/api/admin/users'), api.get('/api/institutions'), api.get('/api/admin/roles'),
   ]);
+  const titleOf = (code) => roles.find((r) => r.code === code)?.title || ROLE_TITLES[code] || code;
   const byRole = {};
   for (const u of users) (byRole[u.role] ||= []).push(u);
 
@@ -369,7 +491,7 @@ async function usersPanel(panel) {
       <button class="btn btn--sm btn--primary spacer" data-add-user>Добавить участника</button>
     </div>
     <div class="stack">
-      ${Object.entries(ROLE_TITLES).filter(([r]) => byRole[r]).map(([role, title]) => html`
+      ${roles.filter((r) => byRole[r.code]).map(({ code: role, title }) => html`
         <div class="card">
           <div class="card__head"><h3>${esc(title)}</h3>
             <span class="badge badge--outline spacer">${byRole[role].length}</span></div>
@@ -383,12 +505,18 @@ async function usersPanel(panel) {
                 <td class="fs-13">${esc(u.position || '—')}</td>
                 <td class="fs-13">${esc(u.institution || '—')}</td>
                 <td class="fs-12 text-3">${u.last_login_at ? fmtAgo(u.last_login_at) : 'не входил'}</td>
-                <td><span class="badge badge--${u.is_active ? 'ok' : 'danger'}">${u.is_active ? 'Активен' : 'Отключён'}</span></td>
+                <td><span class="badge badge--${u.is_active ? 'ok' : 'danger'}">${u.is_active ? 'Активен' : 'Отключён'}</span>
+                  <button class="btn btn--sm" data-user-roles="${u.id}" style="margin-left:8px">Роли</button></td>
               </tr>`)}
             </tbody>
           </table></div>
         </div>`)}
     </div>`;
+
+  panel.querySelectorAll('[data-user-roles]').forEach((b) => b.onclick = () => {
+    const u = users.find((x) => x.id === Number(b.dataset.userRoles));
+    userRolesModal(u, roles, titleOf, () => usersPanel(panel));
+  });
 
   panel.querySelector('[data-add-user]').onclick = () => modal({
     title: 'Новый участник',
@@ -509,4 +637,54 @@ async function systemPanel(panel) {
         </dl>
       </div>
     </div>`;
+}
+
+/**
+ * Дополнительные роли участника сверх основной. Права складываются: сотрудник,
+ * которому выдана роль согласующего, сохраняет всё, что мог до этого.
+ */
+async function userRolesModal(user, roles, titleOf, done) {
+  const extra = await api.get(`/api/admin/users/${user.id}/roles`);
+  const taken = new Set([user.role, ...extra.map((r) => r.role_code)]);
+  const free = roles.filter((r) => !taken.has(r.code) && r.is_active);
+
+  modal({
+    title: `Роли участника: ${user.full_name}`,
+    body: html`
+      <div class="ed__group" style="border-top:0;padding-top:0">
+        <div class="ed__group-title">Основная роль</div>
+        <div class="fs-13">${esc(titleOf(user.role))}
+          <span class="text-3 fs-12">— меняется в карточке участника</span></div>
+      </div>
+      <div class="ed__group">
+        <div class="ed__group-title">Дополнительные роли</div>
+        ${extra.length ? extra.map((r) => html`
+          <div class="row" style="gap:8px">
+            <span class="fs-13" style="flex:1">${esc(r.title)}</span>
+            <button class="btn btn--sm btn--danger" data-revoke="${esc(r.role_code)}">Снять</button>
+          </div>`) : '<p class="ed__note">Дополнительных ролей нет.</p>'}
+      </div>
+      ${free.length ? html`
+        <div class="ed__group">
+          <div class="ed__group-title">Выдать роль</div>
+          <div class="row" style="gap:8px">
+            <select class="select" id="ur-role" style="flex:1">
+              ${free.map((r) => `<option value="${esc(r.code)}">${esc(r.title)}</option>`)}
+            </select>
+            <button class="btn btn--primary btn--sm" data-grant>Выдать</button>
+          </div>
+        </div>` : ''}`,
+    footer: '<button class="btn" data-close>Закрыть</button>',
+    onMount: (el, close) => {
+      const act = async (fn, msg) => {
+        try { await fn(); toast(msg, 'ok'); close(); done(); }
+        catch (e) { toast(e.message, 'danger', 'Не получилось'); }
+      };
+      el.querySelector('[data-grant]')?.addEventListener('click', () =>
+        act(() => api.post(`/api/admin/users/${user.id}/roles`,
+          { role_code: el.querySelector('#ur-role').value }), 'Роль выдана'));
+      el.querySelectorAll('[data-revoke]').forEach((b) => b.onclick = () =>
+        act(() => api.del(`/api/admin/users/${user.id}/roles/${b.dataset.revoke}`), 'Роль снята'));
+    },
+  });
 }

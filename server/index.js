@@ -3,9 +3,15 @@ import { createServer } from 'node:http';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { matchRoute, sendJson, serveStatic, parseCookies, HttpError } from './http.js';
-import { userFromToken } from './auth.js';
-import { ensureWorkflow, sweepSla } from './workflow.js';
+import { userFromToken, ensureRoles } from './auth.js';
+import { ensureWorkflow, sweepSla, ensureStageEvents } from './workflow.js';
 import { ensureIdeaHub, sweepIdeaHub } from './ideahub.js';
+import { ensureProcesses } from './process-repo.js';
+import { ensureKnowledge } from './knowledge.js';
+import { ensureSampleForms } from './seed-forms.js';
+import './knowledge-flow.js';   // подписки: документ → задача → документ
+import { ensureSearchIndex } from './search.js';
+import { sweepApprovals } from './process-changes.js';
 import { logAction } from './audit.js';
 import { q } from './db.js';
 
@@ -21,14 +27,30 @@ import './api/analytics.js';
 import './api/community.js';
 import './api/admin.js';
 import './api/processes.js';
+import './api/process-changes.js';
+import './api/knowledge.js';
+import './api/forms.js';
+import './api/providers.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const WEB = join(ROOT, 'web');
+const SHARED = join(ROOT, 'shared');  // модули, общие для браузера и сервера
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 
+ensureRoles();
 ensureWorkflow();
 ensureIdeaHub();
+// Репозиторий процессов заполняется после конвейера: он же его и переопределяет,
+// собирая workflow_config из опубликованной модели
+ensureProcesses();
+ensureKnowledge();
+// Образец формы-опросника заводится один раз и дальше живёт как обычная форма:
+// его правят в конструкторе, и перезапуск правки не отменяет
+ensureSampleForms();
+ensureSearchIndex();
+// История переходов старше событийного слоя — восстанавливаем её один раз
+ensureStageEvents();
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
@@ -46,6 +68,10 @@ const server = createServer(async (req, res) => {
   const send = (status, data) => sendJson(res, status, data);
 
   try {
+    // Общие модели (раскладка, схема, сравнение версий) грузятся браузером как ES-модули
+    if (pathname.startsWith('/shared/')) {
+      return await serveStatic(res, SHARED, pathname.slice('/shared'.length), { spaFallback: false });
+    }
     if (!pathname.startsWith('/api/')) return await serveStatic(res, WEB, pathname);
 
     const matched = matchRoute(req.method, pathname);
@@ -79,6 +105,12 @@ const slaTimer = setInterval(() => {
     const r = sweepSla();
     if (r.escalated) console.log(`SLA: эскалировано задач — ${r.escalated}`);
   } catch (e) { console.error('Ошибка проверки SLA:', e.message); }
+  try {
+    // Согласование изменений процессов живёт по тем же правилам, что и точки
+    // принятия решений: просроченный ответ эскалируется координатору
+    const a = sweepApprovals();
+    if (a.escalated) console.log(`Согласование процессов: эскалировано — ${a.escalated}`);
+  } catch (e) { console.error('Ошибка проверки согласований:', e.message); }
 }, 15 * 60 * 1000);
 slaTimer.unref();
 

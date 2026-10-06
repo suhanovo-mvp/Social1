@@ -1,9 +1,18 @@
 // Наполнение платформы демонстрационными данными: учреждения, участники,
 // инициативы на всех стадиях жизненного цикла с реальной историей решений.
 import { q, tx, db } from './db.js';
-import { hashPassword } from './auth.js';
-import { ensureWorkflow, stageConfig, dueDate, grantAward, LAST_STAGE } from './workflow.js';
+import { hashPassword, ensureRoles, grantRole } from './auth.js';
+import { ensureWorkflow, stageConfig, dueDate, grantAward, lastStage, ensureStageEvents } from './workflow.js';
 import { ensureIdeaHub, awardPoints, refreshBadges, periodBounds } from './ideahub.js';
+import * as repo from './process-repo.js';
+import { ensureProcesses } from './process-repo.js';
+import { ensureKnowledge } from './knowledge.js';
+import { ensureSampleForms } from './seed-forms.js';
+import { seedSampleProviders } from './seed-providers.js';
+import * as kn from './knowledge.js';
+import * as discussions from './discussions.js';
+import { reindexAll } from './search.js';
+import * as changes from './process-changes.js';
 import { logAction } from './audit.js';
 import { classify } from './ai.js';
 
@@ -20,14 +29,29 @@ if (RESET) {
   // Журнал аудита неизменяем и ссылается на пользователей — на время очистки
   // отключаем проверку внешних ключей, сам журнал при этом сохраняется.
   db.exec('PRAGMA foreign_keys = OFF');
-  for (const t of ['survey_answers','survey_responses','survey_questions','surveys','pilot_kpis','pilots',
+  for (const t of ['form_answers','form_responses','form_questions','forms',
+    // каталог разработчиков ИИ-решений
+    'provider_members','provider_notes','provider_reviews','provider_solutions','provider_cases','providers',
+    'survey_answers','survey_responses','survey_questions','surveys','pilot_kpis','pilots',
     'pilot_applications','board_items','sprints','documents','projects','forum_posts','forum_topics',
     'best_practices','rollouts','awards','comments','attachments','gate_decisions','stage_transitions',
+    'votes','follows',
     // модуль «Идеи и решения»
     'review_flags','proposal_reviews','idea_reports','incentives','advisor_badges','points_ledger',
     'idea_comments','proposal_endorsements','idea_reactions','idea_attachments','proposals',
     'idea_drafts','ideas',
-    'notifications','tasks','initiatives','sessions','users','institutions','workflow_config']) {
+    'notifications','tasks','initiatives','sessions','users','institutions',
+    // Настройки восстанавливаются значениями по умолчанию сразу после очистки:
+    // ensureRoles, ensureWorkflow и ensureIdeaHub вызываются следом
+    'user_roles','role_permissions','roles','permissions_catalog','workflow_config',
+    'points_rules','incentive_types','ideahub_settings',
+    // совместная работа над процессами и репозиторий схем: схемы восстанавливаются
+    // из начального наполнения, обсуждения и предложения — это данные пользователей
+    'search_index',
+    'knowledge_versions','knowledge_docs','knowledge_sections',
+    'event_failures','events',
+    'discussion_votes','discussions','approvals','process_change_votes',
+    'process_changes','process_approval_routes','process_versions','process_defs']) {
     try { db.exec(`DELETE FROM ${t}`); } catch {}
   }
   try { db.exec("DELETE FROM sqlite_sequence WHERE name != 'audit_log'"); } catch {}
@@ -35,8 +59,11 @@ if (RESET) {
   console.log('Данные очищены (журнал аудита сохранён — он неизменяем).');
 }
 
+ensureRoles();
 ensureWorkflow();
 ensureIdeaHub();
+ensureProcesses();
+ensureKnowledge();
 if (q.get('SELECT COUNT(*) AS c FROM users').c > 0 && !RESET) {
   console.log('Данные уже загружены. Для пересоздания: npm run reset');
   process.exit(0);
@@ -360,7 +387,7 @@ for (const spec of INITIATIVES) {
     if (!firstDecision) firstDecision = decidedAt;
 
     if (h.dec === 'go') {
-      if (stage === LAST_STAGE) { enteredAt = decidedAt; continue; } // Gate 5: цикл завершён
+      if (stage === lastStage()) { enteredAt = decidedAt; continue; } // Gate 5: цикл завершён
       const next = stage + 1;
       q.run(`INSERT INTO stage_transitions (initiative_id, from_stage, to_stage, at, by_user, reason, hours_in_stage)
              VALUES (?,?,?,?,?,?,?)`, id, stage, next, decidedAt, decider.id, `Go на ${cfg.gate_name}`, durationHours);
@@ -1037,7 +1064,7 @@ const totals = q.all(`
   SELECT l.user_id, SUM(l.points) AS points, u.institution_id FROM points_ledger l
   JOIN users u ON u.id = l.user_id
   WHERE l.status='approved' GROUP BY l.user_id ORDER BY points DESC`);
-// Три лучших советчика экосистемы и лучший советчик учреждения, чей руководитель
+// Три лучших социальных советника экосистемы и лучший социальный советник учреждения, чей руководитель
 // открывает демонстрацию, — иначе раздел поощрений у него окажется пустым.
 const demoInstitution = U['volkov@social1.mos.ru'].institution_id;
 const leaders = totals.slice(0, 3);
@@ -1057,7 +1084,7 @@ leaders.forEach((l, i) => {
      decision_note, proposed_by, decided_by, decided_at, created_at, updated_at)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     l.user_id, code, 'month', period.label, l.points, i + 1, status,
-    `${l.points} очков за период, ${i + 1} место в рейтинге советчиков.`, note,
+    `${l.points} очков за период, ${i + 1} место в рейтинге социальных советников.`, note,
     U['lebedeva@social1.mos.ru'].id,
     status === 'proposed' ? null : U['volkov@social1.mos.ru'].id,
     status === 'proposed' ? null : ts(3), ts(6), ts(status === 'proposed' ? 6 : 3));
@@ -1069,6 +1096,153 @@ q.run(`UPDATE notifications SET is_read=1
        WHERE idea_id IS NOT NULL OR type IN ('points','badge','incentive_proposed')`);
 
 console.log(`Идей: ${ideaRows.length}, предложений: ${q.get('SELECT COUNT(*) AS c FROM proposals').c}, начислений: ${ledgerCount}`);
+
+// ── Изменения процессов ──────────────────────────────────────
+// Предложения заводятся тем же кодом, что работает в интерфейсе: с обсуждением,
+// голосами, листом согласования и начислением очков. Демонстрационные данные
+// показывают раздел во всех состояниях — от обсуждения до вступления в силу.
+const backdate = (table, id, fields) => {
+  const sets = Object.keys(fields).map((f) => `${f}=?`).join(', ');
+  q.run(`UPDATE ${table} SET ${sets} WHERE id=?`, ...Object.values(fields), id);
+};
+
+// Замечания на шагах схем: метки видны прямо на диаграмме
+const SCHEME_NOTES = [
+  ['e2e', 'g2', 'lebedeva@social1.mos.ru', 21,
+   'Пять рабочих дней на вердикт — половина времени пути инициативы до пилота. По типовым обращениям решение готово за три.'],
+  ['e2e', 'build', 'tihonov@social1.mos.ru', 14,
+   'Четыре спринта — усреднённый план. Для простых доработок хватает двух, и это стоит отражать в схеме.'],
+  ['emp-submit', 'search', 'petrov@social1.mos.ru', 9,
+   'Проверять дубли приходится в другом разделе: возвращаешься к форме и заполняешь заново.'],
+  ['emp-pilot', 'analyse', 'ershova@social1.mos.ru', 26,
+   'Сопоставление откликов с KPI по итогам месяца — поздно. Расхождение прогноза с фактом всплывает уже на Gate 4.'],
+];
+for (const [defKey, nodeId, email, daysAgo, body] of SCHEME_NOTES) {
+  const c = changes.addComment({ defKey, nodeId, body, user: U[email] });
+  backdate('discussions', c.id, { created_at: ts(daysAgo) });
+}
+// Часть замечаний коллеги отметили полезными
+for (const [nodeId, email] of [['g2', 'grigoriev@social1.mos.ru'], ['g2', 'volkov@social1.mos.ru'],
+                               ['analyse', 'danilov@social1.mos.ru']]) {
+  const row = q.get("SELECT id FROM discussions WHERE anchor_id=? AND target_type='process' ORDER BY id LIMIT 1", nodeId);
+  if (row) changes.markCommentUseful({ commentId: row.id, user: U[email] });
+}
+
+/** Завести предложение и довести его до нужного состояния. */
+function seedChange({ defKey, author, title, rationale, effect, edit, supporters = [],
+                      objectors = [], discussion = [], stage, verdicts = {}, days }) {
+  const c = changes.createChange({
+    defKey, title, rationale, expectedEffect: effect ?? null, user: U[author],
+  });
+  const model = structuredClone(repo.getVersion(c.draft_version_id).model);
+  edit(model);
+  changes.saveChangeModel({ changeId: c.id, model, user: U[author] });
+  backdate('process_changes', c.id, { created_at: ts(days.created) });
+  if (stage === 'draft') return c;
+
+  changes.submitForDiscussion({ changeId: c.id, user: U[author] });
+  backdate('process_changes', c.id, { submitted_at: ts(days.submitted), updated_at: ts(days.submitted) });
+  for (const email of supporters) changes.vote({ changeId: c.id, user: U[email], value: 1 });
+  for (const email of objectors) changes.vote({ changeId: c.id, user: U[email], value: -1 });
+  for (const [email, body] of discussion) {
+    const m = changes.addComment({ defKey, changeId: c.id, body, user: U[email] });
+    backdate('discussions', m.id, { created_at: ts(Math.max(0, days.submitted - 1)) });
+  }
+  if (stage === 'discussion') return c;
+
+  changes.submitForApproval({ changeId: c.id, user: U[author] });
+  for (const row of changes.approvalSheet(c.id)) {
+    const decision = verdicts[row.role_code];
+    if (!decision) continue;                       // роль ещё не высказалась
+    changes.decideApproval({ changeId: c.id, user: U[decision.by],
+                             verdict: decision.verdict, comment: decision.comment ?? null });
+    backdate('approvals', row.id, { decided_at: ts(days.decided) });
+  }
+  if (changes.getChange(c.id).status === 'accepted' && stage === 'published') {
+    changes.publishChange({ changeId: c.id, user: U['director@social1.mos.ru'] });
+    backdate('process_changes', c.id, { decided_at: ts(days.decided), published_at: ts(days.published) });
+  } else {
+    backdate('process_changes', c.id, { decided_at: ts(days.decided) });
+  }
+  return c;
+}
+
+seedChange({
+  defKey: 'emp-pilot', author: 'smirnova@social1.mos.ru',
+  title: 'Сверять отклики пилота с KPI еженедельно',
+  rationale: 'Сейчас отклики сопоставляются с показателями только по итогам месяца. Расхождение прогноза с фактом всплывает уже на Gate 4, когда исправлять прототип поздно, и пилот приходится продлевать.',
+  effect: 'Проблемы прототипа видны на второй неделе пилота, а не после его окончания',
+  edit: (m) => { m.nodes.find((n) => n.id === 'analyse').label = 'Сверять отклики с KPI еженедельно'; },
+  supporters: ['ershova@social1.mos.ru', 'danilov@social1.mos.ru', 'volkov@social1.mos.ru',
+               'orlova@social1.mos.ru', 'grigoriev@social1.mos.ru'],
+  discussion: [['ershova@social1.mos.ru',
+    'Поддерживаю. Еженедельная сверка — это полчаса координатора, а на Gate 4 экономит недели переделок.']],
+  stage: 'published',
+  verdicts: { pilot_coordinator: { by: 'ershova@social1.mos.ru', verdict: 'agree',
+    comment: 'Готовы вести сверку еженедельно: данные и так собираются непрерывно.' } },
+  days: { created: 24, submitted: 23, decided: 18, published: 16 },
+});
+
+seedChange({
+  defKey: 'e2e', author: 'fedorov@social1.mos.ru',
+  title: 'Сократить срок решения руководителя до двух рабочих дней',
+  rationale: 'Три рабочих дня на Gate 1 растягивают ожидание автора до недели с учётом выходных. Руководитель принимает решение по трём критериям и, как показывает журнал, укладывается в два дня.',
+  effect: 'Автор получает первое решение на день раньше',
+  edit: (m) => {
+    const g = m.nodes.find((n) => n.stage && n.stage.stage_no === 2);
+    g.stage.sla_value = 2;
+    g.stage.sla_text = 'Руководитель учреждения принимает решение в течение 2 рабочих дней.';
+    g.label = 'Gate 1 — 2 рабочих дня';
+  },
+  supporters: ['smirnova@social1.mos.ru', 'petrov@social1.mos.ru', 'nikitina@social1.mos.ru',
+               'larina@social1.mos.ru', 'kuznecov@social1.mos.ru', 'ivanova@social1.mos.ru'],
+  objectors: ['morozov@social1.mos.ru'],
+  discussion: [
+    ['morozov@social1.mos.ru',
+     'В большом интернате три дня нужны: приходится советоваться с профильными специалистами. Двух хватит не везде.'],
+    ['volkov@social1.mos.ru',
+     'По журналу за полгода средний срок решения — 1,4 дня. Два дня оставляют запас даже для сложных случаев.'],
+  ],
+  // Руководители согласовали, центральный аппарат ещё смотрит — в листе идёт срок
+  stage: 'approval',
+  verdicts: { head: { by: 'volkov@social1.mos.ru', verdict: 'agree',
+    comment: 'Срок реалистичный, статистика решений его подтверждает.' } },
+  days: { created: 6, submitted: 5, decided: 3, published: 3 },
+});
+
+seedChange({
+  defKey: 'adv-propose', author: 'nikitina@social1.mos.ru',
+  title: 'Показывать социальному советнику судьбу его прежних предложений',
+  rationale: 'Социальный советник видит начисленные очки, но не видит, что из предложенного дошло до внедрения. Обратная связь обрывается на публикации, и мотивация держится только на цифре рейтинга.',
+  effect: 'Социальный советник видит, какие его решения работают в учреждениях',
+  edit: (m) => { m.nodes.find((n) => n.id === 'end').label = 'Видно, что из предложенного внедрено'; },
+  supporters: ['orlova@social1.mos.ru', 'larina@social1.mos.ru', 'petrov@social1.mos.ru',
+               'kuznecov@social1.mos.ru'],
+  discussion: [['lebedeva@social1.mos.ru',
+    'Полезно и для модерации: видно, чьи советы доходят до дела, а не только собирают отметки.']],
+  stage: 'discussion',
+  days: { created: 3, submitted: 3, decided: 3, published: 3 },
+});
+
+seedChange({
+  defKey: 'head-gate1', author: 'larina@social1.mos.ru',
+  title: 'Не требовать аргументацию при решении «Остановить»',
+  rationale: 'Заполнение обоснования при отказе занимает время руководителя, а автор всё равно чаще всего не возвращается к инициативе. Предлагаю сделать поле необязательным.',
+  edit: (m) => { m.nodes.find((n) => n.id === 'gw').label = 'Решение руководителя'; },
+  supporters: ['zaharov@social1.mos.ru'],
+  objectors: ['smirnova@social1.mos.ru', 'petrov@social1.mos.ru', 'grigoriev@social1.mos.ru'],
+  discussion: [['smirnova@social1.mos.ru',
+    'Обоснование — единственное, что автор получает при отказе. Без него отказ выглядит произвольным.']],
+  stage: 'approval',
+  verdicts: { head: { by: 'sokolova@social1.mos.ru', verdict: 'reject',
+    comment: 'Аргументация на Gate — не формальность, а архив знаний: по ней следующие авторы понимают, почему похожее решение не прошло. Снимать нельзя.' } },
+  days: { created: 12, submitted: 11, decided: 9, published: 9 },
+});
+
+console.log('Предложений об изменении процессов: '
+  + q.get('SELECT COUNT(*) AS c FROM process_changes').c
+  + ', замечаний на схемах: '
+  + q.get("SELECT COUNT(*) AS c FROM discussions WHERE anchor_kind='node'").c);
 
 // ── Задачи и уведомления по текущим ожидающим Gate ───────────
 for (const it of created.filter((c) => c.status === 'active')) {
@@ -1091,6 +1265,134 @@ for (const it of created.slice(0, 6)) {
 grantAward(U['lebedeva@social1.mos.ru'].id, null, 'expert', 'Эксперт года по числу рассмотренных инициатив', U['director@social1.mos.ru'].id);
 grantAward(U['petrov@social1.mos.ru'].id, created[1]?.id, 'author', 'Инициатива дошла до пилотирования', U['director@social1.mos.ru'].id);
 
+// События переходов восстанавливаются в конце: к этому моменту история этапов
+// уже воспроизведена, и метрика времени на этапе получает данные сразу
+// ── База знаний ──────────────────────────────────────────────
+// Документы заводятся тем же кодом, что работает в интерфейсе: с рецензированием,
+// замечаниями к разделам и публикацией. Раздел показывается во всех состояниях —
+// от черновика до заменённого решения, — иначе по нему не понять, как он живёт.
+{
+  const архитектор = U['tihonov@social1.mos.ru'];
+  grantRole(архитектор.id, 'architect', { grantedBy: U['director@social1.mos.ru'].id });
+  // Права считаются по всем ролям участника, а объект в сиде собран до выдачи
+  архитектор.extra_roles = 'architect';
+
+  const заведи = ({ kind, title, author, subjectType = null, subjectId = null, sections,
+                    stage, verdicts = {}, notes = [], days }) => {
+    const doc = kn.createDoc({ kind, title, subjectType, subjectId, user: U[author] });
+    kn.saveDraft({ docId: doc.id, sections, user: U[author] });
+    backdate('knowledge_docs', doc.id, { created_at: ts(days.created) });
+    if (stage === 'draft') return doc;
+
+    kn.submitForReview({ docId: doc.id, user: U[author] });
+    for (const [section, [email, body]] of Object.entries(notes.length ? Object.fromEntries(notes) : {})) {
+      const c = discussions.add({ targetType: 'knowledge_doc', targetId: doc.id,
+        anchorKind: 'section', anchorId: section, body, user: U[email] });
+      backdate('discussions', c.id, { created_at: ts(days.created - 1) });
+    }
+    if (stage === 'review') return doc;
+
+    for (const row of kn.reviewSheet(doc.id)) {
+      const кто = row.user_id
+        ? Object.values(U).find((u) => u.id === row.user_id)
+        : U[verdicts[row.role_code]];
+      if (!кто) continue;
+      kn.decideReview({ docId: doc.id, user: кто, verdict: stage === 'rejected' ? 'reject' : 'agree',
+        comment: stage === 'rejected'
+          ? 'Решение переносит нагрузку на учреждения без дополнительных ресурсов — в таком виде принять нельзя.'
+          : null });
+      if (stage === 'rejected') break;
+    }
+    if (stage === 'rejected') { backdate('knowledge_docs', doc.id, { decided_at: ts(days.decided) }); return doc; }
+    if (stage === 'accepted') return doc;
+
+    kn.publishDoc({ docId: doc.id, user: U['director@social1.mos.ru'] });
+    backdate('knowledge_docs', doc.id, { published_at: ts(days.published), decided_at: ts(days.decided) });
+    return doc;
+  };
+
+  заведи({
+    kind: 'adr', title: 'Возврат заявления сопровождается перечнем недостающих сведений',
+    author: 'lebedeva@social1.mos.ru', stage: 'published',
+    sections: {
+      context: 'Специалист возвращал заявление с отметкой «неполный пакет». Заявитель не понимал, чего именно не хватает, и приходил повторно — в среднем 1,7 раза на одно обращение.',
+      decision: 'Возврат оформляется только вместе с перечнем недостающих документов. Перечень формируется из карточки услуги, вручную ничего не набирается.',
+      consequences: 'Повторные обращения по одному поводу сократились. Приём удлинился примерно на две минуты: специалист сверяет перечень при заявителе.',
+      alternatives: 'Рассматривали памятку на стенде — отклонено: перечень зависит от жизненной ситуации заявителя, общая памятка её не покрывает.',
+    },
+    verdicts: { architect: 'tihonov@social1.mos.ru', dtszn: 'director@social1.mos.ru' },
+    days: { created: 62, decided: 55, published: 54 },
+  });
+
+  заведи({
+    kind: 'adr', title: 'Очередь на путёвки формируется по нуждаемости, а не по дате обращения',
+    author: 'grigoriev@social1.mos.ru', stage: 'published',
+    sections: {
+      context: 'Путёвки распределялись по дате обращения. Семьи, узнавшие об услуге позже, оказывались в конце очереди независимо от положения.',
+      decision: 'Очередь строится по оценке нуждаемости; дата обращения используется только при равных оценках.',
+      consequences: 'Доступность выросла для семей в трудной ситуации. Ожидание для части заявителей увеличилось — им заранее сообщается расчётный срок.',
+      alternatives: 'Рассматривали квоты по категориям — отклонено: жёсткие квоты не учитывают изменение положения семьи в течение года.',
+    },
+    verdicts: { architect: 'tihonov@social1.mos.ru', dtszn: 'director@social1.mos.ru' },
+    days: { created: 40, decided: 33, published: 32 },
+  });
+
+  заведи({
+    kind: 'rfc', title: 'Единая анкета семьи вместо четырёх отдельных заявлений',
+    author: 'smirnova@social1.mos.ru', stage: 'review',
+    sections: {
+      problem: 'Родители заполняют одни и те же сведения в четырёх заявлениях: на путёвку, на питание, на кружки и на компенсацию проезда. На это уходит около 40 минут и часть данных расходится между заявлениями.',
+      solution: 'Единая анкета семьи заполняется один раз. Из неё формируются заявления по каждой услуге; специалист правит только то, что относится к конкретной услуге.',
+      alternatives: 'Рассматривали автозаполнение из учётной системы — отклонено: часть сведений там устаревает, и родители всё равно правят их вручную. Рассматривали объединение только двух самых частых заявлений — отклонено: экономия времени меньше трудозатрат на переделку.',
+      risks: 'Единая анкета собирает больше сведений за один раз — нужна проверка на избыточность персональных данных. Семьям без доступа к порталу сохраняется бумажный приём.',
+      effect: 'Время подачи сокращается с 40 до 12 минут; расхождения между заявлениями исчезают.',
+    },
+    notes: [['risks', ['tihonov@social1.mos.ru',
+      'Проверку на избыточность нужно описать конкретнее: кто её проводит и на каком шаге. Иначе раздел не проходит согласование с юристами.']]],
+    days: { created: 9, decided: 9, published: 9 },
+  });
+
+  заведи({
+    kind: 'rfc', title: 'Передать приём заявлений на бытовую технику в учреждения',
+    author: 'fedorov@social1.mos.ru', stage: 'rejected',
+    sections: {
+      problem: 'Заявления на бытовую технику принимает центральный аппарат, срок рассмотрения — до 30 дней.',
+      solution: 'Передать приём и первичную проверку в учреждения.',
+      alternatives: 'Рассматривали сокращение срока без передачи полномочий — отклонено: узкое место в пересылке документов.',
+      risks: 'Учреждения получат дополнительную нагрузку.',
+    },
+    verdicts: { architect: 'tihonov@social1.mos.ru' },
+    days: { created: 21, decided: 16, published: 16 },
+  });
+
+  заведи({
+    kind: 'guide', title: 'Как учреждению подготовиться к роли пилотной площадки',
+    author: 'ershova@social1.mos.ru', stage: 'draft',
+    sections: {
+      audience: 'Директорам и заместителям учреждений, которые подали заявку на пилот.',
+      steps: 'Назначить ответственного, выделить двух сотрудников на обучение, согласовать окно в расписании, подготовить рабочие места.',
+    },
+    days: { created: 4, decided: 4, published: 4 },
+  });
+
+  console.log('Документов в базе знаний: '
+    + q.get('SELECT COUNT(*) AS c FROM knowledge_docs').c
+    + ', опубликовано: '
+    + q.get("SELECT COUNT(*) AS c FROM knowledge_docs WHERE status='published'").c);
+}
+
+// Образец формы-опросника: функциональные требования ДЗМ, собранные в конструкторе
+const sampleForm = ensureSampleForms();
+if (sampleForm) {
+  console.log(`Образец формы: «${sampleForm.title}» — ${sampleForm.responses} ответов, `
+    + `ссылка /f/${sampleForm.slug}`);
+}
+
+// Каталог разработчиков: по три вымышленных разработчика каждого вида, помечены как демо
+console.log(`Демонстрационных разработчиков ИИ-решений: ${seedSampleProviders()}`);
+console.log(`Восстановлено событий переходов: ${ensureStageEvents()}`);
+console.log(`Проиндексировано для поиска: ${reindexAll()}`);
+
 logAction(U['coordinator@social1.mos.ru'].id, 'system.seed', 'system', null,
   { initiatives: created.length, users: Object.keys(U).length }, 'system');
 
@@ -1110,6 +1412,9 @@ console.log(`
   Оценок в ревью:${q.get('SELECT COUNT(*) AS c FROM proposal_reviews').c}
   Очков:         ${q.get("SELECT COALESCE(SUM(points),0) AS s FROM points_ledger WHERE status='approved'").s}
   Поощрений:     ${q.get('SELECT COUNT(*) AS c FROM incentives').c}
+  Изменений процессов: ${q.get('SELECT COUNT(*) AS c FROM process_changes').c}
+  База знаний:   ${q.get('SELECT COUNT(*) AS c FROM knowledge_docs').c} документов, ${q.get("SELECT COUNT(*) AS c FROM knowledge_docs WHERE status='published'").c} опубликовано
+  Формы:         ${q.get('SELECT COUNT(*) AS c FROM forms').c}, ответов собрано: ${q.get('SELECT COUNT(*) AS c FROM form_responses').c}
 
   Вход: любой e-mail из списка, пароль social1
   Например: director@social1.mos.ru (ДТСЗН), volkov@social1.mos.ru (руководитель),

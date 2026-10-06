@@ -3,7 +3,7 @@ import { q, tx } from '../db.js';
 import { can } from '../auth.js';
 import { logAction } from '../audit.js';
 import {
-  stages, stageConfig, slaState, submitInitiative, decideGate, canDecide, notify, LAST_STAGE,
+  stages, stageConfig, slaState, submitInitiative, decideGate, canDecide, notify,
 } from '../workflow.js';
 import { classify, findSimilar, predictSuccess } from '../ai.js';
 

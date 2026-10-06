@@ -160,6 +160,27 @@ end
 end`;
 }
 
+// ── Изображения ──────────────────────────────────────────────
+/**
+ * Размеры JPEG из маркера начала кадра. PDF встраивает JPEG как есть (DCTDecode),
+ * поэтому перекодировать ничего не нужно — достаточно знать ширину, высоту и
+ * число цветовых каналов.
+ */
+export function jpegInfo(buf) {
+  if (buf[0] !== 0xFF || buf[1] !== 0xD8) throw new Error('Не JPEG: нет маркера SOI');
+  let i = 2;
+  while (i + 9 < buf.length) {
+    if (buf[i] !== 0xFF) { i += 1; continue; }
+    const m = buf[i + 1];
+    // SOF0…SOF15, кроме DHT (C4), JPG (C8) и DAC (CC)
+    if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+      return { height: buf.readUInt16BE(i + 5), width: buf.readUInt16BE(i + 7), components: buf[i + 9] };
+    }
+    i += 2 + buf.readUInt16BE(i + 2);
+  }
+  throw new Error('В JPEG не найден маркер начала кадра');
+}
+
 // ── Сборка документа ─────────────────────────────────────────
 const escText = (s) => String(s).replace(/([\\()])/g, '\\$1');
 
@@ -169,6 +190,20 @@ export class PdfDoc {
     this.pages = [];
     this.meta = { title, author, subject };
     this.fonts = {};
+    this.images = [];
+  }
+
+  /** Встраивает JPEG; возвращает имя ресурса и размеры в пикселях. */
+  addJpeg(buf) {
+    const { width, height, components } = jpegInfo(buf);
+    const id = this.add({ dict: {
+      Type: '/XObject', Subtype: '/Image', Width: width, Height: height,
+      ColorSpace: components === 1 ? '/DeviceGray' : components === 4 ? '/DeviceCMYK' : '/DeviceRGB',
+      BitsPerComponent: 8, Filter: '/DCTDecode',
+    }, stream: buf });
+    const image = { name: `Im${this.images.length + 1}`, id, width, height };
+    this.images.push(image);
+    return image;
   }
 
   add(content) { this.objects.push(content); return this.objects.length - 1; }
@@ -226,10 +261,12 @@ export class PdfDoc {
       const packed = deflateSync(Buffer.from(p.stream, 'latin1'));
       const contentId = this.add({ dict: { Filter: '/FlateDecode' }, stream: packed });
       const fontsDict = Object.entries(fontRefs).map(([id, ref]) => `/${id} ${ref} 0 R`).join(' ');
+      const images = this.images.length
+        ? ` /XObject << ${this.images.map((im) => `/${im.name} ${im.id} 0 R`).join(' ')} >>` : '';
       kids.push(this.add({ dict: {
         Type: '/Page', Parent: `${pagesId} 0 R`,
         MediaBox: `[0 0 ${p.width.toFixed(2)} ${p.height.toFixed(2)}]`,
-        Resources: `<< /Font << ${fontsDict} >> >>`, Contents: `${contentId} 0 R`,
+        Resources: `<< /Font << ${fontsDict} >>${images} >>`, Contents: `${contentId} 0 R`,
       } }));
     }
     this.objects[pagesId] = { dict: {
@@ -334,6 +371,11 @@ export class Canvas {
     return this.op('BT').op(`/${entry.id} ${size} Tf`)
       .op(`0 1 -1 0 ${x.toFixed(2)} ${(y - w / 2).toFixed(2)} Tm`)
       .op(`<${entry.font.encode(str)}> Tj`).op('ET');
+  }
+  /** Изображение, встроенное через doc.addJpeg, в прямоугольник x, y (низ), w, h. */
+  image(img, x, y, w, h) {
+    return this.op('q').op(`${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm`)
+      .op(`/${img.name} Do`).op('Q');
   }
   textWidth(str, size, font = 'regular') { return this.doc.useFont(font).font.width(str, size); }
   toString() { return this.ops.join('\n'); }

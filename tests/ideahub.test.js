@@ -230,7 +230,7 @@ describe('Модерация идей', () => {
 });
 
 // ── Рейтинг и периоды ────────────────────────────────────────
-describe('Рейтинг советчиков', () => {
+describe('Рейтинг социальных советников', () => {
   test('границы периодов считаются корректно', () => {
     const ref = new Date(2026, 4, 17);         // 17 мая 2026
     assert.deepEqual(hub.periodBounds('month', ref).from, '2026-05-01');
@@ -271,7 +271,7 @@ describe('Рейтинг советчиков', () => {
 
 // ── Знаки отличия ────────────────────────────────────────────
 describe('Знаки отличия', () => {
-  test('«Активный советчик» присваивается за пять предложений', () => {
+  test('«Активный социальный советник» присваивается за пять предложений', () => {
     const helper = makeUser('helper@test', 'employee');
     const idea = makeIdea(author.id, 'Идея для знака отличия', 'accepted');
     for (let i = 0; i < 5; i++) makeProposal(idea.id, helper.id, `Решение номер ${i}`);
@@ -337,5 +337,69 @@ describe('Аудит', () => {
     assert.ok(entry);
     assert.equal(entry.action, 'idea.approve');
     assert.throws(() => q.run('DELETE FROM audit_log WHERE id=?', entry.id), /неизменяем/);
+  });
+});
+
+// ── Переименование сущности ──────────────────────────────────
+// «Советчик» переименован в «социального советника». Значения по умолчанию пишутся
+// только в пустые таблицы, поэтому у работающей установки надписи остались бы
+// прежними — их правит отдельная миграция. Склонение проверяется по всем падежам:
+// механическая замена без падежей дала бы «очки советчику» → «очки социальный советник».
+describe('Переименование советчика в социального советника', () => {
+  test('склонение по всем падежам', () => {
+    const формы = {
+      'советчик': 'социальный советник',
+      'советчика': 'социального советника',
+      'советчику': 'социальному советнику',
+      'советчиком': 'социальным советником',
+      'советчике': 'социальном советнике',
+      'советчики': 'социальные советники',
+      'советчиков': 'социальных советников',
+      'советчикам': 'социальным советникам',
+      'советчиками': 'социальными советниками',
+      'советчиках': 'социальных советниках',
+    };
+    for (const [было, стало] of Object.entries(формы)) {
+      assert.equal(hub.renameAdvisor(было), стало, `неверная форма для «${было}»`);
+    }
+  });
+
+  test('заглавная буква сохраняется', () => {
+    assert.equal(hub.renameAdvisor('Советчик получает очки'), 'Социальный советник получает очки');
+    assert.equal(hub.renameAdvisor('Советчику начислено'), 'Социальному советнику начислено');
+  });
+
+  test('слова, начинающиеся так же, не затрагиваются', () => {
+    assert.equal(hub.renameAdvisor('советчиковый'), 'советчиковый');
+    assert.equal(hub.renameAdvisor('совет и советник'), 'совет и советник');
+  });
+
+  test('прежние надписи в базе обновляются', () => {
+    q.run(`UPDATE points_rules SET description='Начисляется советчику за предложение.'
+           WHERE code='proposal.created'`);
+    q.run(`UPDATE incentive_types SET title='Сертификат «Лучший советчик месяца»'
+           WHERE code='advisor_of_month'`);
+    assert.ok(hub.renameAdvisorWording() >= 2, 'миграция не нашла прежние надписи');
+    assert.match(q.get("SELECT description FROM points_rules WHERE code='proposal.created'").description,
+      /социальному советнику/);
+    assert.match(q.get("SELECT title FROM incentive_types WHERE code='advisor_of_month'").title,
+      /Лучший социальный советник месяца/);
+  });
+
+  test('повторный запуск миграции ничего не меняет', () => {
+    hub.renameAdvisorWording();
+    assert.equal(hub.renameAdvisorWording(), 0, 'миграция не идемпотентна');
+  });
+
+  test('прежнее название не осталось в справочных данных модуля', () => {
+    for (const [table, columns] of [
+      ['points_rules', ['title', 'description']],
+      ['incentive_types', ['title', 'description', 'legal_note']],
+      ['advisor_badges', ['title']],
+    ]) {
+      const where = columns.map((c) => `${c} LIKE '%оветчик%'`).join(' OR ');
+      const left = q.get(`SELECT COUNT(*) AS c FROM ${table} WHERE ${where}`).c;
+      assert.equal(left, 0, `в таблице ${table} осталось прежнее название`);
+    }
   });
 });

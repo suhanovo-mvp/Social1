@@ -1,7 +1,7 @@
 // Отрисовка BPMN-схем в инлайновый SVG. Геометрия, нумерация и перенос подписей
-// вынесены в bpmn-layout.js — их разделяет генератор PDF на сервере.
+// вынесены в shared/bpmn/layout.js — их разделяет генератор PDF на сервере.
 import { esc, html } from './core.js';
-import { GEO, layout, routeFlow, pathToSvg, wrapText, numberAnchor } from './bpmn-layout.js';
+import { GEO, layout, routeFlow, pathToSvg, wrapLabel, numberAnchor } from '/shared/bpmn/layout.js';
 
 export { GEO, layout };
 
@@ -83,22 +83,22 @@ export function renderDiagram(diagram, seq = null) {
         ${b.double ? `<circle cx="${b.cx}" cy="${b.cy}" r="${GEO.EVENT_R - 3.5}" class="bp-event"/>` : ''}
         ${glyphMarkup(b.glyph, b.cx, b.cy)}`;
       labelEl = html`<text class="bp-label bp-label--out" text-anchor="middle">
-        ${textBlock(wrapText(n.label, 24, 3), b.cx, b.cy + GEO.EVENT_R + 15, 12.5)}</text>`;
+        ${textBlock(wrapLabel(n.label, 'event'), b.cx, b.cy + GEO.EVENT_R + 15, 12.5)}</text>`;
     } else if (b.shape === 'gateway') {
       const h = GEO.GW / 2;
       shape = html`<path d="M${b.cx} ${b.cy - h}L${b.cx + h} ${b.cy}L${b.cx} ${b.cy + h}L${b.cx - h} ${b.cy}Z"
                      class="bp-gateway"/>${glyphMarkup(b.glyph, b.cx, b.cy)}`;
       labelEl = html`<text class="bp-label bp-label--out" text-anchor="middle">
-        ${textBlock(wrapText(n.label, 24, 2), b.cx, b.cy - h - 16, 12.5)}</text>`;
+        ${textBlock(wrapLabel(n.label, 'gateway'), b.cx, b.cy - h - 16, 12.5)}</text>`;
     } else if (b.shape === 'note') {
       shape = html`<path d="M${b.x + 9} ${b.y}h${b.w - 9}v${b.h}h-${b.w - 9}" class="bp-note"/>`;
       labelEl = html`<text class="bp-label bp-label--note" text-anchor="start">
-        ${textBlock(wrapText(n.label, 26, 3), b.x + 15, b.cy, 13)}</text>`;
+        ${textBlock(wrapLabel(n.label, 'note'), b.x + 15, b.cy, 13)}</text>`;
     } else {
       shape = html`<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="7" class="bp-task"/>
         ${b.glyph ? glyphMarkup(b.glyph, b.x + 13, b.y + 13) : ''}`;
       labelEl = html`<text class="bp-label" text-anchor="middle">
-        ${textBlock(wrapText(n.label, 23, 3), b.cx, b.cy + (b.glyph ? 5 : 0), 13.5)}</text>`;
+        ${textBlock(wrapLabel(n.label, 'task'), b.cx, b.cy + (b.glyph ? 5 : 0), 13.5)}</text>`;
     }
 
     return html`<g class="bp-node bp-node--${n.type}" data-node="${esc(n.id)}"

@@ -1,7 +1,7 @@
 // Сообщество: форумы, профили, лучшие практики, масштабирование, признание.
 import { route, readJson, HttpError } from '../http.js';
 import { q } from '../db.js';
-import { can, ROLES } from '../auth.js';
+import { can, roleTitle } from '../auth.js';
 import { logAction } from '../audit.js';
 import { grantAward, notifyRole } from '../workflow.js';
 
@@ -64,7 +64,7 @@ route.get('/api/users/:id', async ({ params, sendJson }) => {
   const awards = q.all(`SELECT a.*, i.number FROM awards a LEFT JOIN initiatives i ON i.id=a.initiative_id
                         WHERE a.user_id=? ORDER BY a.granted_at DESC`, u.id);
   const decisions = q.get('SELECT COUNT(*) AS c FROM gate_decisions WHERE decided_by=?', u.id).c;
-  sendJson(200, { ...u, role_title: ROLES[u.role]?.title, initiatives, awards, decisions_made: decisions });
+  sendJson(200, { ...u, role_title: roleTitle(u.role), initiatives, awards, decisions_made: decisions });
 });
 
 route.get('/api/users', async ({ url, sendJson }) => {

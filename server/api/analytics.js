@@ -3,7 +3,7 @@
 import { route, HttpError } from '../http.js';
 import { q } from '../db.js';
 import { can } from '../auth.js';
-import { stages, LAST_STAGE } from '../workflow.js';
+import { stages } from '../workflow.js';
 
 const median = (arr) => {
   if (!arr.length) return null;

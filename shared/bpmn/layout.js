@@ -47,6 +47,26 @@ export function wrapText(text, maxChars, maxLines = 3) {
 }
 
 /**
+ * Пределы переноса подписи по форме фигуры: [знаков в строке, строк].
+ * Значения одни на отрисовку в SVG, выгрузку в PDF и проверку схемы, иначе
+ * подпись, умещавшаяся на экране, обрезалась бы на бумаге.
+ */
+export const WRAP = {
+  event:   [24, 3],
+  gateway: [24, 2],
+  note:    [26, 3],
+  task:    [23, 3],
+};
+
+export const shapeOf = (type) => (SHAPES[type] || SHAPES.task).shape;
+
+/** Подпись узла, разбитая по строкам по правилам его формы. */
+export function wrapLabel(text, shape) {
+  const [chars, lines] = WRAP[shape] || WRAP.task;
+  return wrapText(text, chars, lines);
+}
+
+/**
  * Название дорожки повёрнуто на 90°, поэтому ограничено её высотой, а не шириной.
  * Длинные названия переносятся на две строки — иначе текст выходит за границы дорожки.
  */

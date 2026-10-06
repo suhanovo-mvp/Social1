@@ -2,6 +2,13 @@
 // Конфигурация этапов и Gate хранится в БД и меняется без правки кода.
 import { q, tx } from './db.js';
 import { logAction } from './audit.js';
+import { iso, parseSql, addWorkdays, dueDate, slaStateOf, hoursSince } from './sla.js';
+import { notify as sendNotification, notifyRole as sendToRole } from './notify.js';
+import { emit } from './events.js';
+
+// Расчёт сроков переехал в sla.js — конвейер и согласование изменений процессов
+// считают их одинаково. Реэкспорт оставлен: на эти имена ссылаются сид и модули API.
+export { addWorkdays, dueDate };
 
 export const DECISIONS = {
   go:       { title: 'Go — продолжить',        tone: 'ok' },
@@ -127,6 +134,34 @@ export function ensureWorkflow() {
   }
 }
 
+/**
+ * Восстановление событий из истории переходов.
+ *
+ * Переходы этапов копились в stage_transitions задолго до появления событийного
+ * слоя, а метрика «сколько инициатива простояла на этапе» нужна по всей истории,
+ * а не только по будущим переходам. Поэтому события восстанавливаются из того,
+ * что уже записано, — один раз, при первом запуске после обновления.
+ */
+export function ensureStageEvents() {
+  const already = q.get(
+    "SELECT COUNT(*) AS c FROM events WHERE subject_type = 'initiative'").c;
+  if (already) return 0;
+
+  const rows = q.all(`SELECT t.*, i.number FROM stage_transitions t
+                      JOIN initiatives i ON i.id = t.initiative_id
+                      ORDER BY t.id`);
+  for (const t of rows) {
+    q.run(`INSERT INTO events
+           (type, subject_type, subject_id, actor_id, from_state, to_state, payload, at)
+           VALUES ('initiative.stage.changed','initiative',?,?,?,?,?,?)`,
+      t.initiative_id, t.by_user,
+      t.from_stage === null ? null : String(t.from_stage), String(t.to_stage),
+      JSON.stringify({ number: t.number, reason: t.reason, hoursInStage: t.hours_in_stage }),
+      t.at);
+  }
+  return rows.length;
+}
+
 export function stages() {
   return q.all('SELECT * FROM workflow_config ORDER BY stage_no').map((s) => ({
     ...s,
@@ -140,52 +175,28 @@ export function stageConfig(n) {
   return stages().find((s) => s.stage_no === n) || null;
 }
 
-export const LAST_STAGE = 6;
-
-// ── Расчёт SLA ───────────────────────────────────────────────
-const iso = (d) => d.toISOString().slice(0, 19).replace('T', ' ');
-
-export function addWorkdays(from, days) {
-  const d = new Date(from);
-  let left = days;
-  while (left > 0) {
-    d.setDate(d.getDate() + 1);
-    const wd = d.getDay();
-    if (wd !== 0 && wd !== 6) left -= 1;
-  }
-  return d;
-}
-
-export function dueDate(fromISO, value, unit) {
-  if (!value || !unit) return null;
-  const from = new Date((fromISO || iso(new Date())).replace(' ', 'T') + 'Z');
-  const d = unit === 'workdays' ? addWorkdays(from, value) : new Date(from.getTime() + value * 864e5);
-  return iso(d);
+/**
+ * Номер последнего этапа конвейера. Раньше это была постоянная: конвейер задавался
+ * кодом и всегда состоял из шести этапов. Теперь этапы приходят из опубликованной
+ * модели процесса, и величину нужно считать по факту.
+ */
+export function lastStage() {
+  return q.get('SELECT MAX(stage_no) AS n FROM workflow_config').n || 1;
 }
 
 export function slaState(initiative) {
-  if (!initiative.sla_due_at || initiative.status !== 'active') return { code: 'none', label: '—' };
-  const due = new Date(initiative.sla_due_at.replace(' ', 'T') + 'Z').getTime();
-  const now = Date.now();
-  const hoursLeft = (due - now) / 36e5;
-  if (hoursLeft < 0) return { code: 'breached', label: 'SLA нарушен', hoursLeft };
-  if (hoursLeft < 24) return { code: 'risk', label: 'Риск нарушения SLA', hoursLeft };
-  return { code: 'ok', label: 'В рамках SLA', hoursLeft };
+  return slaStateOf(initiative.sla_due_at, initiative.status === 'active');
 }
 
 // ── Задачи и уведомления ─────────────────────────────────────
+// Сигнатуры сохранены: конвейер привязывает уведомления к инициативе, и все его
+// вызовы передают её идентификатор вторым доводом.
 export function notify(userId, initiativeId, type, title, body) {
-  if (!userId) return;
-  q.run('INSERT INTO notifications (user_id, initiative_id, type, title, body) VALUES (?,?,?,?,?)',
-    userId, initiativeId ?? null, type, title, body ?? null);
+  sendNotification(userId, type, title, body, { initiative_id: initiativeId });
 }
 
 export function notifyRole(role, institutionId, initiativeId, type, title, body) {
-  const users = institutionId
-    ? q.all('SELECT id FROM users WHERE role = ? AND institution_id = ? AND is_active = 1', role, institutionId)
-    : q.all('SELECT id FROM users WHERE role = ? AND is_active = 1', role);
-  for (const u of users) notify(u.id, initiativeId, type, title, body);
-  return users.length;
+  return sendToRole(role, institutionId, type, title, body, { initiative_id: initiativeId });
 }
 
 function createGateTask(initiative, cfg) {
@@ -213,9 +224,7 @@ export function enterStage(initiative, toStage, byUser, reason) {
   const cfg = stageConfig(toStage);
   const now = iso(new Date());
   const prevEntered = initiative.stage_entered_at;
-  const hoursInStage = prevEntered
-    ? (Date.now() - new Date(prevEntered.replace(' ', 'T') + 'Z').getTime()) / 36e5
-    : null;
+  const hoursInStage = prevEntered ? hoursSince(prevEntered) : null;
 
   const due = cfg ? dueDate(now, cfg.sla_value, cfg.sla_unit) : null;
   q.run(`UPDATE initiatives SET stage=?, stage_entered_at=?, sla_due_at=?, updated_at=datetime('now'),
@@ -226,6 +235,11 @@ export function enterStage(initiative, toStage, byUser, reason) {
     initiative.id, initiative.stage, toStage, byUser ?? null, reason ?? null, hoursInStage);
 
   const fresh = q.get('SELECT * FROM initiatives WHERE id=?', initiative.id);
+  emit('initiative.stage.changed', {
+    subjectType: 'initiative', subjectId: initiative.id, actorId: byUser ?? null,
+    from: initiative.stage ? String(initiative.stage) : null, to: String(toStage),
+    number: initiative.number, hoursInStage,
+  });
   createGateTask(fresh, cfg);
   return fresh;
 }
@@ -273,9 +287,8 @@ export function decideGate({ user, initiativeId, decision, rationale, criteriaSc
       throw Object.assign(new Error('Аргументация обязательна (не менее 10 символов) — решения на Gate документируются'), { status: 400 });
     }
 
-    const enteredMs = new Date(init.stage_entered_at.replace(' ', 'T') + 'Z').getTime();
-    const durationHours = (Date.now() - enteredMs) / 36e5;
-    const slaMet = init.sla_due_at ? (Date.now() <= new Date(init.sla_due_at.replace(' ', 'T') + 'Z').getTime() ? 1 : 0) : null;
+    const durationHours = hoursSince(init.stage_entered_at);
+    const slaMet = init.sla_due_at ? (Date.now() <= parseSql(init.sla_due_at).getTime() ? 1 : 0) : null;
 
     q.run(`INSERT INTO gate_decisions
       (initiative_id, gate_no, stage_no, decision, rationale, criteria_scores, decided_by, sla_due_at, sla_met, duration_hours)
@@ -290,11 +303,11 @@ export function decideGate({ user, initiativeId, decision, rationale, criteriaSc
 
     let result;
     if (decision === 'go') {
-      if (cfg.stage_no === LAST_STAGE) {
+      if (cfg.stage_no === lastStage()) {
         q.run(`UPDATE initiatives SET status='scaled', scaled_at=datetime('now'), closed_at=datetime('now'),
                sla_due_at=NULL, updated_at=datetime('now') WHERE id=?`, init.id);
         q.run(`INSERT INTO stage_transitions (initiative_id, from_stage, to_stage, by_user, reason)
-               VALUES (?,?,?,?,?)`, init.id, cfg.stage_no, LAST_STAGE, user.id, 'Масштабирование утверждено');
+               VALUES (?,?,?,?,?)`, init.id, cfg.stage_no, cfg.stage_no, user.id, 'Масштабирование утверждено');
         notify(init.author_id, init.id, 'scaled', `Инициатива ${init.number} масштабирована`,
           'Ваша инициатива прошла полный цикл и утверждена к тиражированию в других учреждениях.');
         grantAward(init.author_id, init.id, 'scaled', 'Автор масштабированной инициативы', user.id);

@@ -391,6 +391,34 @@ CREATE TABLE IF NOT EXISTS follows (
 );
 CREATE INDEX IF NOT EXISTS idx_follows_init ON follows(initiative_id);
 
+-- ── События платформы ────────────────────────────────────────
+-- Что произошло, а не кто что сделал: журнал аудита отвечает на второй вопрос и
+-- защищён цепочкой хэшей — разбавлять его системными переходами нельзя. Здесь же
+-- лежат и переходы, сделанные платформой самостоятельно, и по этой таблице
+-- считается, сколько предмет пробыл в каждом состоянии.
+CREATE TABLE IF NOT EXISTS events (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  type         TEXT NOT NULL,      -- doc.accepted, task.completed, idea.status.changed
+  subject_type TEXT NOT NULL,      -- idea | initiative | process_change | knowledge_doc | task
+  subject_id   INTEGER,
+  actor_id     INTEGER REFERENCES users(id),
+  from_state   TEXT,               -- заполняется у событий смены состояния
+  to_state     TEXT,
+  payload      TEXT,               -- JSON с подробностями
+  at           TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_events_subject ON events(subject_type, subject_id, at);
+CREATE INDEX IF NOT EXISTS idx_events_type ON events(type, at);
+
+-- Сбой обработчика не отменяет исходное действие, но и не теряется молча
+CREATE TABLE IF NOT EXISTS event_failures (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  event_id   INTEGER REFERENCES events(id) ON DELETE CASCADE,
+  handler    TEXT NOT NULL,
+  message    TEXT NOT NULL,
+  at         TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Неизменяемый журнал аудита (цепочка хэшей)
 CREATE TABLE IF NOT EXISTS audit_log (
   id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -410,7 +438,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity, entity_id);
 // ─────────────────────────────────────────────────────────────
 // Модуль «Идеи и решения»
 // Быстрый вход в экосистему: сотрудник фиксирует проблему за минуту, коллеги
-// предлагают решения и делятся проверенным опытом, вклад советчиков измеряется
+// предлагают решения и делятся проверенным опытом, вклад социальных советников измеряется
 // очками и превращается в рекомендации к поощрению. Идея, принятая в работу,
 // поднимается в инициативу и уходит в конвейер Stage-Gate.
 // ─────────────────────────────────────────────────────────────
@@ -557,7 +585,7 @@ CREATE TABLE IF NOT EXISTS points_ledger (
 CREATE INDEX IF NOT EXISTS idx_ledger_user ON points_ledger(user_id, status);
 CREATE INDEX IF NOT EXISTS idx_ledger_created ON points_ledger(created_at);
 
--- Знаки отличия советчиков
+-- Знаки отличия социальных советников
 CREATE TABLE IF NOT EXISTS advisor_badges (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id    INTEGER NOT NULL REFERENCES users(id),
@@ -652,6 +680,464 @@ CREATE TABLE IF NOT EXISTS ideahub_settings (
 `);
 
 // ─────────────────────────────────────────────────────────────
+// Гибкая ролевая модель
+// Роли и права были постоянной в коде: добавить роль или передать право означало
+// править исходники и выкладывать сборку. Теперь это данные — администратор меняет
+// их в интерфейсе, а участник может держать несколько ролей сразу.
+// ─────────────────────────────────────────────────────────────
+db.exec(`
+CREATE TABLE IF NOT EXISTS roles (
+  code       TEXT PRIMARY KEY,
+  title      TEXT NOT NULL,
+  short      TEXT NOT NULL,
+  kind       TEXT NOT NULL DEFAULT 'system',   -- system | custom
+  description TEXT,
+  is_active  INTEGER NOT NULL DEFAULT 1,
+  order_idx  INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS role_permissions (
+  role_code  TEXT NOT NULL REFERENCES roles(code) ON DELETE CASCADE,
+  permission TEXT NOT NULL,
+  PRIMARY KEY (role_code, permission)
+);
+
+-- Справочник прав: расшифровка для интерфейса администратора
+CREATE TABLE IF NOT EXISTS permissions_catalog (
+  code        TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  group_title TEXT NOT NULL DEFAULT 'Прочее',
+  order_idx   INTEGER NOT NULL DEFAULT 0
+);
+
+-- Дополнительные роли участника сверх основной в users.role.
+-- institution_id ограничивает роль одним учреждением: например, согласующий
+-- по своему центру, но не по соседнему.
+CREATE TABLE IF NOT EXISTS user_roles (
+  user_id        INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role_code      TEXT NOT NULL REFERENCES roles(code) ON DELETE CASCADE,
+  institution_id INTEGER REFERENCES institutions(id),
+  granted_by     INTEGER REFERENCES users(id),
+  granted_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, role_code)
+);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role ON user_roles(role_code);
+`);
+
+// ─────────────────────────────────────────────────────────────
+// Репозиторий процессов
+// Схемы перестают быть текстом в исходниках и становятся данными с историей версий.
+// Опубликованная версия — источник истины: из неё собирается конфигурация конвейера,
+// поэтому принятое сообществом изменение схемы меняет работу платформы, а не только
+// картинку в справочнике.
+// ─────────────────────────────────────────────────────────────
+db.exec(`
+CREATE TABLE IF NOT EXISTS process_defs (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  key           TEXT NOT NULL UNIQUE,          -- 'e2e', 'emp-submit'
+  title         TEXT NOT NULL,
+  description   TEXT,
+  scenario      TEXT,                          -- пользовательский путь: initiative | ideas
+  group_title   TEXT,                          -- владелец процесса в оглавлении альбома
+  role_owner    TEXT,                          -- роль, чей это процесс ('all' — сквозной)
+  sla_text      TEXT,
+  order_idx     INTEGER NOT NULL DEFAULT 0,    -- место в альбоме: нумерация разделов сквозная
+  -- Конвейер инициатив: из его опубликованной версии собирается workflow_config
+  is_pipeline   INTEGER NOT NULL DEFAULT 0,
+  status        TEXT NOT NULL DEFAULT 'published', -- draft | published | deprecated | archived
+  current_version_id INTEGER,
+  owner_id      INTEGER REFERENCES users(id),
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_pdef_scenario ON process_defs(scenario, order_idx);
+
+-- Версия схемы. Опубликованная версия неизменяема: правка идёт через новый черновик,
+-- иначе ссылка из регламента на шаг «3.5» перестала бы что-либо значить.
+CREATE TABLE IF NOT EXISTS process_versions (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  def_id        INTEGER NOT NULL REFERENCES process_defs(id) ON DELETE CASCADE,
+  version       INTEGER NOT NULL,
+  model         TEXT NOT NULL,                 -- JSON: дорожки, шаги, переходы, разбор
+  notes         TEXT,
+  status        TEXT NOT NULL DEFAULT 'draft', -- draft | review | published | superseded
+  based_on_version_id INTEGER REFERENCES process_versions(id),
+  created_by    INTEGER REFERENCES users(id),
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  published_at  TEXT,
+  published_by  INTEGER REFERENCES users(id),
+  UNIQUE(def_id, version)
+);
+CREATE INDEX IF NOT EXISTS idx_pver_def ON process_versions(def_id, status);
+`);
+
+// ─────────────────────────────────────────────────────────────
+// Совместная работа над процессами
+// Обсуждение привязано к шагу схемы, а не к процессу целиком: «здесь теряется два
+// дня» — замечание к конкретной фигуре, и разговор о ней не тонет в общей ленте.
+// Предложение об изменении несёт черновую версию, а не текст пожеланий: то, что
+// обсуждают и согласовывают, и есть то, что будет опубликовано.
+// ─────────────────────────────────────────────────────────────
+db.exec(`
+-- Обсуждение любой сущности платформы. Замечание привязывается к якорю внутри неё:
+-- шаг схемы, переход между шагами, раздел документа. Разговор о конкретном месте
+-- не тонет в общей ленте — это оказалось верно и для схем, и для документов,
+-- поэтому таблица одна на всё, а не своя у каждого модуля.
+CREATE TABLE IF NOT EXISTS discussions (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  target_type TEXT NOT NULL,      -- process | process_change | knowledge_doc | idea
+  target_id   INTEGER NOT NULL,
+  context_id  INTEGER,            -- версия схемы или документа, к которой оставлено
+  anchor_kind TEXT,               -- node | flow | section
+  anchor_id   TEXT,
+  parent_id   INTEGER REFERENCES discussions(id) ON DELETE CASCADE,
+  author_id   INTEGER NOT NULL REFERENCES users(id),
+  body        TEXT NOT NULL,
+  status      TEXT NOT NULL DEFAULT 'open',   -- open | resolved
+  resolved_by INTEGER REFERENCES users(id),
+  resolved_at TEXT,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_disc_target ON discussions(target_type, target_id, status);
+CREATE INDEX IF NOT EXISTS idx_disc_anchor ON discussions(target_type, target_id, anchor_id);
+
+-- Отметка полезности замечания: поднимает содержательное наверх
+CREATE TABLE IF NOT EXISTS discussion_votes (
+  discussion_id INTEGER NOT NULL REFERENCES discussions(id) ON DELETE CASCADE,
+  user_id       INTEGER NOT NULL REFERENCES users(id),
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (discussion_id, user_id)
+);
+
+-- Лист согласования. Состав не задаётся списком должностей, а выводится из самого
+-- предмета: для правки схемы — из затронутых дорожек, для проекта решения — из его
+-- предмета и ролей, которых оно касается. Поле reason хранит основание попадания
+-- в лист, чтобы согласующий видел, почему спрашивают именно его.
+CREATE TABLE IF NOT EXISTS approvals (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  target_type    TEXT NOT NULL,   -- process_change | knowledge_doc
+  target_id      INTEGER NOT NULL,
+  step_no        INTEGER NOT NULL DEFAULT 1,
+  reason         TEXT,
+  role_code      TEXT,            -- согласует роль целиком
+  user_id        INTEGER REFERENCES users(id),   -- либо поимённо
+  institution_id INTEGER REFERENCES institutions(id),
+  required       INTEGER NOT NULL DEFAULT 1,
+  verdict        TEXT,            -- agree | reject | remarks
+  comment        TEXT,
+  due_at         TEXT,
+  decided_by     INTEGER REFERENCES users(id),
+  decided_at     TEXT,
+  created_at     TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_appr_target ON approvals(target_type, target_id, verdict);
+
+-- Предложение об изменении процесса
+CREATE TABLE IF NOT EXISTS process_changes (
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
+  number           TEXT NOT NULL UNIQUE,     -- PRC-2026-0001
+  def_id           INTEGER NOT NULL REFERENCES process_defs(id) ON DELETE CASCADE,
+  base_version_id  INTEGER NOT NULL REFERENCES process_versions(id),
+  draft_version_id INTEGER NOT NULL REFERENCES process_versions(id) ON DELETE CASCADE,
+  title            TEXT NOT NULL,
+  rationale        TEXT NOT NULL,            -- зачем менять: обязательное обоснование
+  expected_effect  TEXT,
+  author_id        INTEGER NOT NULL REFERENCES users(id),
+  institution_id   INTEGER REFERENCES institutions(id),
+  -- draft: автор ещё правит; discussion: обсуждается коллегами;
+  -- approval: на согласовании; accepted: согласовано; published: вошло в действующую
+  -- версию; rejected | withdrawn: закрыто
+  status           TEXT NOT NULL DEFAULT 'draft',
+  decision_note    TEXT,
+  idea_id          INTEGER REFERENCES ideas(id) ON DELETE SET NULL,
+  initiative_id    INTEGER REFERENCES initiatives(id) ON DELETE SET NULL,
+  created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at       TEXT NOT NULL DEFAULT (datetime('now')),
+  submitted_at     TEXT,
+  decided_at       TEXT,
+  published_at     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_pchange_def ON process_changes(def_id, status);
+CREATE INDEX IF NOT EXISTS idx_pchange_author ON process_changes(author_id);
+
+-- Поддержка предложения коллегами: сигнал приоритета для согласующих
+CREATE TABLE IF NOT EXISTS process_change_votes (
+  change_id  INTEGER NOT NULL REFERENCES process_changes(id) ON DELETE CASCADE,
+  user_id    INTEGER NOT NULL REFERENCES users(id),
+  value      INTEGER NOT NULL DEFAULT 1,     -- 1 поддерживаю, -1 возражаю
+  comment    TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (change_id, user_id)
+);
+
+-- Лист согласования. Шаги выводятся из затронутых дорожек, поэтому изменение
+-- согласуют те, чью работу оно меняет, а не заранее заданный список должностей.
+-- Настройка маршрута: кто согласует сверх выведенных из схемы и в какой срок
+CREATE TABLE IF NOT EXISTS process_approval_routes (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  def_id     INTEGER REFERENCES process_defs(id) ON DELETE CASCADE,
+  scenario   TEXT,                            -- маршрут на весь пользовательский путь
+  always     TEXT NOT NULL DEFAULT '[]',      -- JSON: роли, согласующие любое изменение
+  sla_value  REAL,
+  sla_unit   TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+`);
+
+// ─────────────────────────────────────────────────────────────
+// База знаний: проекты решений и зафиксированные решения
+// Платформа умеет доводить решение до внедрения, но не превращает его в знание:
+// следующий автор не найдёт, что похожее уже разбирали и какие варианты отклонили.
+// Документ закрывает именно это — он хранит не только решение, но и контекст,
+// рассмотренные альтернативы и последствия.
+// ─────────────────────────────────────────────────────────────
+db.exec(`
+CREATE TABLE IF NOT EXISTS knowledge_docs (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  number        TEXT NOT NULL UNIQUE,   -- РД-2026-0001 (проект) / ЗР-2026-0001 (решение)
+  kind          TEXT NOT NULL,          -- rfc | adr | spec | guide
+  title         TEXT NOT NULL,
+  -- draft: автор пишет; review: на рецензировании; accepted: согласовано;
+  -- published: в базе знаний; rejected | superseded: закрыто
+  status        TEXT NOT NULL DEFAULT 'draft',
+  current_version_id INTEGER,
+  author_id     INTEGER NOT NULL REFERENCES users(id),
+  institution_id INTEGER REFERENCES institutions(id),
+  -- Документ относится к чему угодно: идее, инициативе, процессу, пилоту, проекту
+  subject_type  TEXT,
+  subject_id    INTEGER,
+  -- Решение, которое этот документ заменяет: история не теряется
+  supersedes_id INTEGER REFERENCES knowledge_docs(id) ON DELETE SET NULL,
+  -- Проект решения, из которого вырос ADR, и задача, которая его реализовала
+  source_doc_id INTEGER REFERENCES knowledge_docs(id) ON DELETE SET NULL,
+  task_id       INTEGER REFERENCES board_items(id) ON DELETE SET NULL,
+  decision_note TEXT,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  decided_at    TEXT,
+  published_at  TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_kdoc_kind ON knowledge_docs(kind, status);
+CREATE INDEX IF NOT EXISTS idx_kdoc_subject ON knowledge_docs(subject_type, subject_id);
+CREATE INDEX IF NOT EXISTS idx_kdoc_author ON knowledge_docs(author_id);
+
+-- Версия документа. Опубликованная неизменяема: ссылка из регламента на решение
+-- должна означать то же самое и через год.
+CREATE TABLE IF NOT EXISTS knowledge_versions (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  doc_id        INTEGER NOT NULL REFERENCES knowledge_docs(id) ON DELETE CASCADE,
+  version       INTEGER NOT NULL,
+  sections      TEXT NOT NULL DEFAULT '{}',  -- JSON: раздел → текст, источник истины
+  body          TEXT,                        -- собранный Markdown: выгрузка и поиск
+  notes         TEXT,
+  status        TEXT NOT NULL DEFAULT 'draft', -- draft | published | superseded
+  based_on_version_id INTEGER REFERENCES knowledge_versions(id),
+  created_by    INTEGER REFERENCES users(id),
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  published_at  TEXT,
+  published_by  INTEGER REFERENCES users(id),
+  UNIQUE(doc_id, version)
+);
+CREATE INDEX IF NOT EXISTS idx_kver_doc ON knowledge_versions(doc_id, status);
+
+-- Состав разделов документа — данные, а не код: администратор меняет шаблон,
+-- не трогая исходники. Именно на раздел вешается замечание при рецензировании.
+CREATE TABLE IF NOT EXISTS knowledge_sections (
+  kind        TEXT NOT NULL,
+  key         TEXT NOT NULL,
+  title       TEXT NOT NULL,
+  hint        TEXT,
+  required    INTEGER NOT NULL DEFAULT 1,
+  order_idx   INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (kind, key)
+);
+`);
+
+// ─────────────────────────────────────────────────────────────
+// Конструктор форм: опросы и анкеты
+// Опрос по итогам пилота платформа умела и раньше, но только его: три типа
+// вопросов, заданных в коде. Собрать анкету под свою задачу — оценить спрос на
+// решение, собрать заявки, провести обследование учреждений — было нельзя.
+// Здесь форма становится данными: состав вопросов, условия показа и правила
+// проверки задаются в конструкторе, а не правкой исходников.
+// ─────────────────────────────────────────────────────────────
+db.exec(`
+CREATE TABLE IF NOT EXISTS forms (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug          TEXT NOT NULL UNIQUE,   -- адрес публичной ссылки: /f/<slug>
+  title         TEXT NOT NULL,
+  description   TEXT,                   -- вступительный текст перед первым вопросом
+  status        TEXT NOT NULL DEFAULT 'draft',    -- draft | published | closed
+  -- internal: только участникам платформы; link: любому по ссылке, без входа
+  access        TEXT NOT NULL DEFAULT 'internal',
+  is_anonymous  INTEGER NOT NULL DEFAULT 0,  -- не связывать ответ с автором
+  one_per_user  INTEGER NOT NULL DEFAULT 1,
+  show_progress INTEGER NOT NULL DEFAULT 1,
+  closing_text  TEXT,                   -- что человек видит после отправки
+  closes_at     TEXT,                   -- срок сбора ответов
+  created_by    INTEGER REFERENCES users(id),
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  published_at  TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_forms_status ON forms(status);
+CREATE INDEX IF NOT EXISTS idx_forms_author ON forms(created_by);
+
+-- Вопрос формы. key устойчив: на него ссылаются условия показа и выгрузка,
+-- поэтому правка текста вопроса не рвёт ни то, ни другое.
+CREATE TABLE IF NOT EXISTS form_questions (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  form_id    INTEGER NOT NULL REFERENCES forms(id) ON DELETE CASCADE,
+  key        TEXT NOT NULL,
+  type       TEXT NOT NULL,   -- см. QUESTION_TYPES в shared/forms/schema.js
+  title      TEXT NOT NULL,
+  hint       TEXT,
+  required   INTEGER NOT NULL DEFAULT 0,
+  options    TEXT NOT NULL DEFAULT '[]',  -- JSON: [{code,label}]
+  settings   TEXT NOT NULL DEFAULT '{}',  -- JSON: шкала, единицы, «свой ответ»
+  visible_if TEXT,                        -- JSON: условие показа, ссылки только назад
+  order_idx  INTEGER NOT NULL DEFAULT 0,
+  UNIQUE (form_id, key)
+);
+CREATE INDEX IF NOT EXISTS idx_fq_form ON form_questions(form_id, order_idx);
+
+CREATE TABLE IF NOT EXISTS form_responses (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  form_id        INTEGER NOT NULL REFERENCES forms(id) ON DELETE CASCADE,
+  -- У анонимной формы и у ответа по ссылке автора нет: связать ответ с человеком
+  -- нечем по замыслу, а не по недосмотру
+  respondent_id  INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  institution_id INTEGER REFERENCES institutions(id),
+  status         TEXT NOT NULL DEFAULT 'submitted',  -- draft | submitted
+  source         TEXT NOT NULL DEFAULT 'portal',     -- portal | link
+  started_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at     TEXT NOT NULL DEFAULT (datetime('now')),
+  submitted_at   TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_fresp_form ON form_responses(form_id, status);
+CREATE INDEX IF NOT EXISTS idx_fresp_user ON form_responses(respondent_id);
+
+-- Ответ хранится трижды: нормализованным значением (истина), числом (сводка) и
+-- текстом (выгрузка и чтение). Иначе каждая из трёх задач разбирала бы JSON
+-- по-своему, и расхождение обнаружилось бы в отчёте.
+CREATE TABLE IF NOT EXISTS form_answers (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  response_id INTEGER NOT NULL REFERENCES form_responses(id) ON DELETE CASCADE,
+  question_id INTEGER NOT NULL REFERENCES form_questions(id) ON DELETE CASCADE,
+  value       TEXT,
+  value_num   REAL,
+  value_text  TEXT,
+  UNIQUE (response_id, question_id)
+);
+CREATE INDEX IF NOT EXISTS idx_fans_question ON form_answers(question_id);
+`);
+
+// ─────────────────────────────────────────────────────────────
+// Каталог разработчиков ИИ-решений
+// Кому можно поручить разработку и внедрение: внешние вендоры, внутренние команды
+// ДТСЗН и команды, которые может выделить ДИТ. Сведения о них — коммерчески
+// чувствительные, поэтому реестр виден только тем, кому доступ выдан явно.
+// ─────────────────────────────────────────────────────────────
+db.exec(`
+CREATE TABLE IF NOT EXISTS providers (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  kind          TEXT NOT NULL,              -- external | internal | dit
+  name          TEXT NOT NULL,
+  legal_name    TEXT,                       -- полное наименование юрлица
+  inn           TEXT,                       -- только у внешних вендоров
+  org_unit      TEXT,                       -- подразделение у внутренних команд и ДИТ
+  description   TEXT,
+  website       TEXT,
+  city          TEXT,
+  team_size     INTEGER,
+  founded_year  INTEGER,
+  contact_name  TEXT,
+  contact_role  TEXT,
+  contact_email TEXT,
+  contact_phone TEXT,
+  status        TEXT NOT NULL DEFAULT 'new',          -- см. PROVIDER_STATUS
+  availability  TEXT NOT NULL DEFAULT 'unknown',      -- свободен / загружен
+  price_band    INTEGER,                              -- 1..3, ориентир стоимости
+  competencies  TEXT NOT NULL DEFAULT '[]',           -- JSON: коды компетенций
+  domains       TEXT NOT NULL DEFAULT '[]',           -- JSON: отраслевой опыт
+  compliance    TEXT NOT NULL DEFAULT '[]',           -- JSON: соответствие требованиям
+  tags          TEXT NOT NULL DEFAULT '[]',           -- JSON: технологии свободным списком
+  owner_id      INTEGER REFERENCES users(id) ON DELETE SET NULL, -- кто ведёт контакт
+  created_by    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  updated_by    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_providers_kind ON providers(kind, status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_providers_inn ON providers(inn) WHERE inn IS NOT NULL;
+
+-- Портфолио: выполненные проекты
+CREATE TABLE IF NOT EXISTS provider_cases (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  provider_id  INTEGER NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+  title        TEXT NOT NULL,
+  customer     TEXT,
+  year         INTEGER,
+  description  TEXT,
+  result       TEXT,                        -- измеримый эффект
+  tags         TEXT NOT NULL DEFAULT '[]',
+  link         TEXT,
+  public_sector INTEGER NOT NULL DEFAULT 0,
+  created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_pcases_provider ON provider_cases(provider_id);
+
+-- Каталог доступных решений и технологий
+CREATE TABLE IF NOT EXISTS provider_solutions (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  provider_id  INTEGER NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+  name         TEXT NOT NULL,
+  kind         TEXT NOT NULL DEFAULT 'product',    -- см. SOLUTION_KINDS
+  maturity     TEXT NOT NULL DEFAULT 'production', -- prototype | pilot | production
+  license      TEXT,                               -- proprietary | open_source | saas
+  description  TEXT,
+  competencies TEXT NOT NULL DEFAULT '[]',
+  tags         TEXT NOT NULL DEFAULT '[]',
+  in_registry  INTEGER NOT NULL DEFAULT 0,         -- в реестре отечественного ПО
+  price_note   TEXT,
+  link         TEXT,
+  created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_psol_provider ON provider_solutions(provider_id);
+
+-- Оценка по итогам совместной работы: одна от участника, её можно уточнять
+CREATE TABLE IF NOT EXISTS provider_reviews (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  provider_id   INTEGER NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+  author_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  quality       INTEGER NOT NULL,
+  deadlines     INTEGER NOT NULL,
+  communication INTEGER NOT NULL,
+  context       TEXT,                       -- по какому проекту
+  comment       TEXT,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (provider_id, author_id)
+);
+
+-- Журнал взаимодействий: встречи, запросы, письма
+CREATE TABLE IF NOT EXISTS provider_notes (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  provider_id INTEGER NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+  author_id   INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  kind        TEXT NOT NULL DEFAULT 'note',  -- см. NOTE_KINDS
+  body        TEXT NOT NULL,
+  happened_at TEXT NOT NULL DEFAULT (date('now')),
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_pnotes_provider ON provider_notes(provider_id, happened_at);
+`);
+
+// ─────────────────────────────────────────────────────────────
 // Миграции существующих баз
 // ─────────────────────────────────────────────────────────────
 function addColumn(table, column, ddl) {
@@ -662,6 +1148,94 @@ function addColumn(table, column, ddl) {
 // Уведомления модуля привязываются к идее так же, как остальные — к инициативе
 addColumn('notifications', 'idea_id', 'INTEGER REFERENCES ideas(id) ON DELETE CASCADE');
 addColumn('tasks', 'idea_id', 'INTEGER REFERENCES ideas(id) ON DELETE CASCADE');
+
+// Предложения об изменении процессов пользуются теми же задачами, уведомлениями и
+// очками, что и остальная работа: согласование приходит в «Мои задачи», а вклад
+// автора попадает в общий рейтинг социальных советников. Отдельных механизмов для этого нет.
+addColumn('notifications', 'process_change_id', 'INTEGER REFERENCES process_changes(id) ON DELETE CASCADE');
+addColumn('tasks', 'process_change_id', 'INTEGER REFERENCES process_changes(id) ON DELETE CASCADE');
+addColumn('points_ledger', 'process_change_id', 'INTEGER REFERENCES process_changes(id) ON DELETE CASCADE');
+
+// Документы базы знаний пользуются теми же задачами и уведомлениями
+addColumn('tasks', 'knowledge_doc_id', 'INTEGER REFERENCES knowledge_docs(id) ON DELETE CASCADE');
+addColumn('notifications', 'knowledge_doc_id', 'INTEGER REFERENCES knowledge_docs(id) ON DELETE CASCADE');
+addColumn('board_items', 'knowledge_doc_id', 'INTEGER REFERENCES knowledge_docs(id) ON DELETE SET NULL');
+
+// Синтетические разработчики для демонстрации помечаются, чтобы их не приняли за
+// реальных подрядчиков и могли убрать одной командой, не задев введённое вручную
+addColumn('providers', 'is_demo', 'INTEGER NOT NULL DEFAULT 0');
+
+// Представитель разработчика — учётная запись поставщика, привязанная к карточке
+// своей компании. Базовые сведения ведёт модератор каталога, технологический профиль,
+// портфолио и решения — представитель; его правки ждут подтверждения модератором.
+db.exec(`
+CREATE TABLE IF NOT EXISTS provider_members (
+  provider_id INTEGER NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+  user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  added_by    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  added_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (provider_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_pmembers_user ON provider_members(user_id);
+`);
+addColumn('providers', 'profile_status', "TEXT NOT NULL DEFAULT 'confirmed'");  // confirmed | pending
+addColumn('providers', 'profile_changed_at', 'TEXT');
+addColumn('providers', 'profile_changed_by', 'INTEGER REFERENCES users(id) ON DELETE SET NULL');
+addColumn('providers', 'profile_note', 'TEXT');   // что изменил представитель, коротко
+addColumn('notifications', 'provider_id', 'INTEGER REFERENCES providers(id) ON DELETE CASCADE');
+
+
+// Обсуждения и согласования отвязаны от процессов и стали общими для всей
+// платформы. Прежние таблицы переносятся строка в строку и удаляются: SQLite не
+// меняет внешние ключи на месте, поэтому пересоздание — единственный путь.
+//
+// Транзакция открывается напрямую: помощник tx() объявлен ниже по файлу и на
+// момент миграции ещё недоступен.
+function tableExists(name) {
+  return !!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(name);
+}
+
+if (tableExists('process_comments')) {
+  db.exec('BEGIN');
+  try {
+    // Замечание к схеме и реплика внутри предложения различались полем change_id —
+    // теперь это разные типы цели
+    db.exec(`INSERT INTO discussions
+      (id, target_type, target_id, context_id, anchor_kind, anchor_id, parent_id,
+       author_id, body, status, resolved_by, resolved_at, created_at)
+      SELECT id,
+             CASE WHEN change_id IS NOT NULL THEN 'process_change' ELSE 'process' END,
+             COALESCE(change_id, def_id),
+             version_id,
+             CASE WHEN node_id IS NOT NULL THEN 'node'
+                  WHEN flow_id IS NOT NULL THEN 'flow' ELSE NULL END,
+             COALESCE(node_id, flow_id),
+             parent_id, author_id, body, status, resolved_by, resolved_at, created_at
+      FROM process_comments`);
+    if (tableExists('process_comment_votes')) {
+      db.exec(`INSERT INTO discussion_votes (discussion_id, user_id, created_at)
+               SELECT comment_id, user_id, created_at FROM process_comment_votes`);
+      db.exec('DROP TABLE process_comment_votes');
+    }
+    db.exec('DROP TABLE process_comments');
+    db.exec('COMMIT');
+  } catch (e) { db.exec('ROLLBACK'); throw e; }
+}
+
+if (tableExists('process_approvals')) {
+  db.exec('BEGIN');
+  try {
+    db.exec(`INSERT INTO approvals
+      (id, target_type, target_id, step_no, reason, role_code, user_id, institution_id,
+       required, verdict, comment, due_at, decided_by, decided_at, created_at)
+      SELECT id, 'process_change', change_id, step_no, NULL, role_code, user_id,
+             institution_id, required, verdict, comment, due_at, decided_by,
+             decided_at, created_at
+      FROM process_approvals`);
+    db.exec('DROP TABLE process_approvals');
+    db.exec('COMMIT');
+  } catch (e) { db.exec('ROLLBACK'); throw e; }
+}
 
 // Защита журнала аудита от изменения и удаления на уровне БД
 db.exec(`
@@ -683,8 +1257,20 @@ export const q = {
   insert(sql, ...params) { return Number(db.prepare(sql).run(...params).lastInsertRowid); },
 };
 
+// Вложенный вызов не открывает свою транзакцию, а продолжает внешнюю: SQLite
+// вложенных транзакций не поддерживает, а составные операции у нас складываются из
+// более мелких — публикация версии процесса внутри себя пересобирает конвейер.
+//
+// Границей отката остаётся самый внешний вызов: сбой в любой части отменяет всё.
+// Поэтому исключение внутри tx нельзя гасить и продолжать работу — оно должно
+// дойти до внешнего вызова, иначе будет зафиксирована половина изменений.
+let txDepth = 0;
+
 export function tx(fn) {
+  if (txDepth > 0) return fn();
+  txDepth = 1;
   db.exec('BEGIN');
   try { const r = fn(); db.exec('COMMIT'); return r; }
   catch (e) { db.exec('ROLLBACK'); throw e; }
+  finally { txDepth = 0; }
 }
