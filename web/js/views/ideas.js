@@ -96,7 +96,7 @@ export async function ideasBoard(view, query) {
       </div>
       <input class="input" type="search" id="idea-q" placeholder="Поиск по идеям…" value="${esc(search)}"
              style="min-width:180px;flex:1;max-width:290px">
-      <select class="select" id="idea-status">
+      <select data-ac="US-IDEA-003/AC6" class="select" id="idea-status">
         <option value="">Любой статус</option>
         ${Object.entries(IDEA_STATUS).map(([k, m]) =>
           `<option value="${k}" ${status === k ? 'selected' : ''}>${esc(m.title)}${c[k] ? ` (${c[k]})` : ''}</option>`)}
@@ -134,7 +134,7 @@ export async function ideasBoard(view, query) {
 
 function ideaCard(i) {
   return html`
-    <article class="idea" data-idea="${i.id}">
+    <article data-ac="US-IDEA-001/AC4" class="idea" data-idea="${i.id}">
       <div class="idea__rail">
         <div class="idea__rail-value">${i.support_total}</div>
         <div class="idea__rail-label">${plural(i.support_total, 'отметка', 'отметки', 'отметок')}</div>
@@ -220,7 +220,7 @@ export async function ideaCreate(view) {
   view.innerHTML = html`
     <div class="crumb"><a href="/ideas">Идеи и решения</a> <span>/</span> <span>Новая идея</span></div>
     <div class="quick" data-tour="quick-form">
-      <form class="card" id="idea-form">
+      <form data-ac="US-IDEA-001/AC1" class="card" id="idea-form">
         <div class="card__head">
           <div>
             <h3>Опишите проблему — решение найдут коллеги</h3>
@@ -231,7 +231,7 @@ export async function ideaCreate(view) {
         <div class="card__body">
           <div class="field">
             <label class="field__label">С чего начать — выберите шаблон</label>
-            <div class="chip-row" id="templates">
+            <div data-ac="US-IDEA-001/AC2" class="chip-row" id="templates">
               ${meta.templates.map((t) => `<button type="button" class="chip" data-tpl="${esc(t.code)}">${esc(t.title)}</button>`)}
             </div>
           </div>
@@ -255,7 +255,7 @@ export async function ideaCreate(view) {
               placeholder="Как должно быть, если проблему решить"></textarea>
           </div>
 
-          <div id="similar-box"></div>
+          <div data-ac="US-IDEA-001/AC3 US-IDEA-001/AC5" id="similar-box"></div>
 
           <details class="quick__more">
             <summary>Уточнения — необязательно</summary>
@@ -287,7 +287,7 @@ export async function ideaCreate(view) {
           </details>
         </div>
         <div class="card__foot row">
-          <span class="fs-12 text-3" id="draft-state">${draft ? 'Найден черновик' : 'Черновик сохраняется автоматически'}</span>
+          <span data-ac="US-IDEA-001/AC2" class="fs-12 text-3" id="draft-state">${draft ? 'Найден черновик' : 'Черновик сохраняется автоматически'}</span>
           <div class="row spacer">
             ${draft ? '<button type="button" class="btn btn--sm" id="restore-draft">Восстановить черновик</button>' : ''}
             <a href="/ideas" class="btn">Отмена</a>
@@ -447,7 +447,7 @@ export async function ideaDetail(view, id) {
         <div class="row">
           ${idea.can_moderate ? '<button class="btn" data-moderate>Модерация</button>' : ''}
           ${idea.can_moderate && !idea.initiative_id && ['accepted', 'in_progress', 'done'].includes(idea.status)
-            ? '<button class="btn btn--primary" data-promote>Поднять до инициативы</button>' : ''}
+            ? '<button data-ac="US-IDEA-004/AC1 US-IDEA-004/AC2" class="btn btn--primary" data-promote>Поднять до инициативы</button>' : ''}
         </div>
       </div>
     </div>
@@ -485,7 +485,7 @@ export async function ideaDetail(view, id) {
         <div class="card" data-tour="proposals">
           <div class="card__head">
             <div>
-              <h3>Решения и опыт коллег</h3>
+              <h3 data-ac="US-IDEA-002/AC1 US-IDEA-002/AC4">Решения и опыт коллег</h3>
               <div class="card__hint">${idea.proposals.length
                 ? `${idea.proposals.length} ${plural(idea.proposals.length, 'предложение', 'предложения', 'предложений')}${useful.length ? `, полезных — ${useful.length}` : ''}`
                 : 'Пока никто не предложил решение'}</div>

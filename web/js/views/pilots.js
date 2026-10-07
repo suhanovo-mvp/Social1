@@ -17,12 +17,12 @@ export async function pilotsList(view) {
           <p>Пилотное учреждение внедряет прототип в реальную работу на один месяц. Собирается обратная
              связь от сотрудников и граждан, отслеживаются KPI, определённые на этапе оценки инициативы.</p>
         </div>
-        ${can('pilot.apply') ? '<button class="btn btn--primary" data-apply>Заявить площадку</button>' : ''}
+        ${can('pilot.apply') ? '<button class="btn btn--primary" data-apply data-ac="US-PIL-001/AC1">Заявить площадку</button>' : ''}
       </div>
     </div>
 
     ${pending.length && can('pilot.manage') ? html`
-    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--warn)">
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--warn)" data-ac="US-PIL-001/AC3">
       <div class="card__head"><h3>Заявки на роль пилотной площадки</h3>
         <span class="badge badge--warn spacer">${pending.length}</span></div>
       <div class="card__body--flush"><div class="list">
@@ -130,7 +130,7 @@ export async function pilotDetail(view, id) {
 
     <div class="grid grid--2" style="align-items:start">
       <div class="stack">
-        <div class="card">
+        <div class="card" data-ac="US-PIL-002/AC1 US-PIL-002/AC2">
           <div class="card__head"><h3>Мониторинг KPI пилота</h3>
             ${manage ? '<button class="btn btn--sm spacer" data-add-kpi>Добавить показатель</button>' : ''}</div>
           <div class="card__body">
@@ -169,7 +169,7 @@ export async function pilotDetail(view, id) {
       </div>
 
       <div class="stack">
-        <div class="card">
+        <div class="card" data-ac="US-PIL-003/AC4">
           <div class="card__head"><h3>Анализ обратной связи</h3>
             <span class="card__hint spacer">NLP-обработка свободных ответов</span></div>
           <div class="card__body">
@@ -202,7 +202,7 @@ export async function pilotDetail(view, id) {
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" data-ac="US-PIL-003/AC1">
           <div class="card__head"><h3>Опросы участников</h3>
             ${manage ? '<button class="btn btn--sm spacer" data-add-survey>Создать опрос</button>' : ''}</div>
           <div class="card__body--flush">
@@ -312,7 +312,7 @@ export async function surveyDetail(view, id) {
 
     <div class="grid grid--2" style="align-items:start">
       ${s.is_open && !s.answered ? html`
-      <div class="card">
+      <div data-ac="US-PIL-003/AC2" class="card">
         <div class="card__head"><h3>Пройти опрос</h3></div>
         <form class="card__body" id="survey-form">
           ${s.questions.map((qq) => html`
@@ -339,7 +339,7 @@ export async function surveyDetail(view, id) {
         </div>
       </div>`}
 
-      <div class="card">
+      <div data-ac="US-PIL-003/AC3" class="card">
         <div class="card__head"><h3>Результаты</h3></div>
         <div class="card__body">
           ${s.results.map((r) => {

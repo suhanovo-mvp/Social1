@@ -1,0 +1,6190 @@
+{
+ "root": ".",
+ "generatedAt": "2026-10-06T20:08:04.531Z",
+ "framework": [],
+ "only": [],
+ "routes": [
+  {
+   "path": "/web",
+   "file": "web/index.html",
+   "line": 1,
+   "kind": "html",
+   "title": "Social1 — платформа системных инноваций ДТСЗН"
+  },
+  {
+   "path": "/",
+   "file": "web/js/app.js",
+   "line": 27,
+   "kind": "regex-table",
+   "title": "Рабочий стол"
+  },
+  {
+   "path": "/tasks",
+   "file": "web/js/app.js",
+   "line": 28,
+   "kind": "regex-table",
+   "title": "Мои задачи"
+  },
+  {
+   "path": "/ideas",
+   "file": "web/js/app.js",
+   "line": 29,
+   "kind": "regex-table",
+   "title": "Идеи и решения"
+  },
+  {
+   "path": "/review",
+   "file": "web/js/app.js",
+   "line": 32,
+   "kind": "regex-table",
+   "title": "Ревью предложений"
+  },
+  {
+   "path": "/rating",
+   "file": "web/js/app.js",
+   "line": 33,
+   "kind": "regex-table",
+   "title": "Рейтинг социальных советников"
+  },
+  {
+   "path": "/moderation",
+   "file": "web/js/app.js",
+   "line": 34,
+   "kind": "regex-table",
+   "title": "Модерация идей"
+  },
+  {
+   "path": "/incentives",
+   "file": "web/js/app.js",
+   "line": 35,
+   "kind": "regex-table",
+   "title": "Рекомендации к поощрению"
+  },
+  {
+   "path": "/initiatives",
+   "file": "web/js/app.js",
+   "line": 36,
+   "kind": "regex-table",
+   "title": "Инициативы"
+  },
+  {
+   "path": "/process",
+   "file": "web/js/app.js",
+   "line": 39,
+   "kind": "regex-table",
+   "title": "Процесс Stage-Gate"
+  },
+  {
+   "path": "/processes",
+   "file": "web/js/app.js",
+   "line": 40,
+   "kind": "regex-table",
+   "title": "Схемы процессов"
+  },
+  {
+   "path": "/changes",
+   "file": "web/js/app.js",
+   "line": 41,
+   "kind": "regex-table",
+   "title": "Изменения процессов"
+  },
+  {
+   "path": "/knowledge",
+   "file": "web/js/app.js",
+   "line": 44,
+   "kind": "regex-table",
+   "title": "База знаний"
+  },
+  {
+   "path": "/projects",
+   "file": "web/js/app.js",
+   "line": 46,
+   "kind": "regex-table",
+   "title": "Разработка прототипов"
+  },
+  {
+   "path": "/pilots",
+   "file": "web/js/app.js",
+   "line": 48,
+   "kind": "regex-table",
+   "title": "Пилотирование"
+  },
+  {
+   "path": "/forms",
+   "file": "web/js/app.js",
+   "line": 51,
+   "kind": "regex-table",
+   "title": "Формы и опросы"
+  },
+  {
+   "path": "/providers",
+   "file": "web/js/app.js",
+   "line": 55,
+   "kind": "regex-table",
+   "title": "Каталог разработчиков ИИ-решений"
+  },
+  {
+   "path": "/analytics",
+   "file": "web/js/app.js",
+   "line": 59,
+   "kind": "regex-table",
+   "title": "Аналитика и КПЭ"
+  },
+  {
+   "path": "/sla",
+   "file": "web/js/app.js",
+   "line": 60,
+   "kind": "regex-table",
+   "title": "Контроль SLA"
+  },
+  {
+   "path": "/community",
+   "file": "web/js/app.js",
+   "line": 61,
+   "kind": "regex-table",
+   "title": "Сообщество"
+  },
+  {
+   "path": "/practices",
+   "file": "web/js/app.js",
+   "line": 63,
+   "kind": "regex-table",
+   "title": "Лучшие практики"
+  },
+  {
+   "path": "/admin",
+   "file": "web/js/app.js",
+   "line": 65,
+   "kind": "regex-table",
+   "title": "Настройки платформы"
+  }
+ ],
+ "api": [
+  {
+   "method": "GET",
+   "path": "/api/admin/presentation.pdf",
+   "file": "server/api/admin.js",
+   "line": 19,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/workflow",
+   "file": "server/api/admin.js",
+   "line": 34,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/workflow/:stage",
+   "file": "server/api/admin.js",
+   "line": 47,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/roles",
+   "file": "server/api/admin.js",
+   "line": 79,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/admin/roles",
+   "file": "server/api/admin.js",
+   "line": 93,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/roles/:code",
+   "file": "server/api/admin.js",
+   "line": 107,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/admin/roles/:code/permissions",
+   "file": "server/api/admin.js",
+   "line": 117,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/users/:id/roles",
+   "file": "server/api/admin.js",
+   "line": 138,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/admin/users/:id/roles",
+   "file": "server/api/admin.js",
+   "line": 143,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/admin/users/:id/roles/:code",
+   "file": "server/api/admin.js",
+   "line": 155,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/users",
+   "file": "server/api/admin.js",
+   "line": 163,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/admin/users",
+   "file": "server/api/admin.js",
+   "line": 171,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/users/:id",
+   "file": "server/api/admin.js",
+   "line": 185,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/admin/institutions",
+   "file": "server/api/admin.js",
+   "line": 198,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/audit",
+   "file": "server/api/admin.js",
+   "line": 211,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/audit/verify",
+   "file": "server/api/admin.js",
+   "line": 229,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/sla",
+   "file": "server/api/admin.js",
+   "line": 235,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/admin/sla/sweep",
+   "file": "server/api/admin.js",
+   "line": 260,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/system",
+   "file": "server/api/admin.js",
+   "line": 268,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/analytics/overview",
+   "file": "server/api/analytics.js",
+   "line": 180,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/analytics/institutions",
+   "file": "server/api/analytics.js",
+   "line": 220,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/analytics/contributors",
+   "file": "server/api/analytics.js",
+   "line": 241,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/analytics/export",
+   "file": "server/api/analytics.js",
+   "line": 255,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/auth/login",
+   "file": "server/api/auth.js",
+   "line": 6,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/auth/logout",
+   "file": "server/api/auth.js",
+   "line": 22,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/auth/me",
+   "file": "server/api/auth.js",
+   "line": 29,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/auth/roles",
+   "file": "server/api/auth.js",
+   "line": 40,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/auth/demo-accounts",
+   "file": "server/api/auth.js",
+   "line": 45,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forum/topics",
+   "file": "server/api/community.js",
+   "line": 9,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forum/topics",
+   "file": "server/api/community.js",
+   "line": 23,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forum/topics/:id",
+   "file": "server/api/community.js",
+   "line": 34,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forum/topics/:id/posts",
+   "file": "server/api/community.js",
+   "line": 46,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/users/:id",
+   "file": "server/api/community.js",
+   "line": 57,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/users",
+   "file": "server/api/community.js",
+   "line": 70,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/best-practices",
+   "file": "server/api/community.js",
+   "line": 79,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/best-practices",
+   "file": "server/api/community.js",
+   "line": 91,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/rollouts",
+   "file": "server/api/community.js",
+   "line": 105,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/rollouts",
+   "file": "server/api/community.js",
+   "line": 116,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/rollouts/:id",
+   "file": "server/api/community.js",
+   "line": 133,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/institutions",
+   "file": "server/api/community.js",
+   "line": 144,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/awards",
+   "file": "server/api/community.js",
+   "line": 149,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/meta",
+   "file": "server/api/forms.js",
+   "line": 25,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms",
+   "file": "server/api/forms.js",
+   "line": 37,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms",
+   "file": "server/api/forms.js",
+   "line": 50,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/:id",
+   "file": "server/api/forms.js",
+   "line": 56,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/forms/:id",
+   "file": "server/api/forms.js",
+   "line": 69,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/forms/:id/questions",
+   "file": "server/api/forms.js",
+   "line": 73,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/:id/publish",
+   "file": "server/api/forms.js",
+   "line": 79,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/:id/status",
+   "file": "server/api/forms.js",
+   "line": 83,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/:id/duplicate",
+   "file": "server/api/forms.js",
+   "line": 88,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/forms/:id",
+   "file": "server/api/forms.js",
+   "line": 92,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/:id/responses",
+   "file": "server/api/forms.js",
+   "line": 99,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/forms/:id/draft",
+   "file": "server/api/forms.js",
+   "line": 107,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/:id/results",
+   "file": "server/api/forms.js",
+   "line": 122,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/:id/responses",
+   "file": "server/api/forms.js",
+   "line": 126,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/:id/export",
+   "file": "server/api/forms.js",
+   "line": 130,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/public/forms/:slug",
+   "file": "server/api/forms.js",
+   "line": 169,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/public/forms/:slug/responses",
+   "file": "server/api/forms.js",
+   "line": 173,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/templates",
+   "file": "server/api/ideas.js",
+   "line": 70,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/categories",
+   "file": "server/api/ideas.js",
+   "line": 81,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/similar",
+   "file": "server/api/ideas.js",
+   "line": 87,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/draft",
+   "file": "server/api/ideas.js",
+   "line": 93,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/ideas/draft",
+   "file": "server/api/ideas.js",
+   "line": 98,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/ideas/draft",
+   "file": "server/api/ideas.js",
+   "line": 108,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/moderation",
+   "file": "server/api/ideas.js",
+   "line": 114,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas",
+   "file": "server/api/ideas.js",
+   "line": 136,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas",
+   "file": "server/api/ideas.js",
+   "line": 181,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/:id",
+   "file": "server/api/ideas.js",
+   "line": 231,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/ideas/:id",
+   "file": "server/api/ideas.js",
+   "line": 283,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/:id/moderate",
+   "file": "server/api/ideas.js",
+   "line": 302,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/:id/reactions",
+   "file": "server/api/ideas.js",
+   "line": 315,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/:id/comments",
+   "file": "server/api/ideas.js",
+   "line": 353,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/:id/report",
+   "file": "server/api/ideas.js",
+   "line": 385,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/:id/report",
+   "file": "server/api/ideas.js",
+   "line": 389,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/reports/:id/resolve",
+   "file": "server/api/ideas.js",
+   "line": 393,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/:id/proposals",
+   "file": "server/api/ideas.js",
+   "line": 406,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/proposals/:id",
+   "file": "server/api/ideas.js",
+   "line": 461,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/:id/useful",
+   "file": "server/api/ideas.js",
+   "line": 483,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/:id/endorse",
+   "file": "server/api/ideas.js",
+   "line": 504,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/:id/decide",
+   "file": "server/api/ideas.js",
+   "line": 534,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/:id/promote",
+   "file": "server/api/ideas.js",
+   "line": 590,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/contribution/:userId",
+   "file": "server/api/ideas.js",
+   "line": 635,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/workflow/stages",
+   "file": "server/api/initiatives.js",
+   "line": 67,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives",
+   "file": "server/api/initiatives.js",
+   "line": 70,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives",
+   "file": "server/api/initiatives.js",
+   "line": 108,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives/:id",
+   "file": "server/api/initiatives.js",
+   "line": 144,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/initiatives/:id",
+   "file": "server/api/initiatives.js",
+   "line": 198,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/:id/gate",
+   "file": "server/api/initiatives.js",
+   "line": 217,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/:id/resume",
+   "file": "server/api/initiatives.js",
+   "line": 227,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/:id/comments",
+   "file": "server/api/initiatives.js",
+   "line": 248,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/:id/vote",
+   "file": "server/api/initiatives.js",
+   "line": 265,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/:id/follow",
+   "file": "server/api/initiatives.js",
+   "line": 307,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ai/classify",
+   "file": "server/api/initiatives.js",
+   "line": 325,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ai/similar",
+   "file": "server/api/initiatives.js",
+   "line": 330,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives/:id/prediction",
+   "file": "server/api/initiatives.js",
+   "line": 335,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/categories",
+   "file": "server/api/initiatives.js",
+   "line": 342,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge",
+   "file": "server/api/knowledge.js",
+   "line": 17,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge/template/:kind",
+   "file": "server/api/knowledge.js",
+   "line": 35,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge",
+   "file": "server/api/knowledge.js",
+   "line": 41,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge/:id",
+   "file": "server/api/knowledge.js",
+   "line": 54,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/knowledge/:id",
+   "file": "server/api/knowledge.js",
+   "line": 74,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/:id/review",
+   "file": "server/api/knowledge.js",
+   "line": 82,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/:id/verdict",
+   "file": "server/api/knowledge.js",
+   "line": 88,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/:id/publish",
+   "file": "server/api/knowledge.js",
+   "line": 95,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/:id/revise",
+   "file": "server/api/knowledge.js",
+   "line": 101,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/:id/decision",
+   "file": "server/api/knowledge.js",
+   "line": 107,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge/:id/versions/:versionId",
+   "file": "server/api/knowledge.js",
+   "line": 112,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/search",
+   "file": "server/api/knowledge.js",
+   "line": 121,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/search/similar",
+   "file": "server/api/knowledge.js",
+   "line": 132,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/search/reindex",
+   "file": "server/api/knowledge.js",
+   "line": 141,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/:id/comments",
+   "file": "server/api/knowledge.js",
+   "line": 149,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge/:id/comments",
+   "file": "server/api/knowledge.js",
+   "line": 166,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/pilots",
+   "file": "server/api/pilots.js",
+   "line": 9,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/pilot-applications",
+   "file": "server/api/pilots.js",
+   "line": 28,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/pilot-applications",
+   "file": "server/api/pilots.js",
+   "line": 45,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/pilot-applications/:id/approve",
+   "file": "server/api/pilots.js",
+   "line": 58,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/pilots/:id",
+   "file": "server/api/pilots.js",
+   "line": 75,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/pilots/:id",
+   "file": "server/api/pilots.js",
+   "line": 95,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/pilots/:id/kpis",
+   "file": "server/api/pilots.js",
+   "line": 108,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/pilot-kpis/:id",
+   "file": "server/api/pilots.js",
+   "line": 119,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/surveys",
+   "file": "server/api/pilots.js",
+   "line": 133,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/surveys/:id",
+   "file": "server/api/pilots.js",
+   "line": 147,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/surveys/:id/respond",
+   "file": "server/api/pilots.js",
+   "line": 169,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/surveys",
+   "file": "server/api/pilots.js",
+   "line": 186,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/:key/comments",
+   "file": "server/api/process-changes.js",
+   "line": 15,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/processes/:key/comments",
+   "file": "server/api/process-changes.js",
+   "line": 27,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-comments/:id/useful",
+   "file": "server/api/process-changes.js",
+   "line": 36,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-comments/:id/resolve",
+   "file": "server/api/process-changes.js",
+   "line": 41,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-changes",
+   "file": "server/api/process-changes.js",
+   "line": 48,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes",
+   "file": "server/api/process-changes.js",
+   "line": 62,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-changes/:id",
+   "file": "server/api/process-changes.js",
+   "line": 73,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/process-changes/:id/model",
+   "file": "server/api/process-changes.js",
+   "line": 89,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/:id/submit",
+   "file": "server/api/process-changes.js",
+   "line": 95,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/:id/withdraw",
+   "file": "server/api/process-changes.js",
+   "line": 99,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/:id/vote",
+   "file": "server/api/process-changes.js",
+   "line": 105,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/process-changes/:id/vote",
+   "file": "server/api/process-changes.js",
+   "line": 110,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-changes/:id/route",
+   "file": "server/api/process-changes.js",
+   "line": 116,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/:id/to-approval",
+   "file": "server/api/process-changes.js",
+   "line": 120,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/:id/approve",
+   "file": "server/api/process-changes.js",
+   "line": 124,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/:id/publish",
+   "file": "server/api/process-changes.js",
+   "line": 132,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes",
+   "file": "server/api/processes.js",
+   "line": 48,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/index",
+   "file": "server/api/processes.js",
+   "line": 58,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/album/pdf",
+   "file": "server/api/processes.js",
+   "line": 67,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/:id",
+   "file": "server/api/processes.js",
+   "line": 74,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/:id/pdf",
+   "file": "server/api/processes.js",
+   "line": 85,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/:id/versions",
+   "file": "server/api/processes.js",
+   "line": 92,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-versions/:id",
+   "file": "server/api/processes.js",
+   "line": 98,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/processes/:id/draft",
+   "file": "server/api/processes.js",
+   "line": 108,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/process-versions/:id",
+   "file": "server/api/processes.js",
+   "line": 121,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/process-versions/:id",
+   "file": "server/api/processes.js",
+   "line": 132,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-versions/:id/validate",
+   "file": "server/api/processes.js",
+   "line": 140,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-versions/:id/publish",
+   "file": "server/api/processes.js",
+   "line": 144,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/pipeline/usage",
+   "file": "server/api/processes.js",
+   "line": 156,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers",
+   "file": "server/api/providers.js",
+   "line": 53,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/export.csv",
+   "file": "server/api/providers.js",
+   "line": 62,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/dictionaries",
+   "file": "server/api/providers.js",
+   "line": 74,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/duplicates",
+   "file": "server/api/providers.js",
+   "line": 80,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/solutions",
+   "file": "server/api/providers.js",
+   "line": 86,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers",
+   "file": "server/api/providers.js",
+   "line": 103,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/guide/:file",
+   "file": "server/api/providers.js",
+   "line": 112,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/mine",
+   "file": "server/api/providers.js",
+   "line": 129,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/members/candidates",
+   "file": "server/api/providers.js",
+   "line": 133,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/access",
+   "file": "server/api/providers.js",
+   "line": 141,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/access/candidates",
+   "file": "server/api/providers.js",
+   "line": 146,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/access",
+   "file": "server/api/providers.js",
+   "line": 151,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/providers/access/:userId",
+   "file": "server/api/providers.js",
+   "line": 157,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/:id",
+   "file": "server/api/providers.js",
+   "line": 165,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/:id",
+   "file": "server/api/providers.js",
+   "line": 177,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/:id/confirm",
+   "file": "server/api/providers.js",
+   "line": 185,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/:id/members",
+   "file": "server/api/providers.js",
+   "line": 191,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/:id/members",
+   "file": "server/api/providers.js",
+   "line": 195,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/providers/:id/members/:userId",
+   "file": "server/api/providers.js",
+   "line": 200,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/:id/status",
+   "file": "server/api/providers.js",
+   "line": 205,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/providers/:id",
+   "file": "server/api/providers.js",
+   "line": 211,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/:id/cases",
+   "file": "server/api/providers.js",
+   "line": 221,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/:id/cases/:caseId",
+   "file": "server/api/providers.js",
+   "line": 227,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/providers/:id/cases/:caseId",
+   "file": "server/api/providers.js",
+   "line": 233,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/:id/solutions",
+   "file": "server/api/providers.js",
+   "line": 241,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/:id/solutions/:solutionId",
+   "file": "server/api/providers.js",
+   "line": 247,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/providers/:id/solutions/:solutionId",
+   "file": "server/api/providers.js",
+   "line": 253,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/:id/review",
+   "file": "server/api/providers.js",
+   "line": 261,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/providers/:id/review",
+   "file": "server/api/providers.js",
+   "line": 265,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/:id/notes",
+   "file": "server/api/providers.js",
+   "line": 272,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/providers/:id/notes/:noteId",
+   "file": "server/api/providers.js",
+   "line": 276,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/rating",
+   "file": "server/api/rating.js",
+   "line": 26,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/rating/export",
+   "file": "server/api/rating.js",
+   "line": 46,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/points/ledger",
+   "file": "server/api/rating.js",
+   "line": 72,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/points/:id/revoke",
+   "file": "server/api/rating.js",
+   "line": 105,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/points/grant",
+   "file": "server/api/rating.js",
+   "line": 116,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/incentive-types",
+   "file": "server/api/rating.js",
+   "line": 133,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/incentives",
+   "file": "server/api/rating.js",
+   "line": 137,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/incentives",
+   "file": "server/api/rating.js",
+   "line": 167,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/incentives/build",
+   "file": "server/api/rating.js",
+   "line": 190,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/incentives/:id",
+   "file": "server/api/rating.js",
+   "line": 210,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/ideahub",
+   "file": "server/api/rating.js",
+   "line": 238,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/ideahub/rules/:code",
+   "file": "server/api/rating.js",
+   "line": 257,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/ideahub/settings",
+   "file": "server/api/rating.js",
+   "line": 287,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/ideahub/incentive-types/:code",
+   "file": "server/api/rating.js",
+   "line": 302,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/admin/ideahub/refresh-badges",
+   "file": "server/api/rating.js",
+   "line": 318,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/review/filters",
+   "file": "server/api/review.js",
+   "line": 46,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/review/queue",
+   "file": "server/api/review.js",
+   "line": 68,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/review/top",
+   "file": "server/api/review.js",
+   "line": 123,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/review/flags",
+   "file": "server/api/review.js",
+   "line": 159,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/review/flags/:id/resolve",
+   "file": "server/api/review.js",
+   "line": 175,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/review/:id",
+   "file": "server/api/review.js",
+   "line": 186,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/review/:id",
+   "file": "server/api/review.js",
+   "line": 239,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/tasks",
+   "file": "server/api/work.js",
+   "line": 10,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/tasks/:id/done",
+   "file": "server/api/work.js",
+   "line": 26,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/notifications",
+   "file": "server/api/work.js",
+   "line": 37,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/notifications/read",
+   "file": "server/api/work.js",
+   "line": 45,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/projects",
+   "file": "server/api/work.js",
+   "line": 53,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/projects",
+   "file": "server/api/work.js",
+   "line": 65,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/projects/:id",
+   "file": "server/api/work.js",
+   "line": 77,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/projects/:id/sprints",
+   "file": "server/api/work.js",
+   "line": 93,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/projects/:id/items",
+   "file": "server/api/work.js",
+   "line": 104,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/board-items/:id",
+   "file": "server/api/work.js",
+   "line": 117,
+   "kind": "handler"
+  },
+  {
+   "method": "DELETE",
+   "path": "/api/board-items/:id",
+   "file": "server/api/work.js",
+   "line": 139,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/projects/:id/documents",
+   "file": "server/api/work.js",
+   "line": 147,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/admin/roles/${role.code}/permissions",
+   "file": "web/js/views/admin.js",
+   "line": 109,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/ideahub/incentive-types/${cb.dataset.type}",
+   "file": "web/js/views/admin.js",
+   "line": 331,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/ideahub/rules/${rule.code}",
+   "file": "web/js/views/admin.js",
+   "line": 371,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/admin/workflow/${s.stage_no}",
+   "file": "web/js/views/admin.js",
+   "line": 457,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/audit?limit=150",
+   "file": "web/js/views/admin.js",
+   "line": 562,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/admin/users/${user.id}/roles",
+   "file": "web/js/views/admin.js",
+   "line": 647,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/admin/users/${user.id}/roles",
+   "file": "web/js/views/admin.js",
+   "line": 684,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/analytics/overview?scope=${scope}",
+   "file": "web/js/views/analytics.js",
+   "line": 13,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-changes?${params}",
+   "file": "web/js/views/changes.js",
+   "line": 26,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-changes/${id}",
+   "file": "web/js/views/changes.js",
+   "line": 94,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-changes?limit=1",
+   "file": "web/js/views/changes.js",
+   "line": 96,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/${c.id}/submit",
+   "file": "web/js/views/changes.js",
+   "line": 278,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/process-changes/${c.id}/route",
+   "file": "web/js/views/changes.js",
+   "line": 281,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/${c.id}/to-approval",
+   "file": "web/js/views/changes.js",
+   "line": 287,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/${c.id}/publish",
+   "file": "web/js/views/changes.js",
+   "line": 317,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/${c.id}/withdraw",
+   "file": "web/js/views/changes.js",
+   "line": 323,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/${c.id}/vote",
+   "file": "web/js/views/changes.js",
+   "line": 330,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/processes/${c.def_key}/comments",
+   "file": "web/js/views/changes.js",
+   "line": 338,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-changes/${c.id}/approve",
+   "file": "web/js/views/changes.js",
+   "line": 360,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/process-changes/${c.id}/model",
+   "file": "web/js/views/changes.js",
+   "line": 400,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forum/topics${cat ? ",
+   "file": "web/js/views/community.js",
+   "line": 13,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forum/topics/${id}",
+   "file": "web/js/views/community.js",
+   "line": 84,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forum/topics/${id}/posts",
+   "file": "web/js/views/community.js",
+   "line": 114,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/users/${id}",
+   "file": "web/js/views/community.js",
+   "line": 198,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/tasks?status=open",
+   "file": "web/js/views/dashboard.js",
+   "line": 12,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives?mine=1&limit=5",
+   "file": "web/js/views/dashboard.js",
+   "line": 13,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives?limit=6&sort=new",
+   "file": "web/js/views/dashboard.js",
+   "line": 14,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/${id}",
+   "file": "web/js/views/form-fill.js",
+   "line": 236,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/forms/${form.id}/draft",
+   "file": "web/js/views/form-fill.js",
+   "line": 286,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/${form.id}/responses",
+   "file": "web/js/views/form-fill.js",
+   "line": 299,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/public/forms/${encodeURIComponent(slug)}",
+   "file": "web/js/views/form-fill.js",
+   "line": 329,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/public/forms/${encodeURIComponent(slug)}/responses",
+   "file": "web/js/views/form-fill.js",
+   "line": 392,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/${id}/results",
+   "file": "web/js/views/form-results.js",
+   "line": 17,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms/${formId}/responses",
+   "file": "web/js/views/form-results.js",
+   "line": 164,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/forms?${params}",
+   "file": "web/js/views/forms.js",
+   "line": 30,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/forms/${form.id}/questions",
+   "file": "web/js/views/forms.js",
+   "line": 163,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/forms/${form.id}",
+   "file": "web/js/views/forms.js",
+   "line": 504,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/${form.id}/publish",
+   "file": "web/js/views/forms.js",
+   "line": 576,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/${form.id}/status",
+   "file": "web/js/views/forms.js",
+   "line": 587,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/forms/${form.id}/duplicate",
+   "file": "web/js/views/forms.js",
+   "line": 594,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas?${params}",
+   "file": "web/js/views/ideas.js",
+   "line": 69,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/${id}/reactions",
+   "file": "web/js/views/ideas.js",
+   "line": 189,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/${id}",
+   "file": "web/js/views/ideas.js",
+   "line": 428,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/${b.dataset.endorse}/endorse",
+   "file": "web/js/views/ideas.js",
+   "line": 602,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/${b.dataset.useful}/useful",
+   "file": "web/js/views/ideas.js",
+   "line": 614,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/${id}/comments",
+   "file": "web/js/views/ideas.js",
+   "line": 630,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/${idea.id}/proposals",
+   "file": "web/js/views/ideas.js",
+   "line": 750,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/${proposalId}/decide",
+   "file": "web/js/views/ideas.js",
+   "line": 792,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/${idea.id}/moderate",
+   "file": "web/js/views/ideas.js",
+   "line": 854,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/${idea.id}/promote",
+   "file": "web/js/views/ideas.js",
+   "line": 870,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/ideas/${idea.id}",
+   "file": "web/js/views/ideas.js",
+   "line": 892,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/${id}/vote",
+   "file": "web/js/views/initiatives.js",
+   "line": 37,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives?${params}",
+   "file": "web/js/views/initiatives.js",
+   "line": 85,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives/${id}",
+   "file": "web/js/views/initiatives.js",
+   "line": 188,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/${id}/follow",
+   "file": "web/js/views/initiatives.js",
+   "line": 429,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/${id}/comments",
+   "file": "web/js/views/initiatives.js",
+   "line": 439,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives/${id}/prediction",
+   "file": "web/js/views/initiatives.js",
+   "line": 448,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/${it.id}/gate",
+   "file": "web/js/views/initiatives.js",
+   "line": 544,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/initiatives/${it.id}/resume",
+   "file": "web/js/views/initiatives.js",
+   "line": 572,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge?${params}",
+   "file": "web/js/views/knowledge.js",
+   "line": 31,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/search?q=${encodeURIComponent(text)}",
+   "file": "web/js/views/knowledge.js",
+   "line": 92,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge/${id}",
+   "file": "web/js/views/knowledge.js",
+   "line": 195,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/knowledge?limit=1",
+   "file": "web/js/views/knowledge.js",
+   "line": 199,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/knowledge/${doc.id}",
+   "file": "web/js/views/knowledge.js",
+   "line": 368,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/${doc.id}/comments",
+   "file": "web/js/views/knowledge.js",
+   "line": 389,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/${doc.id}/review",
+   "file": "web/js/views/knowledge.js",
+   "line": 398,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/${doc.id}/publish",
+   "file": "web/js/views/knowledge.js",
+   "line": 404,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/${doc.id}/revise",
+   "file": "web/js/views/knowledge.js",
+   "line": 413,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/${doc.id}/decision",
+   "file": "web/js/views/knowledge.js",
+   "line": 421,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/knowledge/${doc.id}/verdict",
+   "file": "web/js/views/knowledge.js",
+   "line": 442,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/pilot-applications/${b.dataset.approve}/approve",
+   "file": "web/js/views/pilots.js",
+   "line": 69,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/initiatives?stage=4&limit=50",
+   "file": "web/js/views/pilots.js",
+   "line": 78,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/pilots/${id}",
+   "file": "web/js/views/pilots.js",
+   "line": 111,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/pilots/${pilotId}/kpis",
+   "file": "web/js/views/pilots.js",
+   "line": 258,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/surveys/${id}",
+   "file": "web/js/views/pilots.js",
+   "line": 302,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/surveys/${id}/respond",
+   "file": "web/js/views/pilots.js",
+   "line": 396,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/processes/${diagram.id}/comments",
+   "file": "web/js/views/processes.js",
+   "line": 268,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/processes/${diagram.id}/comments",
+   "file": "web/js/views/processes.js",
+   "line": 336,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/process-comments/${b.dataset.useful}/useful",
+   "file": "web/js/views/processes.js",
+   "line": 344,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/projects/${id}",
+   "file": "web/js/views/projects.js",
+   "line": 45,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/board-items/${itemId}",
+   "file": "web/js/views/projects.js",
+   "line": 137,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/projects/${project.id}/items",
+   "file": "web/js/views/projects.js",
+   "line": 214,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers?${params}",
+   "file": "web/js/views/providers.js",
+   "line": 121,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/${id}",
+   "file": "web/js/views/providers.js",
+   "line": 268,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/solutions?${params}",
+   "file": "web/js/views/providers.js",
+   "line": 306,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/access/candidates?q=${encodeURIComponent(text)}",
+   "file": "web/js/views/providers.js",
+   "line": 443,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/${p.id}/status",
+   "file": "web/js/views/providers.js",
+   "line": 549,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/${p.id}/confirm",
+   "file": "web/js/views/providers.js",
+   "line": 553,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/providers/members/candidates?q=${encodeURIComponent(text)}",
+   "file": "web/js/views/providers.js",
+   "line": 653,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/${p.id}/members",
+   "file": "web/js/views/providers.js",
+   "line": 660,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/${p.id}/cases/${c.id}",
+   "file": "web/js/views/providers.js",
+   "line": 735,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/${p.id}/cases",
+   "file": "web/js/views/providers.js",
+   "line": 736,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/${p.id}/solutions/${s.id}",
+   "file": "web/js/views/providers.js",
+   "line": 801,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/${p.id}/solutions",
+   "file": "web/js/views/providers.js",
+   "line": 802,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/${p.id}/review",
+   "file": "web/js/views/providers.js",
+   "line": 857,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/providers/${p.id}/notes",
+   "file": "web/js/views/providers.js",
+   "line": 900,
+   "kind": "handler"
+  },
+  {
+   "method": "PUT",
+   "path": "/api/providers/${p.id}",
+   "file": "web/js/views/providers.js",
+   "line": 1053,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/rating?period=${period}${scope ? ",
+   "file": "web/js/views/rating.js",
+   "line": 34,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/ideas/${ideaId}/moderate",
+   "file": "web/js/views/rating.js",
+   "line": 298,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/proposals/${b.dataset.decide}/decide",
+   "file": "web/js/views/rating.js",
+   "line": 351,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/reports/${b.dataset.resolve}/resolve",
+   "file": "web/js/views/rating.js",
+   "line": 422,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/review/flags/${b.dataset.flag}/resolve",
+   "file": "web/js/views/rating.js",
+   "line": 429,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/points/ledger?limit=200",
+   "file": "web/js/views/rating.js",
+   "line": 437,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/points/${b.dataset.revoke}/revoke",
+   "file": "web/js/views/rating.js",
+   "line": 481,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/incentives${status ? ",
+   "file": "web/js/views/rating.js",
+   "line": 501,
+   "kind": "handler"
+  },
+  {
+   "method": "PATCH",
+   "path": "/api/incentives/${id}",
+   "file": "web/js/views/rating.js",
+   "line": 679,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/ideas/contribution/${userId}",
+   "file": "web/js/views/rating.js",
+   "line": 693,
+   "kind": "handler"
+  },
+  {
+   "method": "GET",
+   "path": "/api/review/queue?${params}",
+   "file": "web/js/views/review.js",
+   "line": 44,
+   "kind": "handler"
+  },
+  {
+   "method": "POST",
+   "path": "/api/review/${current.id}",
+   "file": "web/js/views/review.js",
+   "line": 286,
+   "kind": "handler"
+  }
+ ],
+ "actions": [],
+ "models": [
+  {
+   "name": "institutions",
+   "fields": [
+    "id",
+    "name",
+    "short_name",
+    "kind",
+    "--",
+    "address",
+    "staff_count",
+    "is_pilot_site",
+    "created_at",
+    "email",
+    "full_name",
+    "password_hash",
+    "password_salt",
+    "role",
+    "institution_id",
+    "position",
+    "expertise",
+    "phone",
+    "is_active",
+    "created_at",
+    "last_login_at",
+    "user_id",
+    "created_at",
+    "expires_at",
+    "ip",
+    "user_agent",
+    "stage_no",
+    "--",
+    "tz_stage",
+    "--"
+   ],
+   "file": "server/db.js",
+   "line": 25,
+   "kind": "sql"
+  },
+  {
+   "name": "ideas",
+   "fields": [
+    "id",
+    "number",
+    "--",
+    "problem",
+    "desired_result",
+    "category",
+    "priority",
+    "--",
+    "--",
+    "--",
+    "где",
+    "institution_id",
+    "--",
+    "moderation_note",
+    "moderated_by",
+    "moderated_at",
+    "duplicate_of_id",
+    "initiative_id",
+    "accepted_proposal_id",
+    "--",
+    "принятое",
+    "updated_at",
+    "closed_at",
+    "по",
+    "payload",
+    "updated_at",
+    "idea_id",
+    "author_id",
+    "summary",
+    "--"
+   ],
+   "file": "server/db.js",
+   "line": 447,
+   "kind": "sql"
+  },
+  {
+   "name": "roles",
+   "fields": [
+    "code",
+    "title",
+    "short",
+    "kind",
+    "--",
+    "is_active",
+    "order_idx",
+    "updated_at",
+    "permission",
+    "title",
+    "group_title",
+    "order_idx",
+    "согласующий",
+    "но",
+    "role_code",
+    "institution_id",
+    "granted_by",
+    "granted_at"
+   ],
+   "file": "server/db.js",
+   "line": 689,
+   "kind": "sql"
+  },
+  {
+   "name": "process_defs",
+   "fields": [
+    "id",
+    "key",
+    "--",
+    "'emp-submit'",
+    "description",
+    "scenario",
+    "--",
+    "--",
+    "--",
+    "чей",
+    "order_idx",
+    "--",
+    "status",
+    "--",
+    "owner_id",
+    "created_at",
+    "updated_at",
+    "--",
+    "def_id",
+    "version",
+    "model",
+    "--",
+    "шаги",
+    "переходы",
+    "разбор",
+    "status",
+    "--",
+    "created_by",
+    "created_at",
+    "updated_at"
+   ],
+   "file": "server/db.js",
+   "line": 736,
+   "kind": "sql"
+  },
+  {
+   "name": "discussions",
+   "fields": [
+    "id",
+    "target_type",
+    "--",
+    "context_id",
+    "--",
+    "к",
+    "--",
+    "parent_id",
+    "author_id",
+    "body",
+    "status",
+    "--",
+    "resolved_at",
+    "created_at",
+    "user_id",
+    "created_at",
+    "а",
+    "для",
+    "которых",
+    "чтобы",
+    "почему",
+    "target_type",
+    "--",
+    "step_no",
+    "reason",
+    "role_code",
+    "--",
+    "--",
+    "required",
+    "verdict"
+   ],
+   "file": "server/db.js",
+   "line": 788,
+   "kind": "sql"
+  },
+  {
+   "name": "knowledge_docs",
+   "fields": [
+    "id",
+    "number",
+    "--",
+    "--",
+    "--",
+    "current_version_id",
+    "author_id",
+    "institution_id",
+    "--",
+    "инициативе",
+    "процессу",
+    "пилоту",
+    "проекту",
+    "subject_id",
+    "--",
+    "которое",
+    "--",
+    "из",
+    "и",
+    "которая",
+    "task_id",
+    "decision_note",
+    "created_at",
+    "updated_at",
+    "decided_at",
+    "published_at",
+    "doc_id",
+    "version",
+    "sections",
+    "--"
+   ],
+   "file": "server/db.js",
+   "line": 897,
+   "kind": "sql"
+  },
+  {
+   "name": "forms",
+   "fields": [
+    "id",
+    "slug",
+    "--",
+    "description",
+    "--",
+    "--",
+    "без",
+    "is_anonymous",
+    "--",
+    "show_progress",
+    "closing_text",
+    "--",
+    "--",
+    "created_at",
+    "updated_at",
+    "published_at",
+    "--",
+    "ни",
+    "form_id",
+    "key",
+    "type",
+    "--",
+    "hint",
+    "required",
+    "options",
+    "--",
+    "label}]",
+    "--",
+    "единицы",
+    "«свой"
+   ],
+   "file": "server/db.js",
+   "line": 968,
+   "kind": "sql"
+  },
+  {
+   "name": "providers",
+   "fields": [
+    "id",
+    "kind",
+    "--",
+    "legal_name",
+    "--",
+    "--",
+    "--",
+    "website",
+    "city",
+    "team_size",
+    "founded_year",
+    "contact_name",
+    "contact_role",
+    "contact_email",
+    "contact_phone",
+    "status",
+    "--",
+    "--",
+    "--",
+    "ориентир",
+    "--",
+    "--",
+    "--",
+    "--",
+    "--",
+    "updated_by",
+    "created_at",
+    "updated_at",
+    "provider_id",
+    "title"
+   ],
+   "file": "server/db.js",
+   "line": 1045,
+   "kind": "sql"
+  },
+  {
+   "name": "provider_members",
+   "fields": [
+    "provider_id",
+    "user_id",
+    "added_by",
+    "added_at"
+   ],
+   "file": "server/db.js",
+   "line": 1172,
+   "kind": "sql"
+  }
+ ],
+ "enums": [],
+ "roles": [
+  {
+   "role": "head",
+   "file": "server/api/community.js",
+   "line": 126
+  },
+  {
+   "role": "supplier",
+   "file": "server/api/initiatives.js",
+   "line": 86
+  },
+  {
+   "role": "dtszn",
+   "file": "server/api/initiatives.js",
+   "line": 202
+  },
+  {
+   "role": "employee",
+   "file": "server/seed.js",
+   "line": 549
+  },
+  {
+   "role": "admin",
+   "file": "web/js/shell.js",
+   "line": 66
+  },
+  {
+   "role": "expert",
+   "file": "web/js/views/dashboard.js",
+   "line": 172
+  },
+  {
+   "role": "developer",
+   "file": "web/js/views/dashboard.js",
+   "line": 192
+  },
+  {
+   "role": "pilot_coordinator",
+   "file": "web/js/views/dashboard.js",
+   "line": 206
+  }
+ ],
+ "forms": [
+  {
+   "file": "web/js/shell.js",
+   "fields": [
+    {
+     "name": "email",
+     "rules": [
+      "обязательное",
+      "email"
+     ],
+     "line": 240
+    },
+    {
+     "name": "password",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 245
+    }
+   ]
+  },
+  {
+   "file": "web/js/views/community.js",
+   "fields": [
+    {
+     "name": "body",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 106
+    }
+   ]
+  },
+  {
+   "file": "web/js/views/ideas.js",
+   "fields": [
+    {
+     "name": "title",
+     "rules": [],
+     "line": 241
+    },
+    {
+     "name": "problem",
+     "rules": [],
+     "line": 247
+    },
+    {
+     "name": "desired_result",
+     "rules": [],
+     "line": 254
+    },
+    {
+     "name": "category",
+     "rules": [],
+     "line": 265
+    },
+    {
+     "name": "priority",
+     "rules": [],
+     "line": 270
+    },
+    {
+     "name": "source_link",
+     "rules": [],
+     "line": 279
+    },
+    {
+     "name": "links",
+     "rules": [],
+     "line": 283
+    },
+    {
+     "name": "body",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 526
+    }
+   ]
+  },
+  {
+   "file": "web/js/views/initiatives.js",
+   "fields": [
+    {
+     "name": "body",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 304
+    },
+    {
+     "name": "title",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 594
+    },
+    {
+     "name": "problem",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 599
+    },
+    {
+     "name": "solution",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 605
+    },
+    {
+     "name": "expected_effect",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 610
+    },
+    {
+     "name": "effect_type",
+     "rules": [],
+     "line": 616
+    },
+    {
+     "name": "effect_value",
+     "rules": [
+      "число",
+      "мин. 0"
+     ],
+     "line": 626
+    },
+    {
+     "name": "effect_unit",
+     "rules": [],
+     "line": 630
+    },
+    {
+     "name": "links",
+     "rules": [],
+     "line": 635
+    }
+   ]
+  },
+  {
+   "file": "web/js/views/providers.js",
+   "fields": [
+    {
+     "name": "title",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 711
+    },
+    {
+     "name": "customer",
+     "rules": [],
+     "line": 714
+    },
+    {
+     "name": "year",
+     "rules": [
+      "число",
+      "мин. 1990",
+      "макс. 2100"
+     ],
+     "line": 716
+    },
+    {
+     "name": "public_sector",
+     "rules": [],
+     "line": 718
+    },
+    {
+     "name": "description",
+     "rules": [],
+     "line": 720
+    },
+    {
+     "name": "result",
+     "rules": [],
+     "line": 722
+    },
+    {
+     "name": "link",
+     "rules": [],
+     "line": 725
+    },
+    {
+     "name": "name",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 770
+    },
+    {
+     "name": "kind",
+     "rules": [],
+     "line": 773
+    },
+    {
+     "name": "maturity",
+     "rules": [],
+     "line": 775
+    },
+    {
+     "name": "license",
+     "rules": [],
+     "line": 777
+    },
+    {
+     "name": "in_registry",
+     "rules": [],
+     "line": 779
+    },
+    {
+     "name": "description",
+     "rules": [],
+     "line": 781
+    },
+    {
+     "name": "price_note",
+     "rules": [],
+     "line": 787
+    },
+    {
+     "name": "link",
+     "rules": [],
+     "line": 789
+    },
+    {
+     "name": "context",
+     "rules": [],
+     "line": 839
+    },
+    {
+     "name": "comment",
+     "rules": [],
+     "line": 840
+    },
+    {
+     "name": "kind",
+     "rules": [],
+     "line": 889
+    },
+    {
+     "name": "happened_at",
+     "rules": [],
+     "line": 890
+    },
+    {
+     "name": "body",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 892
+    },
+    {
+     "name": "name",
+     "rules": [
+      "обязательное"
+     ],
+     "line": 938
+    },
+    {
+     "name": "legal_name",
+     "rules": [],
+     "line": 943
+    },
+    {
+     "name": "inn",
+     "rules": [
+      "шаблон"
+     ],
+     "line": 945
+    },
+    {
+     "name": "org_unit",
+     "rules": [],
+     "line": 949
+    },
+    {
+     "name": "city",
+     "rules": [],
+     "line": 952
+    },
+    {
+     "name": "team_size",
+     "rules": [
+      "число",
+      "мин. 1"
+     ],
+     "line": 954
+    },
+    {
+     "name": "founded_year",
+     "rules": [
+      "число",
+      "мин. 1900"
+     ],
+     "line": 956
+    },
+    {
+     "name": "website",
+     "rules": [],
+     "line": 959
+    },
+    {
+     "name": "description",
+     "rules": [],
+     "line": 961
+    },
+    {
+     "name": "status",
+     "rules": [],
+     "line": 978
+    },
+    {
+     "name": "availability",
+     "rules": [],
+     "line": 980
+    },
+    {
+     "name": "price_band",
+     "rules": [],
+     "line": 982
+    },
+    {
+     "name": "contact_name",
+     "rules": [],
+     "line": 992
+    },
+    {
+     "name": "contact_role",
+     "rules": [],
+     "line": 994
+    },
+    {
+     "name": "contact_email",
+     "rules": [
+      "email"
+     ],
+     "line": 996
+    },
+    {
+     "name": "contact_phone",
+     "rules": [
+      "телефон"
+     ],
+     "line": 998
+    },
+    {
+     "name": "owner_me",
+     "rules": [],
+     "line": 1000
+    },
+    {
+     "name": "description",
+     "rules": [],
+     "line": 1072
+    },
+    {
+     "name": "team_size",
+     "rules": [
+      "число",
+      "мин. 1"
+     ],
+     "line": 1076
+    },
+    {
+     "name": "availability",
+     "rules": [],
+     "line": 1078
+    }
+   ]
+  }
+ ],
+ "validation": [],
+ "nav": [
+  {
+   "href": "/",
+   "text": "На рабочий стол",
+   "file": "web/js/app.js"
+  },
+  {
+   "href": "/",
+   "text": "Рабочий стол",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/tasks",
+   "text": "Мои задачи",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/ideas",
+   "text": "Идеи и решения",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/initiatives",
+   "text": "Реестр инициатив",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/review",
+   "text": "Ревью предложений",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/rating",
+   "text": "Рейтинг социальных советников",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/moderation",
+   "text": "Модерация идей",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/incentives",
+   "text": "Поощрения",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/process",
+   "text": "Процесс Stage-Gate",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/processes",
+   "text": "Схемы процессов",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/changes",
+   "text": "Изменения процессов",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/knowledge",
+   "text": "База знаний",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/projects",
+   "text": "Разработка",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/providers",
+   "text": "Каталог разработчиков ИИ-решений",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/providers",
+   "text": "Моя компания в каталоге",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/pilots",
+   "text": "Пилотирование",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/practices",
+   "text": "Лучшие практики",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/forms",
+   "text": "Формы и опросы",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/analytics",
+   "text": "Аналитика и КПЭ",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/sla",
+   "text": "Контроль SLA",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/community",
+   "text": "Сообщество",
+   "file": "web/js/shell.js"
+  },
+  {
+   "href": "/admin",
+   "text": "Настройки платформы",
+   "file": "web/js/shell.js"
+  }
+ ],
+ "headings": [
+  {
+   "level": 2,
+   "text": "От проблемы на рабочем месте — до внедрённого решения",
+   "file": "presentation/Main.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Сотрудник видит проблему первым. Изменение приходит последним",
+   "file": "presentation/S02.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Social1 — не книга предложений, а конвейер изменений",
+   "file": "presentation/S03.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Отсеивать рано и дёшево — цена отказа растёт с каждым этапом",
+   "file": "presentation/S04.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Шесть стадий, пять точек принятия решений, срок на каждой",
+   "file": "presentation/S05.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Ворота 1 и 2: от «есть идея» до «беремся разрабатывать»",
+   "file": "presentation/S06.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Ворота 3, 4 и 5: от прототипа до тиражирования",
+   "file": "presentation/S07.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Четыре решения — и у каждого свой маршрут",
+   "file": "presentation/S08.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Четыре правила, которые не дают отбору стать формальностью",
+   "file": "presentation/S09.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Семь ролей, у каждой — своя зона ответственности",
+   "file": "presentation/S10.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Платформа построена и работает",
+   "file": "presentation/S11.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Три группы показателей и приборная панель руководителя",
+   "file": "presentation/S12.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Главные риски — организационные, и они сняты механизмами",
+   "file": "presentation/S13.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Поэтапно: сначала несколько учреждений, потом сеть",
+   "file": "presentation/S14.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Что требуется от руководства Департамента",
+   "file": "presentation/S15.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Реинжиниринг перестаёт быть перепиской",
+   "file": "presentation-product/Main.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Реинжиниринг упирается не в дефицит идей, а в их администрирование",
+   "file": "presentation-product/S02.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Три потока работы и два сквозных сервиса",
+   "file": "presentation-product/S03.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Идея за минуту — и сразу поиск похожих решений",
+   "file": "presentation-product/S04.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Пять ворот — от подачи до масштабирования",
+   "file": "presentation-product/S05.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Схема процесса — источник истины для конвейера",
+   "file": "presentation-product/S06.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Анкета собирается в интерфейсе, а не в коде",
+   "file": "presentation-product/S07.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Обучение идёт поверх живого интерфейса",
+   "file": "presentation-product/S08.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Пять компонентов — один маршрут",
+   "file": "presentation-product/S09.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Что делает этот поток управляемым",
+   "file": "presentation-product/S10.dc.html"
+  },
+  {
+   "level": 2,
+   "text": "Что получает организация",
+   "file": "presentation-product/S11.dc.html"
+  },
+  {
+   "level": 1,
+   "text": "От проблемы на рабочем месте — до внедрённого решения",
+   "file": "web/js/shell.js"
+  },
+  {
+   "level": 2,
+   "text": "Вход в платформу",
+   "file": "web/js/shell.js"
+  },
+  {
+   "level": 2,
+   "text": "Настройки платформы",
+   "file": "web/js/views/admin.js"
+  },
+  {
+   "level": 2,
+   "text": "Аналитика и КПЭ",
+   "file": "web/js/views/analytics.js"
+  },
+  {
+   "level": 2,
+   "text": "Контроль SLA",
+   "file": "web/js/views/analytics.js"
+  },
+  {
+   "level": 2,
+   "text": "Изменения процессов",
+   "file": "web/js/views/changes.js"
+  },
+  {
+   "level": 2,
+   "text": "Сообщество",
+   "file": "web/js/views/community.js"
+  },
+  {
+   "level": 2,
+   "text": "Библиотека лучших практик",
+   "file": "web/js/views/community.js"
+  },
+  {
+   "level": 2,
+   "text": "Процесс Stage-Gate",
+   "file": "web/js/views/community.js"
+  },
+  {
+   "level": 2,
+   "text": "Мои задачи",
+   "file": "web/js/views/dashboard.js"
+  },
+  {
+   "level": 2,
+   "text": "Форма недоступна",
+   "file": "web/js/views/form-fill.js"
+  },
+  {
+   "level": 2,
+   "text": "Формы и опросы",
+   "file": "web/js/views/forms.js"
+  },
+  {
+   "level": 2,
+   "text": "Идеи и решения",
+   "file": "web/js/views/ideas.js"
+  },
+  {
+   "level": 2,
+   "text": "Инициативы",
+   "file": "web/js/views/initiatives.js"
+  },
+  {
+   "level": 2,
+   "text": "Подать инициативу",
+   "file": "web/js/views/initiatives.js"
+  },
+  {
+   "level": 2,
+   "text": "База знаний",
+   "file": "web/js/views/knowledge.js"
+  },
+  {
+   "level": 2,
+   "text": "Пилотирование",
+   "file": "web/js/views/pilots.js"
+  },
+  {
+   "level": 2,
+   "text": "Схемы процессов",
+   "file": "web/js/views/processes.js"
+  },
+  {
+   "level": 2,
+   "text": "Разработка прототипов",
+   "file": "web/js/views/projects.js"
+  },
+  {
+   "level": 2,
+   "text": "Каталог разработчиков ИИ-решений",
+   "file": "web/js/views/providers.js"
+  },
+  {
+   "level": 2,
+   "text": "Моя компания в каталоге",
+   "file": "web/js/views/providers.js"
+  },
+  {
+   "level": 2,
+   "text": "Технологический профиль компании",
+   "file": "web/js/views/providers.js"
+  },
+  {
+   "level": 2,
+   "text": "Рейтинг социальных советников",
+   "file": "web/js/views/rating.js"
+  },
+  {
+   "level": 2,
+   "text": "Модерация идей и решений",
+   "file": "web/js/views/rating.js"
+  },
+  {
+   "level": 2,
+   "text": "Рекомендации к поощрению",
+   "file": "web/js/views/rating.js"
+  },
+  {
+   "level": 2,
+   "text": "Ревью предложений",
+   "file": "web/js/views/review.js"
+  }
+ ],
+ "tests": [
+  {
+   "name": "Доставка событий",
+   "file": "tests/events.test.js",
+   "line": 33
+  },
+  {
+   "name": "событие записывается даже без подписчиков",
+   "file": "tests/events.test.js",
+   "line": 34
+  },
+  {
+   "name": "подписчики получают событие с подробностями",
+   "file": "tests/events.test.js",
+   "line": 41
+  },
+  {
+   "name": "подписчик чужого типа события не вызывается",
+   "file": "tests/events.test.js",
+   "line": 53
+  },
+  {
+   "name": "Устойчивость к сбою обработчика",
+   "file": "tests/events.test.js",
+   "line": 61
+  },
+  {
+   "name": "сбой не роняет вызывающего и не мешает остальным подписчикам",
+   "file": "tests/events.test.js",
+   "line": 62
+  },
+  {
+   "name": "сбой записывается с именем обработчика, а не теряется молча",
+   "file": "tests/events.test.js",
+   "line": 72
+  },
+  {
+   "name": "Время в состоянии",
+   "file": "tests/events.test.js",
+   "line": 83
+  },
+  {
+   "name": "считает часы между переходами",
+   "file": "tests/events.test.js",
+   "line": 91
+  },
+  {
+   "name": "незавершённый предмет продолжает копить время в текущем состоянии",
+   "file": "tests/events.test.js",
+   "line": 103
+  },
+  {
+   "name": "узкие места отсортированы по среднему времени",
+   "file": "tests/events.test.js",
+   "line": 109
+  },
+  {
+   "name": "Восстановление истории переходов",
+   "file": "tests/events.test.js",
+   "line": 121
+  },
+  {
+   "name": "события собираются из stage_transitions и повторно не дублируются",
+   "file": "tests/events.test.js",
+   "line": 122
+  },
+  {
+   "name": "Структура формы",
+   "file": "tests/forms.test.js",
+   "line": 73
+  },
+  {
+   "name": "вопросы сохраняются с ключами, порядком и вариантами",
+   "file": "tests/forms.test.js",
+   "line": 74
+  },
+  {
+   "name": "вопрос без текста не сохраняется",
+   "file": "tests/forms.test.js",
+   "line": 83
+  },
+  {
+   "name": "условие не может ссылаться на вопрос ниже по форме",
+   "file": "tests/forms.test.js",
+   "line": 91
+  },
+  {
+   "name": "сравнение проверяется по типу вопроса, на который ссылается условие",
+   "file": "tests/forms.test.js",
+   "line": 103
+  },
+  {
+   "name": "шкала не выходит за допустимые границы",
+   "file": "tests/forms.test.js",
+   "line": 115
+  },
+  {
+   "name": "правка структуры сохраняет уже собранные ответы",
+   "file": "tests/forms.test.js",
+   "line": 123
+  },
+  {
+   "name": "удалённый вопрос уносит свои ответы",
+   "file": "tests/forms.test.js",
+   "line": 137
+  },
+  {
+   "name": "Публикация",
+   "file": "tests/forms.test.js",
+   "line": 146
+  },
+  {
+   "name": "форма без вопросов не публикуется",
+   "file": "tests/forms.test.js",
+   "line": 147
+  },
+  {
+   "name": "форма из одних разделов вопросом не считается",
+   "file": "tests/forms.test.js",
+   "line": 153
+  },
+  {
+   "name": "черновик не принимает ответы",
+   "file": "tests/forms.test.js",
+   "line": 158
+  },
+  {
+   "name": "закрытая форма ответы не принимает, но результаты остаются",
+   "file": "tests/forms.test.js",
+   "line": 164
+  },
+  {
+   "name": "срок сбора закрывает форму сам",
+   "file": "tests/forms.test.js",
+   "line": 175
+  },
+  {
+   "name": "форму с ответами нельзя вернуть в черновик",
+   "file": "tests/forms.test.js",
+   "line": 180
+  },
+  {
+   "name": "Условные вопросы",
+   "file": "tests/forms.test.js",
+   "line": 189
+  },
+  {
+   "name": "скрытый вопрос не обязателен, даже если помечен обязательным",
+   "file": "tests/forms.test.js",
+   "line": 190
+  },
+  {
+   "name": "показанный вопрос обязателен",
+   "file": "tests/forms.test.js",
+   "line": 196
+  },
+  {
+   "name": "ответ на скрытый вопрос не сохраняется",
+   "file": "tests/forms.test.js",
+   "line": 202
+  },
+  {
+   "name": "цепочка условий рвётся вместе с первым звеном",
+   "file": "tests/forms.test.js",
+   "line": 213
+  },
+  {
+   "name": "Проверка ответов",
+   "file": "tests/forms.test.js",
+   "line": 229
+  },
+  {
+   "name": "вариант не из списка отвергается",
+   "file": "tests/forms.test.js",
+   "line": 237
+  },
+  {
+   "name": "оценка вне шкалы отвергается",
+   "file": "tests/forms.test.js",
+   "line": 244
+  },
+  {
+   "name": "«другое» принимается только там, где оно разрешено",
+   "file": "tests/forms.test.js",
+   "line": 250
+  },
+  {
+   "name": "почта проверяется по написанию",
+   "file": "tests/forms.test.js",
+   "line": 268
+  },
+  {
+   "name": "ошибки возвращаются списком по вопросам, а не первой попавшейся",
+   "file": "tests/forms.test.js",
+   "line": 275
+  },
+  {
+   "name": "Сбор ответов",
+   "file": "tests/forms.test.js",
+   "line": 291
+  },
+  {
+   "name": "повторный ответ не принимается, когда так настроена форма",
+   "file": "tests/forms.test.js",
+   "line": 292
+  },
+  {
+   "name": "при разрешении нескольких ответов принимается каждый",
+   "file": "tests/forms.test.js",
+   "line": 299
+  },
+  {
+   "name": "анонимная форма не запоминает, кто отвечал",
+   "file": "tests/forms.test.js",
+   "line": 306
+  },
+  {
+   "name": "черновик ответа превращается в отправленный, а не во второй ответ",
+   "file": "tests/forms.test.js",
+   "line": 315
+  },
+  {
+   "name": "чужой ответ не перезаписывается указанием его номера",
+   "file": "tests/forms.test.js",
+   "line": 327
+  },
+  {
+   "name": "форму «только участникам» нельзя заполнить по ссылке",
+   "file": "tests/forms.test.js",
+   "line": 338
+  },
+  {
+   "name": "ответ по ссылке принимается без входа и остаётся безымянным",
+   "file": "tests/forms.test.js",
+   "line": 344
+  },
+  {
+   "name": "Результаты",
+   "file": "tests/forms.test.js",
+   "line": 354
+  },
+  {
+   "name": "сводка считает среднее по шкале и распределение по вариантам",
+   "file": "tests/forms.test.js",
+   "line": 363
+  },
+  {
+   "name": "у условного вопроса охват считается по тем, кому он показывался",
+   "file": "tests/forms.test.js",
+   "line": 380
+  },
+  {
+   "name": "тексты свободных ответов возвращаются целиком",
+   "file": "tests/forms.test.js",
+   "line": 389
+  },
+  {
+   "name": "выгрузка содержит заголовки вопросов и ответы построчно",
+   "file": "tests/forms.test.js",
+   "line": 396
+  },
+  {
+   "name": "Доступ",
+   "file": "tests/forms.test.js",
+   "line": 409
+  },
+  {
+   "name": "чужую форму нельзя изменить",
+   "file": "tests/forms.test.js",
+   "line": 410
+  },
+  {
+   "name": "администратор форм ведёт любую",
+   "file": "tests/forms.test.js",
+   "line": 418
+  },
+  {
+   "name": "адрес формы читается и не повторяется",
+   "file": "tests/forms.test.js",
+   "line": 426
+  },
+  {
+   "name": "адрес опубликованной формы не меняется вместе с названием",
+   "file": "tests/forms.test.js",
+   "line": 433
+  },
+  {
+   "name": "копия формы повторяет вопросы и начинается черновиком",
+   "file": "tests/forms.test.js",
+   "line": 440
+  },
+  {
+   "name": "Инструкции по каталогу разработчиков",
+   "file": "tests/guides.test.js",
+   "line": 24
+  },
+  {
+   "name": "есть инструкции пользователя, модератора и представителя",
+   "file": "tests/guides.test.js",
+   "line": 25
+  },
+  {
+   "name": "каждая схема и разбор ссылаются на схему из альбома, у которой есть разбор",
+   "file": "tests/guides.test.js",
+   "line": 29
+  },
+  {
+   "name": "каждая инструкция показывает хотя бы одну схему вместе с её разбором",
+   "file": "tests/guides.test.js",
+   "line": 42
+  },
+  {
+   "name": "инструкция модератора охватывает добавление, представителей, ведение и доступ",
+   "file": "tests/guides.test.js",
+   "line": 51
+  },
+  {
+   "name": "PDF собирается, текст в нём ищется",
+   "file": "tests/guides.test.js",
+   "line": 56
+  },
+  {
+   "name": "Настройка модуля",
+   "file": "tests/ideahub.test.js",
+   "line": 55
+  },
+  {
+   "name": "правила начисления и меры поощрения загружены",
+   "file": "tests/ideahub.test.js",
+   "line": 56
+  },
+  {
+   "name": "повторный запуск не создаёт дублей",
+   "file": "tests/ideahub.test.js",
+   "line": 61
+  },
+  {
+   "name": "администратор меняет правило без изменения кода",
+   "file": "tests/ideahub.test.js",
+   "line": 66
+  },
+  {
+   "name": "настройки читаются и сохраняются",
+   "file": "tests/ideahub.test.js",
+   "line": 72
+  },
+  {
+   "name": "Начисление очков",
+   "file": "tests/ideahub.test.js",
+   "line": 80
+  },
+  {
+   "name": "очки начисляются по действующему правилу",
+   "file": "tests/ideahub.test.js",
+   "line": 81
+  },
+  {
+   "name": "повторное начисление за то же действие отклоняется",
+   "file": "tests/ideahub.test.js",
+   "line": 88
+  },
+  {
+   "name": "самооценка не учитывается",
+   "file": "tests/ideahub.test.js",
+   "line": 96
+  },
+  {
+   "name": "предел очков по одному объекту соблюдается",
+   "file": "tests/ideahub.test.js",
+   "line": 107
+  },
+  {
+   "name": "отключённое правило не начисляет очки",
+   "file": "tests/ideahub.test.js",
+   "line": 125
+  },
+  {
+   "name": "модератор отменяет начисление, запись остаётся в журнале",
+   "file": "tests/ideahub.test.js",
+   "line": 137
+  },
+  {
+   "name": "отменённые очки не попадают в рейтинг",
+   "file": "tests/ideahub.test.js",
+   "line": 147
+  },
+  {
+   "name": "Защита от дублей",
+   "file": "tests/ideahub.test.js",
+   "line": 159
+  },
+  {
+   "name": "похожие тексты распознаются",
+   "file": "tests/ideahub.test.js",
+   "line": 160
+  },
+  {
+   "name": "дублирующее предложение по той же идее находится",
+   "file": "tests/ideahub.test.js",
+   "line": 167
+  },
+  {
+   "name": "похожие идеи подсказываются автору",
+   "file": "tests/ideahub.test.js",
+   "line": 177
+  },
+  {
+   "name": "Модерация идей",
+   "file": "tests/ideahub.test.js",
+   "line": 186
+  },
+  {
+   "name": "принятая идея открывается для решений и приносит очки автору",
+   "file": "tests/ideahub.test.js",
+   "line": 189
+  },
+  {
+   "name": "отклонение без причины невозможно",
+   "file": "tests/ideahub.test.js",
+   "line": 199
+  },
+  {
+   "name": "объединение дублей требует указания основной идеи",
+   "file": "tests/ideahub.test.js",
+   "line": 205
+  },
+  {
+   "name": "неизвестное действие модерации отклоняется",
+   "file": "tests/ideahub.test.js",
+   "line": 217
+  },
+  {
+   "name": "автор получает уведомление о решении модератора",
+   "file": "tests/ideahub.test.js",
+   "line": 223
+  },
+  {
+   "name": "Рейтинг социальных советников",
+   "file": "tests/ideahub.test.js",
+   "line": 233
+  },
+  {
+   "name": "границы периодов считаются корректно",
+   "file": "tests/ideahub.test.js",
+   "line": 234
+  },
+  {
+   "name": "рейтинг упорядочен по очкам и содержит места",
+   "file": "tests/ideahub.test.js",
+   "line": 244
+  },
+  {
+   "name": "прошлый период не содержит сегодняшних начислений",
+   "file": "tests/ideahub.test.js",
+   "line": 254
+  },
+  {
+   "name": "рейтинг ограничивается учреждением",
+   "file": "tests/ideahub.test.js",
+   "line": 261
+  },
+  {
+   "name": "Знаки отличия",
+   "file": "tests/ideahub.test.js",
+   "line": 273
+  },
+  {
+   "name": "«Активный социальный советник» присваивается за пять предложений",
+   "file": "tests/ideahub.test.js",
+   "line": 274
+  },
+  {
+   "name": "«Проверенный опыт» присваивается после подтверждения",
+   "file": "tests/ideahub.test.js",
+   "line": 284
+  },
+  {
+   "name": "сводка вклада считает идеи, решения и подтверждения",
+   "file": "tests/ideahub.test.js",
+   "line": 293
+  },
+  {
+   "name": "Рекомендации к поощрению",
+   "file": "tests/ideahub.test.js",
+   "line": 301
+  },
+  {
+   "name": "формируются только для тех, кто превысил порог",
+   "file": "tests/ideahub.test.js",
+   "line": 302
+  },
+  {
+   "name": "повторная рекомендация за тот же период не создаётся",
+   "file": "tests/ideahub.test.js",
+   "line": 315
+  },
+  {
+   "name": "высокий порог не даёт рекомендаций",
+   "file": "tests/ideahub.test.js",
+   "line": 321
+  },
+  {
+   "name": "Аудит",
+   "file": "tests/ideahub.test.js",
+   "line": 331
+  },
+  {
+   "name": "решение модератора попадает в неизменяемый журнал",
+   "file": "tests/ideahub.test.js",
+   "line": 332
+  },
+  {
+   "name": "Переименование советчика в социального советника",
+   "file": "tests/ideahub.test.js",
+   "line": 348
+  },
+  {
+   "name": "склонение по всем падежам",
+   "file": "tests/ideahub.test.js",
+   "line": 349
+  },
+  {
+   "name": "заглавная буква сохраняется",
+   "file": "tests/ideahub.test.js",
+   "line": 367
+  },
+  {
+   "name": "слова, начинающиеся так же, не затрагиваются",
+   "file": "tests/ideahub.test.js",
+   "line": 372
+  },
+  {
+   "name": "прежние надписи в базе обновляются",
+   "file": "tests/ideahub.test.js",
+   "line": 377
+  },
+  {
+   "name": "повторный запуск миграции ничего не меняет",
+   "file": "tests/ideahub.test.js",
+   "line": 389
+  },
+  {
+   "name": "прежнее название не осталось в справочных данных модуля",
+   "file": "tests/ideahub.test.js",
+   "line": 394
+  },
+  {
+   "name": "Документ и его разделы",
+   "file": "tests/knowledge.test.js",
+   "line": 59
+  },
+  {
+   "name": "заводится черновиком с номером своего вида",
+   "file": "tests/knowledge.test.js",
+   "line": 60
+  },
+  {
+   "name": "обязательные разделы названы, пока не заполнены",
+   "file": "tests/knowledge.test.js",
+   "line": 67
+  },
+  {
+   "name": "текст собирается из разделов, а не хранится отдельно",
+   "file": "tests/knowledge.test.js",
+   "line": 75
+  },
+  {
+   "name": "чужой документ править нельзя",
+   "file": "tests/knowledge.test.js",
+   "line": 86
+  },
+  {
+   "name": "незаполненный документ не выносится на рецензирование",
+   "file": "tests/knowledge.test.js",
+   "line": 92
+  },
+  {
+   "name": "Рецензирование",
+   "file": "tests/knowledge.test.js",
+   "line": 98
+  },
+  {
+   "name": "состав рецензентов выводится из документа, а не задаётся списком",
+   "file": "tests/knowledge.test.js",
+   "line": 105
+  },
+  {
+   "name": "рецензенту приходит задача со сроком",
+   "file": "tests/knowledge.test.js",
+   "line": 113
+  },
+  {
+   "name": "автор не рецензирует свой документ",
+   "file": "tests/knowledge.test.js",
+   "line": 119
+  },
+  {
+   "name": "отказ требует пояснения",
+   "file": "tests/knowledge.test.js",
+   "line": 125
+  },
+  {
+   "name": "согласование всеми рецензентами переводит документ в согласованные",
+   "file": "tests/knowledge.test.js",
+   "line": 130
+  },
+  {
+   "name": "если проект решения пишет архитектор, его рецензируют эксперты",
+   "file": "tests/knowledge.test.js",
+   "line": 143
+  },
+  {
+   "name": "Заказчик как рецензент",
+   "file": "tests/knowledge.test.js",
+   "line": 153
+  },
+  {
+   "name": "автор идеи попадает в лист по своему предмету",
+   "file": "tests/knowledge.test.js",
+   "line": 154
+  },
+  {
+   "name": "От решения к работе и обратно",
+   "file": "tests/knowledge.test.js",
+   "line": 169
+  },
+  {
+   "name": "принятый проект решения заводит задачу со ссылкой на себя",
+   "file": "tests/knowledge.test.js",
+   "line": 183
+  },
+  {
+   "name": "завершение задачи напоминает зафиксировать решение",
+   "file": "tests/knowledge.test.js",
+   "line": 200
+  },
+  {
+   "name": "зафиксированное решение наследует контекст проекта решения",
+   "file": "tests/knowledge.test.js",
+   "line": 210
+  },
+  {
+   "name": "Публикация и замена решения",
+   "file": "tests/knowledge.test.js",
+   "line": 223
+  },
+  {
+   "name": "опубликованный документ виден в базе знаний",
+   "file": "tests/knowledge.test.js",
+   "line": 234
+  },
+  {
+   "name": "опубликованный документ неизменяем",
+   "file": "tests/knowledge.test.js",
+   "line": 241
+  },
+  {
+   "name": "новая редакция заменяет прежнюю, не стирая её",
+   "file": "tests/knowledge.test.js",
+   "line": 247
+  },
+  {
+   "name": "неполный документ не публикуется",
+   "file": "tests/knowledge.test.js",
+   "line": 262
+  },
+  {
+   "name": "Журнал событий документа",
+   "file": "tests/knowledge.test.js",
+   "line": 269
+  },
+  {
+   "name": "путь документа виден по событиям",
+   "file": "tests/knowledge.test.js",
+   "line": 270
+  },
+  {
+   "name": "Презентация платформы: порядок слайдов",
+   "file": "tests/presentation.test.js",
+   "line": 21
+  },
+  {
+   "name": "сначала титул, принципы взаимодействия, цели, участники и состав",
+   "file": "tests/presentation.test.js",
+   "line": 22
+  },
+  {
+   "name": "на титуле — название концепции и её автор",
+   "file": "tests/presentation.test.js",
+   "line": 28
+  },
+  {
+   "name": "каждый компонент — обзор, ключевые экраны и схема подряд",
+   "file": "tests/presentation.test.js",
+   "line": 41
+  },
+  {
+   "name": "Презентация платформы: содержание",
+   "file": "tests/presentation.test.js",
+   "line": 51
+  },
+  {
+   "name": "в презентации нет счётчиков из базы",
+   "file": "tests/presentation.test.js",
+   "line": 52
+  },
+  {
+   "name": "у компонента есть задача, возможности, роли и хотя бы два кадра",
+   "file": "tests/presentation.test.js",
+   "line": 59
+  },
+  {
+   "name": "разделы и компоненты ссылаются на существующие маршруты портала",
+   "file": "tests/presentation.test.js",
+   "line": 69
+  },
+  {
+   "name": "каждый пункт бокового меню есть на карте платформы",
+   "file": "tests/presentation.test.js",
+   "line": 75
+  },
+  {
+   "name": "у каждого кадра есть JPEG в assets/presentation",
+   "file": "tests/presentation.test.js",
+   "line": 81
+  },
+  {
+   "name": "схемы совместной работы собраны корректно",
+   "file": "tests/presentation.test.js",
+   "line": 89
+  },
+  {
+   "name": "Презентация платформы: файл",
+   "file": "tests/presentation.test.js",
+   "line": 114
+  },
+  {
+   "name": "PDF собирается, текст ищется, скриншоты встроены",
+   "file": "tests/presentation.test.js",
+   "line": 115
+  },
+  {
+   "name": "размеры JPEG читаются из маркера кадра",
+   "file": "tests/presentation.test.js",
+   "line": 127
+  },
+  {
+   "name": "скачать презентацию может только администратор",
+   "file": "tests/presentation.test.js",
+   "line": 133
+  },
+  {
+   "name": "Замечания на шагах схемы",
+   "file": "tests/process-changes.test.js",
+   "line": 48
+  },
+  {
+   "name": "замечание привязывается к конкретному шагу",
+   "file": "tests/process-changes.test.js",
+   "line": 51
+  },
+  {
+   "name": "замечание к несуществующему шагу отклоняется",
+   "file": "tests/process-changes.test.js",
+   "line": 61
+  },
+  {
+   "name": "счётчик замечаний по шагам собирается для меток на схеме",
+   "file": "tests/process-changes.test.js",
+   "line": 67
+  },
+  {
+   "name": "отметка полезности начисляет очки автору замечания",
+   "file": "tests/process-changes.test.js",
+   "line": 72
+  },
+  {
+   "name": "своё замечание отметить нельзя",
+   "file": "tests/process-changes.test.js",
+   "line": 79
+  },
+  {
+   "name": "закрытое замечание уходит из счётчика",
+   "file": "tests/process-changes.test.js",
+   "line": 83
+  },
+  {
+   "name": "Предложение об изменении",
+   "file": "tests/process-changes.test.js",
+   "line": 89
+  },
+  {
+   "name": "обоснование обязательно",
+   "file": "tests/process-changes.test.js",
+   "line": 92
+  },
+  {
+   "name": "создаётся с черновой копией действующей схемы",
+   "file": "tests/process-changes.test.js",
+   "line": 98
+  },
+  {
+   "name": "пустое изменение на обсуждение не выносится",
+   "file": "tests/process-changes.test.js",
+   "line": 111
+  },
+  {
+   "name": "правка схемы даёт понятную сводку",
+   "file": "tests/process-changes.test.js",
+   "line": 116
+  },
+  {
+   "name": "чужое предложение править нельзя",
+   "file": "tests/process-changes.test.js",
+   "line": 133
+  },
+  {
+   "name": "вынесение на обсуждение начисляет очки и зовёт затронутые роли",
+   "file": "tests/process-changes.test.js",
+   "line": 139
+  },
+  {
+   "name": "коллеги поддерживают предложение",
+   "file": "tests/process-changes.test.js",
+   "line": 146
+  },
+  {
+   "name": "повторный голос заменяет прежний, а не добавляется",
+   "file": "tests/process-changes.test.js",
+   "line": 156
+  },
+  {
+   "name": "Согласование",
+   "file": "tests/process-changes.test.js",
+   "line": 164
+  },
+  {
+   "name": "маршрут выводится из затронутых дорожек",
+   "file": "tests/process-changes.test.js",
+   "line": 179
+  },
+  {
+   "name": "лист согласования создаётся с задачами и сроком",
+   "file": "tests/process-changes.test.js",
+   "line": 187
+  },
+  {
+   "name": "автор не согласует собственное предложение",
+   "file": "tests/process-changes.test.js",
+   "line": 209
+  },
+  {
+   "name": "отказ требует пояснения",
+   "file": "tests/process-changes.test.js",
+   "line": 215
+  },
+  {
+   "name": "согласование всеми ролями переводит предложение в согласованные",
+   "file": "tests/process-changes.test.js",
+   "line": 222
+  },
+  {
+   "name": "публикация делает изменение действующим",
+   "file": "tests/process-changes.test.js",
+   "line": 234
+  },
+  {
+   "name": "отказ закрывает предложение с указанием причины",
+   "file": "tests/process-changes.test.js",
+   "line": 243
+  },
+  {
+   "name": "Изменение конвейера сообществом",
+   "file": "tests/process-changes.test.js",
+   "line": 268
+  },
+  {
+   "name": "сокращение срока Gate 2 проходит полный цикл и меняет конвейер",
+   "file": "tests/process-changes.test.js",
+   "line": 271
+  },
+  {
+   "name": "вклад автора виден в общем рейтинге социальных советников",
+   "file": "tests/process-changes.test.js",
+   "line": 314
+  },
+  {
+   "name": "очки за одно и то же действие не начисляются дважды",
+   "file": "tests/process-changes.test.js",
+   "line": 324
+  },
+  {
+   "name": "Просроченные согласования",
+   "file": "tests/process-changes.test.js",
+   "line": 332
+  },
+  {
+   "name": "просрочка эскалируется и помечает задачу",
+   "file": "tests/process-changes.test.js",
+   "line": 333
+  },
+  {
+   "name": "Проекция конвейера",
+   "file": "tests/process-repo.test.js",
+   "line": 38
+  },
+  {
+   "name": "совпадает с прежней конфигурацией Stage-Gate по всем полям",
+   "file": "tests/process-repo.test.js",
+   "line": 39
+  },
+  {
+   "name": "последний этап считается по факту, а не постоянной",
+   "file": "tests/process-repo.test.js",
+   "line": 55
+  },
+  {
+   "name": "повторная проекция не размножает этапы",
+   "file": "tests/process-repo.test.js",
+   "line": 59
+  },
+  {
+   "name": "Версии",
+   "file": "tests/process-repo.test.js",
+   "line": 66
+  },
+  {
+   "name": "черновик создаётся копией действующей версии",
+   "file": "tests/process-repo.test.js",
+   "line": 67
+  },
+  {
+   "name": "опубликованную версию править нельзя",
+   "file": "tests/process-repo.test.js",
+   "line": 75
+  },
+  {
+   "name": "публикация переводит прежнюю версию в замещённые",
+   "file": "tests/process-repo.test.js",
+   "line": 82
+  },
+  {
+   "name": "удалить можно только черновик",
+   "file": "tests/process-repo.test.js",
+   "line": 97
+  },
+  {
+   "name": "Проверка перед публикацией",
+   "file": "tests/process-repo.test.js",
+   "line": 107
+  },
+  {
+   "name": "схема с разрывом потока не публикуется",
+   "file": "tests/process-repo.test.js",
+   "line": 108
+  },
+  {
+   "name": "этап с живыми инициативами убрать нельзя",
+   "file": "tests/process-repo.test.js",
+   "line": 122
+  },
+  {
+   "name": "перенумерация живого этапа отклоняется",
+   "file": "tests/process-repo.test.js",
+   "line": 147
+  },
+  {
+   "name": "срок этапа меняется и вступает в силу после публикации",
+   "file": "tests/process-repo.test.js",
+   "line": 167
+  },
+  {
+   "name": "Правка этапа из настроек платформы",
+   "file": "tests/process-repo.test.js",
+   "line": 179
+  },
+  {
+   "name": "пишет в модель, а не в таблицу конвейера",
+   "file": "tests/process-repo.test.js",
+   "line": 180
+  },
+  {
+   "name": "правка несуществующего этапа отклоняется",
+   "file": "tests/process-repo.test.js",
+   "line": 190
+  },
+  {
+   "name": "история правок сохраняется версиями",
+   "file": "tests/process-repo.test.js",
+   "line": 195
+  },
+  {
+   "name": "Транзакции",
+   "file": "tests/process-repo.test.js",
+   "line": 203
+  },
+  {
+   "name": "вложенный вызов не открывает свою транзакцию",
+   "file": "tests/process-repo.test.js",
+   "line": 204
+  },
+  {
+   "name": "сбой во вложенном вызове откатывает всё",
+   "file": "tests/process-repo.test.js",
+   "line": 213
+  },
+  {
+   "name": "Целостность схем",
+   "file": "tests/processes.test.js",
+   "line": 24
+  },
+  {
+   "name": "каждая схема начального наполнения проходит проверку модели",
+   "file": "tests/processes.test.js",
+   "line": 25
+  },
+  {
+   "name": "идентификаторы схем уникальны",
+   "file": "tests/processes.test.js",
+   "line": 31
+  },
+  {
+   "name": "используются только известные типы фигур",
+   "file": "tests/processes.test.js",
+   "line": 36
+  },
+  {
+   "name": "валидатор ловит поток в несуществующий узел",
+   "file": "tests/processes.test.js",
+   "line": 46
+  },
+  {
+   "name": "валидатор ловит узел вне объявленной дорожки",
+   "file": "tests/processes.test.js",
+   "line": 52
+  },
+  {
+   "name": "валидатор ловит недостижимый узел",
+   "file": "tests/processes.test.js",
+   "line": 58
+  },
+  {
+   "name": "валидатор ловит поток из завершающего события",
+   "file": "tests/processes.test.js",
+   "line": 64
+  },
+  {
+   "name": "валидатор ловит подпись, не умещающуюся в фигуру",
+   "file": "tests/processes.test.js",
+   "line": 71
+  },
+  {
+   "name": "Конвейер инициатив в модели",
+   "file": "tests/processes.test.js",
+   "line": 78
+  },
+  {
+   "name": "конвейер отмечен ровно один",
+   "file": "tests/processes.test.js",
+   "line": 81
+  },
+  {
+   "name": "этапы описаны подряд, с первого по шестой",
+   "file": "tests/processes.test.js",
+   "line": 85
+  },
+  {
+   "name": "на каждой точке принятия решения указаны роль и допустимые решения",
+   "file": "tests/processes.test.js",
+   "line": 91
+  },
+  {
+   "name": "разрыв в нумерации этапов не проходит проверку",
+   "file": "tests/processes.test.js",
+   "line": 100
+  },
+  {
+   "name": "срок этапа задан в известных единицах",
+   "file": "tests/processes.test.js",
+   "line": 108
+  },
+  {
+   "name": "Пользовательские пути",
+   "file": "tests/processes.test.js",
+   "line": 117
+  },
+  {
+   "name": "сценариев четыре и все наполнены",
+   "file": "tests/processes.test.js",
+   "line": 118
+  },
+  {
+   "name": "каждая схема отнесена к существующему сценарию",
+   "file": "tests/processes.test.js",
+   "line": 126
+  },
+  {
+   "name": "схемы сценария идут в альбоме подряд",
+   "file": "tests/processes.test.js",
+   "line": 133
+  },
+  {
+   "name": "у каждой роли сценария описано, что она делает",
+   "file": "tests/processes.test.js",
+   "line": 140
+  },
+  {
+   "name": "путь обсуждения идей покрывает роли модуля",
+   "file": "tests/processes.test.js",
+   "line": 150
+  },
+  {
+   "name": "быстрое ревью описано отдельной схемой с разбором",
+   "file": "tests/processes.test.js",
+   "line": 158
+  },
+  {
+   "name": "путь каталога разработчиков описан для всех трёх ролей каталога",
+   "file": "tests/processes.test.js",
+   "line": 170
+  },
+  {
+   "name": "совместная работа: изменение процессов, база знаний и опросы описаны схемами",
+   "file": "tests/processes.test.js",
+   "line": 179
+  },
+  {
+   "name": "Отбор схем",
+   "file": "tests/processes.test.js",
+   "line": 193
+  },
+  {
+   "name": "фильтр по роли включает сквозные схемы",
+   "file": "tests/processes.test.js",
+   "line": 194
+  },
+  {
+   "name": "перечень ролей покрывает все схемы",
+   "file": "tests/processes.test.js",
+   "line": 200
+  },
+  {
+   "name": "Альбом из репозитория",
+   "file": "tests/processes.test.js",
+   "line": 207
+  },
+  {
+   "name": "в репозиторий попали все схемы начального наполнения",
+   "file": "tests/processes.test.js",
+   "line": 218
+  },
+  {
+   "name": "порядок разделов в альбоме сохранён",
+   "file": "tests/processes.test.js",
+   "line": 222
+  },
+  {
+   "name": "действующие модели из репозитория проходят проверку",
+   "file": "tests/processes.test.js",
+   "line": 226
+  },
+  {
+   "name": "первая версия каждой схемы опубликована",
+   "file": "tests/processes.test.js",
+   "line": 232
+  },
+  {
+   "name": "Оглавление альбома",
+   "file": "tests/processes.test.js",
+   "line": 240
+  },
+  {
+   "name": "в оглавление попадают все схемы и ни одна страница не переполнена",
+   "file": "tests/processes.test.js",
+   "line": 241
+  },
+  {
+   "name": "Доступ к каталогу",
+   "file": "tests/providers.test.js",
+   "line": 34
+  },
+  {
+   "name": "по умолчанию каталог видит только центральный аппарат",
+   "file": "tests/providers.test.js",
+   "line": 35
+  },
+  {
+   "name": "выданная роль даёт права, повторная выдача заменяет прежнюю",
+   "file": "tests/providers.test.js",
+   "line": 43
+  },
+  {
+   "name": "поиск сотрудника не зависит от регистра кириллицы",
+   "file": "tests/providers.test.js",
+   "line": 57
+  },
+  {
+   "name": "чужую роль платформы через каталог не выдать",
+   "file": "tests/providers.test.js",
+   "line": 62
+  },
+  {
+   "name": "отзыв снимает все роли каталога",
+   "file": "tests/providers.test.js",
+   "line": 66
+  },
+  {
+   "name": "администратор каталога по роли не может отозвать доступ у себя",
+   "file": "tests/providers.test.js",
+   "line": 72
+  },
+  {
+   "name": "Карточка разработчика",
+   "file": "tests/providers.test.js",
+   "line": 80
+  },
+  {
+   "name": "ввод проверяется, ссылка без схемы дополняется, опасная — отклоняется",
+   "file": "tests/providers.test.js",
+   "line": 81
+  },
+  {
+   "name": "второй вендор с тем же ИНН не заводится, похожее название распознаётся",
+   "file": "tests/providers.test.js",
+   "line": 93
+  },
+  {
+   "name": "у внутренней команды нет ИНН и признака МСП",
+   "file": "tests/providers.test.js",
+   "line": 101
+  },
+  {
+   "name": "заполненность растёт с портфолио и каталогом",
+   "file": "tests/providers.test.js",
+   "line": 108
+  },
+  {
+   "name": "оценка одна от участника и уточняется",
+   "file": "tests/providers.test.js",
+   "line": 119
+  },
+  {
+   "name": "чужую запись журнала редактор не удалит",
+   "file": "tests/providers.test.js",
+   "line": 129
+  },
+  {
+   "name": "Фильтры, сортировка и каталог",
+   "file": "tests/providers.test.js",
+   "line": 137
+  },
+  {
+   "name": "фильтр по виду оставляет счётчики остальных видов",
+   "file": "tests/providers.test.js",
+   "line": 138
+  },
+  {
+   "name": "компетенции требуются все сразу",
+   "file": "tests/providers.test.js",
+   "line": 144
+  },
+  {
+   "name": "архив скрыт, пока его не выбрали",
+   "file": "tests/providers.test.js",
+   "line": 150
+  },
+  {
+   "name": "сортировка по названию и по числу проектов",
+   "file": "tests/providers.test.js",
+   "line": 157
+  },
+  {
+   "name": "сквозной каталог находит решение по компетенции",
+   "file": "tests/providers.test.js",
+   "line": 164
+  },
+  {
+   "name": "выгрузка обезвреживает формулы",
+   "file": "tests/providers.test.js",
+   "line": 170
+  },
+  {
+   "name": "Демонстрационный набор",
+   "file": "tests/providers.test.js",
+   "line": 178
+  },
+  {
+   "name": "по три разработчика каждого вида, повторный запуск ничего не добавляет, удаление не трогает ручные",
+   "file": "tests/providers.test.js",
+   "line": 179
+  },
+  {
+   "name": "Представитель разработчика",
+   "file": "tests/providers.test.js",
+   "line": 197
+  },
+  {
+   "name": "поставщик ведёт свою карточку, но не видит каталог",
+   "file": "tests/providers.test.js",
+   "line": 208
+  },
+  {
+   "name": "представителю не показываются оценки, журнал, статус и ориентир стоимости",
+   "file": "tests/providers.test.js",
+   "line": 217
+  },
+  {
+   "name": "правка профиля меняет только технологические поля и ставит карточку на проверку",
+   "file": "tests/providers.test.js",
+   "line": 225
+  },
+  {
+   "name": "модератор подтверждает сведения, представитель узнаёт об этом",
+   "file": "tests/providers.test.js",
+   "line": 239
+  },
+  {
+   "name": "отвязанный представитель теряет доступ",
+   "file": "tests/providers.test.js",
+   "line": 246
+  },
+  {
+   "name": "Оценки и полезность",
+   "file": "tests/review.test.js",
+   "line": 61
+  },
+  {
+   "name": "счётчики обновляются сразу после оценки",
+   "file": "tests/review.test.js",
+   "line": 62
+  },
+  {
+   "name": "избранное весит вдвое больше лайка",
+   "file": "tests/review.test.js",
+   "line": 72
+  },
+  {
+   "name": "пропуски не уменьшают полезность",
+   "file": "tests/review.test.js",
+   "line": 81
+  },
+  {
+   "name": "повторная оценка одного предложения невозможна",
+   "file": "tests/review.test.js",
+   "line": 90
+  },
+  {
+   "name": "причины пропуска ограничены закрытым списком",
+   "file": "tests/review.test.js",
+   "line": 97
+  },
+  {
+   "name": "Оценки не начисляют очки",
+   "file": "tests/review.test.js",
+   "line": 106
+  },
+  {
+   "name": "лайки не создают записей в журнале начислений",
+   "file": "tests/review.test.js",
+   "line": 107
+  },
+  {
+   "name": "очки идут только за подтверждение вклада",
+   "file": "tests/review.test.js",
+   "line": 115
+  },
+  {
+   "name": "Антифрод",
+   "file": "tests/review.test.js",
+   "line": 128
+  },
+  {
+   "name": "серия слишком быстрых оценок поднимает сигнал",
+   "file": "tests/review.test.js",
+   "line": 133
+  },
+  {
+   "name": "вдумчивые оценки сигнал не поднимают",
+   "file": "tests/review.test.js",
+   "line": 147
+  },
+  {
+   "name": "оценки нескольких учётных записей с одного устройства",
+   "file": "tests/review.test.js",
+   "line": 159
+  },
+  {
+   "name": "повторный сигнал не создаёт вторую запись",
+   "file": "tests/review.test.js",
+   "line": 169
+  },
+  {
+   "name": "частота оценок ограничена настройкой",
+   "file": "tests/review.test.js",
+   "line": 178
+  },
+  {
+   "name": "Топ предложений",
+   "file": "tests/review.test.js",
+   "line": 195
+  },
+  {
+   "name": "порог попадания в топ задаётся настройкой",
+   "file": "tests/review.test.js",
+   "line": 196
+  },
+  {
+   "name": "порядок топа определяется полезностью",
+   "file": "tests/review.test.js",
+   "line": 207
+  },
+  {
+   "name": "Очередь ревью",
+   "file": "tests/review.test.js",
+   "line": 220
+  },
+  {
+   "name": "предложения к неопубликованной идее в ревью не участвуют",
+   "file": "tests/review.test.js",
+   "line": 221
+  },
+  {
+   "name": "очередь исключает свои и уже оценённые предложения",
+   "file": "tests/review.test.js",
+   "line": 228
+  },
+  {
+   "name": "Переезд прав в данные",
+   "file": "tests/roles.test.js",
+   "line": 53
+  },
+  {
+   "name": "каждая роль сохранила все прежние права",
+   "file": "tests/roles.test.js",
+   "line": 54
+  },
+  {
+   "name": "роль не получила прав чужой роли",
+   "file": "tests/roles.test.js",
+   "line": 63
+  },
+  {
+   "name": "справочник ролей отдаётся в прежней форме",
+   "file": "tests/roles.test.js",
+   "line": 74
+  },
+  {
+   "name": "без пользователя прав нет",
+   "file": "tests/roles.test.js",
+   "line": 82
+  },
+  {
+   "name": "Несколько ролей у участника",
+   "file": "tests/roles.test.js",
+   "line": 88
+  },
+  {
+   "name": "права ролей объединяются",
+   "file": "tests/roles.test.js",
+   "line": 89
+  },
+  {
+   "name": "снятие роли забирает её права",
+   "file": "tests/roles.test.js",
+   "line": 100
+  },
+  {
+   "name": "назначение роли дважды не создаёт дубля",
+   "file": "tests/roles.test.js",
+   "line": 108
+  },
+  {
+   "name": "Правка прав администратором",
+   "file": "tests/roles.test.js",
+   "line": 116
+  },
+  {
+   "name": "выданное право начинает действовать без перезапуска",
+   "file": "tests/roles.test.js",
+   "line": 117
+  },
+  {
+   "name": "новая роль заводится без правки кода",
+   "file": "tests/roles.test.js",
+   "line": 126
+  },
+  {
+   "name": "Права на работу с процессами",
+   "file": "tests/roles.test.js",
+   "line": 135
+  },
+  {
+   "name": "краудсорсинг открыт рядовому сотруднику",
+   "file": "tests/roles.test.js",
+   "line": 136
+  },
+  {
+   "name": "публикация версии доступна только центральному аппарату",
+   "file": "tests/roles.test.js",
+   "line": 143
+  },
+  {
+   "name": "согласование доступно ролям, отвечающим за дорожки",
+   "file": "tests/roles.test.js",
+   "line": 150
+  },
+  {
+   "name": "Приведение слова к основе",
+   "file": "tests/search.test.js",
+   "line": 31
+  },
+  {
+   "name": "все формы одного слова дают одну основу",
+   "file": "tests/search.test.js",
+   "line": 32
+  },
+  {
+   "name": "разные слова не сливаются в одну основу",
+   "file": "tests/search.test.js",
+   "line": 47
+  },
+  {
+   "name": "регистр и «ё» не влияют на основу",
+   "file": "tests/search.test.js",
+   "line": 54
+  },
+  {
+   "name": "Поиск по базе знаний",
+   "file": "tests/search.test.js",
+   "line": 60
+  },
+  {
+   "name": "документ находится по другой форме слова",
+   "file": "tests/search.test.js",
+   "line": 71
+  },
+  {
+   "name": "в выдаче есть фрагмент с найденным словом",
+   "file": "tests/search.test.js",
+   "line": 79
+  },
+  {
+   "name": "пустой и бессмысленный запрос не ломает поиск",
+   "file": "tests/search.test.js",
+   "line": 85
+  },
+  {
+   "name": "кавычки в запросе не ломают разбор",
+   "file": "tests/search.test.js",
+   "line": 91
+  },
+  {
+   "name": "фильтр по виду сущности сужает выдачу",
+   "file": "tests/search.test.js",
+   "line": 95
+  },
+  {
+   "name": "Поддержание индекса",
+   "file": "tests/search.test.js",
+   "line": 101
+  },
+  {
+   "name": "черновик в поиск не попадает, опубликованный попадает",
+   "file": "tests/search.test.js",
+   "line": 102
+  },
+  {
+   "name": "заменённое решение уходит из выдачи, а заменившее остаётся",
+   "file": "tests/search.test.js",
+   "line": 115
+  },
+  {
+   "name": "полная пересборка индекса возвращает то же, что событийная",
+   "file": "tests/search.test.js",
+   "line": 135
+  },
+  {
+   "name": "Подсказка «это уже разбирали»",
+   "file": "tests/search.test.js",
+   "line": 143
+  },
+  {
+   "name": "по тексту идеи находится готовое решение",
+   "file": "tests/search.test.js",
+   "line": 144
+  },
+  {
+   "name": "сам предмет из подсказок исключается",
+   "file": "tests/search.test.js",
+   "line": 152
+  },
+  {
+   "name": "Опросник ИИ-решений ДЗМ",
+   "file": "tests/seed-forms.test.js",
+   "line": 41
+  },
+  {
+   "name": "форма опубликована и доступна по ссылке без входа",
+   "file": "tests/seed-forms.test.js",
+   "line": 42
+  },
+  {
+   "name": "пять блоков требований стали разделами формы",
+   "file": "tests/seed-forms.test.js",
+   "line": 50
+  },
+  {
+   "name": "каждое из пяти решений ДЗМ оценивается по шкале от 1 до 5",
+   "file": "tests/seed-forms.test.js",
+   "line": 62
+  },
+  {
+   "name": "вопросы требований на месте — 24 плюс условное описание ограничений",
+   "file": "tests/seed-forms.test.js",
+   "line": 75
+  },
+  {
+   "name": "уточнения об эффектах показываются только при оценке 3 и выше",
+   "file": "tests/seed-forms.test.js",
+   "line": 86
+  },
+  {
+   "name": "описание ограничений безопасности открывается только строгим ответом",
+   "file": "tests/seed-forms.test.js",
+   "line": 99
+  },
+  {
+   "name": "короткая анкета проходит целиком: обязательны только показанные вопросы",
+   "file": "tests/seed-forms.test.js",
+   "line": 105
+  },
+  {
+   "name": "демонстрационные ответы собраны и сводка их считает",
+   "file": "tests/seed-forms.test.js",
+   "line": 129
+  },
+  {
+   "name": "выгрузка содержит все вопросы анкеты",
+   "file": "tests/seed-forms.test.js",
+   "line": 144
+  },
+  {
+   "name": "повторный запуск форму не задваивает",
+   "file": "tests/seed-forms.test.js",
+   "line": 151
+  },
+  {
+   "name": "Целостность сборки",
+   "file": "tests/smoke.test.js",
+   "line": 19
+  },
+  {
+   "name": "каждый серверный модуль загружается",
+   "file": "tests/smoke.test.js",
+   "line": 20
+  },
+  {
+   "name": "каждый общий модуль загружается",
+   "file": "tests/smoke.test.js",
+   "line": 34
+  },
+  {
+   "name": "каждый клиентский модуль разбирается",
+   "file": "tests/smoke.test.js",
+   "line": 44
+  },
+  {
+   "name": "каждая таблица учтена в очистке сида",
+   "file": "tests/smoke.test.js",
+   "line": 59
+  },
+  {
+   "name": "прежнее название сущности не вернулось в исходники",
+   "file": "tests/smoke.test.js",
+   "line": 77
+  },
+  {
+   "name": "маршруты API зарегистрированы и не дублируются",
+   "file": "tests/smoke.test.js",
+   "line": 97
+  },
+  {
+   "name": "Обучающие сценарии",
+   "file": "tests/tours.test.js",
+   "line": 60
+  },
+  {
+   "name": "сценарии разобраны и шаги у каждого есть",
+   "file": "tests/tours.test.js",
+   "line": 61
+  },
+  {
+   "name": "каждый маршрут шага существует в таблице маршрутов",
+   "file": "tests/tours.test.js",
+   "line": 69
+  },
+  {
+   "name": "каждый селектор шага встречается в разметке разделов",
+   "file": "tests/tours.test.js",
+   "line": 80
+  },
+  {
+   "name": "у сценария изменений процессов описан весь путь предложения",
+   "file": "tests/tours.test.js",
+   "line": 106
+  },
+  {
+   "name": "тур проходит и по доске, и по карточке предложения",
+   "file": "tests/tours.test.js",
+   "line": 124
+  },
+  {
+   "name": "сценарий предложен только тем, кто может предлагать изменения",
+   "file": "tests/tours.test.js",
+   "line": 130
+  }
+ ],
+ "gaps": [
+  {
+   "kind": "stub",
+   "text": "В разработке",
+   "file": "server/api/initiatives.js",
+   "line": 37
+  },
+  {
+   "kind": "stub",
+   "text": "в разработке",
+   "file": "server/auth.js",
+   "line": 177
+  },
+  {
+   "kind": "stub",
+   "text": "В разработке",
+   "file": "web/js/views/dashboard.js",
+   "line": 200
+  }
+ ],
+ "docs": [
+  {
+   "file": "Экосистема «Social1»- Техническое задание на создание управленческой платформы для системных инноваций в ДТСЗН.pdf",
+   "size": 222559,
+   "score": 2
+  },
+  {
+   "file": "README.md",
+   "size": 52041,
+   "score": 0
+  },
+  {
+   "file": "presentation/README.md",
+   "size": 2461,
+   "score": 0
+  },
+  {
+   "file": "presentation-product/README.md",
+   "size": 1952,
+   "score": 0
+  }
+ ],
+ "anchors": {
+  "dataAc": 0,
+  "dataTour": 53,
+  "dataTestid": 0
+ },
+ "package": {
+  "name": "social1",
+  "version": "1.0.0",
+  "scripts": {
+   "start": "node --no-warnings server/index.js",
+   "seed": "node --no-warnings server/seed.js",
+   "reset": "node --no-warnings server/seed.js --reset",
+   "seed:providers": "node --no-warnings server/seed-providers.js",
+   "seed:providers:remove": "node --no-warnings server/seed-providers.js --remove",
+   "screens": "node --no-warnings scripts/presentation-screens.mjs",
+   "test": "node --no-warnings --test \"tests/**/*.test.js\""
+  }
+ },
+ "modulesSuggested": [
+  {
+   "id": "providers",
+   "titles": [
+    "Каталог разработчиков ИИ-решений",
+    "Моя компания в каталоге"
+   ],
+   "routes": [
+    "/providers"
+   ],
+   "api": [
+    "GET /api/providers",
+    "GET /api/providers/export.csv",
+    "GET /api/providers/dictionaries",
+    "POST /api/providers/duplicates",
+    "GET /api/providers/solutions",
+    "POST /api/providers",
+    "GET /api/providers/guide/:file",
+    "GET /api/providers/mine",
+    "GET /api/providers/members/candidates",
+    "GET /api/providers/access",
+    "GET /api/providers/access/candidates",
+    "POST /api/providers/access",
+    "DELETE /api/providers/access/:userId",
+    "GET /api/providers/:id",
+    "PUT /api/providers/:id",
+    "POST /api/providers/:id/confirm",
+    "GET /api/providers/:id/members",
+    "POST /api/providers/:id/members",
+    "DELETE /api/providers/:id/members/:userId",
+    "POST /api/providers/:id/status",
+    "DELETE /api/providers/:id",
+    "POST /api/providers/:id/cases",
+    "PUT /api/providers/:id/cases/:caseId",
+    "DELETE /api/providers/:id/cases/:caseId",
+    "POST /api/providers/:id/solutions",
+    "PUT /api/providers/:id/solutions/:solutionId",
+    "DELETE /api/providers/:id/solutions/:solutionId",
+    "PUT /api/providers/:id/review",
+    "DELETE /api/providers/:id/review",
+    "POST /api/providers/:id/notes",
+    "DELETE /api/providers/:id/notes/:noteId",
+    "GET /api/providers/${id}",
+    "GET /api/providers/solutions?${params}",
+    "GET /api/providers/access/candidates?q=${encodeURIComponent(text)}",
+    "POST /api/providers/${p.id}/status",
+    "POST /api/providers/${p.id}/confirm",
+    "GET /api/providers/members/candidates?q=${encodeURIComponent(text)}",
+    "POST /api/providers/${p.id}/members",
+    "PUT /api/providers/${p.id}/cases/${c.id}",
+    "POST /api/providers/${p.id}/cases",
+    "PUT /api/providers/${p.id}/solutions/${s.id}",
+    "POST /api/providers/${p.id}/solutions",
+    "PUT /api/providers/${p.id}/review",
+    "POST /api/providers/${p.id}/notes",
+    "PUT /api/providers/${p.id}"
+   ]
+  },
+  {
+   "id": "admin",
+   "titles": [
+    "Настройки платформы"
+   ],
+   "routes": [
+    "/admin"
+   ],
+   "api": [
+    "GET /api/admin/presentation.pdf",
+    "GET /api/admin/workflow",
+    "PATCH /api/admin/workflow/:stage",
+    "GET /api/admin/roles",
+    "POST /api/admin/roles",
+    "PATCH /api/admin/roles/:code",
+    "PUT /api/admin/roles/:code/permissions",
+    "GET /api/admin/users/:id/roles",
+    "POST /api/admin/users/:id/roles",
+    "DELETE /api/admin/users/:id/roles/:code",
+    "GET /api/admin/users",
+    "POST /api/admin/users",
+    "PATCH /api/admin/users/:id",
+    "POST /api/admin/institutions",
+    "GET /api/admin/audit",
+    "GET /api/admin/audit/verify",
+    "GET /api/admin/sla",
+    "POST /api/admin/sla/sweep",
+    "GET /api/admin/system",
+    "GET /api/admin/ideahub",
+    "PATCH /api/admin/ideahub/rules/:code",
+    "PATCH /api/admin/ideahub/settings",
+    "PATCH /api/admin/ideahub/incentive-types/:code",
+    "POST /api/admin/ideahub/refresh-badges",
+    "PUT /api/admin/roles/${role.code}/permissions",
+    "PATCH /api/admin/ideahub/incentive-types/${cb.dataset.type}",
+    "PATCH /api/admin/ideahub/rules/${rule.code}",
+    "PATCH /api/admin/workflow/${s.stage_no}",
+    "GET /api/admin/audit?limit=150",
+    "GET /api/admin/users/${user.id}/roles",
+    "POST /api/admin/users/${user.id}/roles"
+   ]
+  },
+  {
+   "id": "ideas",
+   "titles": [
+    "Идеи и решения"
+   ],
+   "routes": [
+    "/ideas"
+   ],
+   "api": [
+    "GET /api/ideas/templates",
+    "GET /api/ideas/categories",
+    "POST /api/ideas/similar",
+    "GET /api/ideas/draft",
+    "PUT /api/ideas/draft",
+    "DELETE /api/ideas/draft",
+    "GET /api/ideas/moderation",
+    "GET /api/ideas",
+    "POST /api/ideas",
+    "GET /api/ideas/:id",
+    "PATCH /api/ideas/:id",
+    "POST /api/ideas/:id/moderate",
+    "POST /api/ideas/:id/reactions",
+    "POST /api/ideas/:id/comments",
+    "POST /api/ideas/:id/report",
+    "POST /api/ideas/:id/proposals",
+    "POST /api/ideas/:id/promote",
+    "GET /api/ideas/contribution/:userId",
+    "POST /api/ideas/${id}/reactions",
+    "GET /api/ideas/${id}",
+    "POST /api/ideas/${id}/comments",
+    "POST /api/ideas/${idea.id}/proposals",
+    "POST /api/ideas/${idea.id}/moderate",
+    "POST /api/ideas/${idea.id}/promote",
+    "PATCH /api/ideas/${idea.id}",
+    "POST /api/ideas/${ideaId}/moderate",
+    "GET /api/ideas/contribution/${userId}"
+   ]
+  },
+  {
+   "id": "forms",
+   "titles": [
+    "Формы и опросы"
+   ],
+   "routes": [
+    "/forms"
+   ],
+   "api": [
+    "GET /api/forms/meta",
+    "GET /api/forms",
+    "POST /api/forms",
+    "GET /api/forms/:id",
+    "PATCH /api/forms/:id",
+    "PUT /api/forms/:id/questions",
+    "POST /api/forms/:id/publish",
+    "POST /api/forms/:id/status",
+    "POST /api/forms/:id/duplicate",
+    "DELETE /api/forms/:id",
+    "POST /api/forms/:id/responses",
+    "PUT /api/forms/:id/draft",
+    "GET /api/forms/:id/results",
+    "GET /api/forms/:id/responses",
+    "GET /api/forms/:id/export",
+    "GET /api/forms/${id}",
+    "PUT /api/forms/${form.id}/draft",
+    "POST /api/forms/${form.id}/responses",
+    "GET /api/forms/${id}/results",
+    "GET /api/forms/${formId}/responses",
+    "PUT /api/forms/${form.id}/questions",
+    "PATCH /api/forms/${form.id}",
+    "POST /api/forms/${form.id}/publish",
+    "POST /api/forms/${form.id}/status",
+    "POST /api/forms/${form.id}/duplicate"
+   ]
+  },
+  {
+   "id": "knowledge",
+   "titles": [
+    "База знаний"
+   ],
+   "routes": [
+    "/knowledge"
+   ],
+   "api": [
+    "GET /api/knowledge",
+    "GET /api/knowledge/template/:kind",
+    "POST /api/knowledge",
+    "GET /api/knowledge/:id",
+    "PUT /api/knowledge/:id",
+    "POST /api/knowledge/:id/review",
+    "POST /api/knowledge/:id/verdict",
+    "POST /api/knowledge/:id/publish",
+    "POST /api/knowledge/:id/revise",
+    "POST /api/knowledge/:id/decision",
+    "GET /api/knowledge/:id/versions/:versionId",
+    "POST /api/knowledge/:id/comments",
+    "GET /api/knowledge/:id/comments",
+    "GET /api/knowledge/${id}",
+    "PUT /api/knowledge/${doc.id}",
+    "POST /api/knowledge/${doc.id}/comments",
+    "POST /api/knowledge/${doc.id}/review",
+    "POST /api/knowledge/${doc.id}/publish",
+    "POST /api/knowledge/${doc.id}/revise",
+    "POST /api/knowledge/${doc.id}/decision",
+    "POST /api/knowledge/${doc.id}/verdict"
+   ]
+  },
+  {
+   "id": "process-changes",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/process-changes",
+    "POST /api/process-changes",
+    "GET /api/process-changes/:id",
+    "PUT /api/process-changes/:id/model",
+    "POST /api/process-changes/:id/submit",
+    "POST /api/process-changes/:id/withdraw",
+    "POST /api/process-changes/:id/vote",
+    "DELETE /api/process-changes/:id/vote",
+    "GET /api/process-changes/:id/route",
+    "POST /api/process-changes/:id/to-approval",
+    "POST /api/process-changes/:id/approve",
+    "POST /api/process-changes/:id/publish",
+    "GET /api/process-changes/${id}",
+    "POST /api/process-changes/${c.id}/submit",
+    "GET /api/process-changes/${c.id}/route",
+    "POST /api/process-changes/${c.id}/to-approval",
+    "POST /api/process-changes/${c.id}/publish",
+    "POST /api/process-changes/${c.id}/withdraw",
+    "POST /api/process-changes/${c.id}/vote",
+    "POST /api/process-changes/${c.id}/approve",
+    "PUT /api/process-changes/${c.id}/model"
+   ]
+  },
+  {
+   "id": "initiatives",
+   "titles": [
+    "Инициативы",
+    "Реестр инициатив"
+   ],
+   "routes": [
+    "/initiatives"
+   ],
+   "api": [
+    "GET /api/initiatives",
+    "POST /api/initiatives",
+    "GET /api/initiatives/:id",
+    "PATCH /api/initiatives/:id",
+    "POST /api/initiatives/:id/gate",
+    "POST /api/initiatives/:id/resume",
+    "POST /api/initiatives/:id/comments",
+    "POST /api/initiatives/:id/vote",
+    "POST /api/initiatives/:id/follow",
+    "GET /api/initiatives/:id/prediction",
+    "POST /api/initiatives/${id}/vote",
+    "GET /api/initiatives/${id}",
+    "POST /api/initiatives/${id}/follow",
+    "POST /api/initiatives/${id}/comments",
+    "GET /api/initiatives/${id}/prediction",
+    "POST /api/initiatives/${it.id}/gate",
+    "POST /api/initiatives/${it.id}/resume"
+   ]
+  },
+  {
+   "id": "processes",
+   "titles": [
+    "Схемы процессов"
+   ],
+   "routes": [
+    "/processes"
+   ],
+   "api": [
+    "GET /api/processes/:key/comments",
+    "POST /api/processes/:key/comments",
+    "GET /api/processes",
+    "GET /api/processes/index",
+    "GET /api/processes/album/pdf",
+    "GET /api/processes/:id",
+    "GET /api/processes/:id/pdf",
+    "GET /api/processes/:id/versions",
+    "POST /api/processes/:id/draft",
+    "GET /api/processes/pipeline/usage",
+    "POST /api/processes/${c.def_key}/comments",
+    "GET /api/processes/${diagram.id}/comments",
+    "POST /api/processes/${diagram.id}/comments"
+   ]
+  },
+  {
+   "id": "review",
+   "titles": [
+    "Ревью предложений"
+   ],
+   "routes": [
+    "/review"
+   ],
+   "api": [
+    "GET /api/review/filters",
+    "GET /api/review/queue",
+    "GET /api/review/top",
+    "GET /api/review/flags",
+    "POST /api/review/flags/:id/resolve",
+    "POST /api/review/:id",
+    "DELETE /api/review/:id",
+    "POST /api/review/flags/${b.dataset.flag}/resolve",
+    "GET /api/review/queue?${params}",
+    "POST /api/review/${current.id}"
+   ]
+  },
+  {
+   "id": "projects",
+   "titles": [
+    "Разработка прототипов",
+    "Разработка"
+   ],
+   "routes": [
+    "/projects"
+   ],
+   "api": [
+    "GET /api/projects",
+    "POST /api/projects",
+    "GET /api/projects/:id",
+    "POST /api/projects/:id/sprints",
+    "POST /api/projects/:id/items",
+    "POST /api/projects/:id/documents",
+    "GET /api/projects/${id}",
+    "POST /api/projects/${project.id}/items"
+   ]
+  },
+  {
+   "id": "proposals",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/proposals/:id/report",
+    "PATCH /api/proposals/:id",
+    "POST /api/proposals/:id/useful",
+    "POST /api/proposals/:id/endorse",
+    "POST /api/proposals/:id/decide",
+    "POST /api/proposals/${b.dataset.endorse}/endorse",
+    "POST /api/proposals/${b.dataset.useful}/useful",
+    "POST /api/proposals/${proposalId}/decide",
+    "POST /api/proposals/${b.dataset.decide}/decide"
+   ]
+  },
+  {
+   "id": "pilots",
+   "titles": [
+    "Пилотирование"
+   ],
+   "routes": [
+    "/pilots"
+   ],
+   "api": [
+    "GET /api/pilots",
+    "GET /api/pilots/:id",
+    "PATCH /api/pilots/:id",
+    "POST /api/pilots/:id/kpis",
+    "GET /api/pilots/${id}",
+    "POST /api/pilots/${pilotId}/kpis"
+   ]
+  },
+  {
+   "id": "forum",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/forum/topics",
+    "POST /api/forum/topics",
+    "GET /api/forum/topics/:id",
+    "POST /api/forum/topics/:id/posts",
+    "GET /api/forum/topics${cat ? ",
+    "GET /api/forum/topics/${id}",
+    "POST /api/forum/topics/${id}/posts"
+   ]
+  },
+  {
+   "id": "incentives",
+   "titles": [
+    "Рекомендации к поощрению",
+    "Поощрения"
+   ],
+   "routes": [
+    "/incentives"
+   ],
+   "api": [
+    "GET /api/incentives",
+    "POST /api/incentives",
+    "POST /api/incentives/build",
+    "PATCH /api/incentives/:id",
+    "PATCH /api/incentives/${id}"
+   ]
+  },
+  {
+   "id": "analytics",
+   "titles": [
+    "Аналитика и КПЭ"
+   ],
+   "routes": [
+    "/analytics"
+   ],
+   "api": [
+    "GET /api/analytics/overview",
+    "GET /api/analytics/institutions",
+    "GET /api/analytics/contributors",
+    "GET /api/analytics/export",
+    "GET /api/analytics/overview?scope=${scope}"
+   ]
+  },
+  {
+   "id": "surveys",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/surveys",
+    "GET /api/surveys/:id",
+    "POST /api/surveys/:id/respond",
+    "GET /api/surveys",
+    "GET /api/surveys/${id}",
+    "POST /api/surveys/${id}/respond"
+   ]
+  },
+  {
+   "id": "auth",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/auth/login",
+    "POST /api/auth/logout",
+    "GET /api/auth/me",
+    "GET /api/auth/roles",
+    "GET /api/auth/demo-accounts"
+   ]
+  },
+  {
+   "id": "process-versions",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/process-versions/:id",
+    "PUT /api/process-versions/:id",
+    "DELETE /api/process-versions/:id",
+    "GET /api/process-versions/:id/validate",
+    "POST /api/process-versions/:id/publish"
+   ]
+  },
+  {
+   "id": "points",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/points/ledger",
+    "POST /api/points/:id/revoke",
+    "POST /api/points/grant",
+    "GET /api/points/ledger?limit=200",
+    "POST /api/points/${b.dataset.revoke}/revoke"
+   ]
+  },
+  {
+   "id": "public",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/public/forms/:slug",
+    "POST /api/public/forms/:slug/responses",
+    "GET /api/public/forms/${encodeURIComponent(slug)}",
+    "POST /api/public/forms/${encodeURIComponent(slug)}/responses"
+   ]
+  },
+  {
+   "id": "pilot-applications",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/pilot-applications",
+    "GET /api/pilot-applications",
+    "POST /api/pilot-applications/:id/approve",
+    "POST /api/pilot-applications/${b.dataset.approve}/approve"
+   ]
+  },
+  {
+   "id": "tasks",
+   "titles": [
+    "Мои задачи"
+   ],
+   "routes": [
+    "/tasks"
+   ],
+   "api": [
+    "GET /api/tasks",
+    "POST /api/tasks/:id/done"
+   ]
+  },
+  {
+   "id": "rating",
+   "titles": [
+    "Рейтинг социальных советников"
+   ],
+   "routes": [
+    "/rating"
+   ],
+   "api": [
+    "GET /api/rating",
+    "GET /api/rating/export"
+   ]
+  },
+  {
+   "id": "users",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/users/:id",
+    "GET /api/users",
+    "GET /api/users/${id}"
+   ]
+  },
+  {
+   "id": "rollouts",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/rollouts",
+    "POST /api/rollouts",
+    "PATCH /api/rollouts/:id"
+   ]
+  },
+  {
+   "id": "search",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/search",
+    "POST /api/search/similar",
+    "POST /api/search/reindex"
+   ]
+  },
+  {
+   "id": "process-comments",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/process-comments/:id/useful",
+    "POST /api/process-comments/:id/resolve",
+    "POST /api/process-comments/${b.dataset.useful}/useful"
+   ]
+  },
+  {
+   "id": "board-items",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "PATCH /api/board-items/:id",
+    "DELETE /api/board-items/:id",
+    "PATCH /api/board-items/${itemId}"
+   ]
+  },
+  {
+   "id": "best-practices",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/best-practices",
+    "POST /api/best-practices"
+   ]
+  },
+  {
+   "id": "reports",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/reports/:id/resolve",
+    "POST /api/reports/${b.dataset.resolve}/resolve"
+   ]
+  },
+  {
+   "id": "ai",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/ai/classify",
+    "POST /api/ai/similar"
+   ]
+  },
+  {
+   "id": "notifications",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/notifications",
+    "POST /api/notifications/read"
+   ]
+  },
+  {
+   "id": "web",
+   "titles": [
+    "Social1 — платформа системных инноваций ДТСЗН"
+   ],
+   "routes": [
+    "/web"
+   ],
+   "api": []
+  },
+  {
+   "id": "home",
+   "titles": [
+    "Рабочий стол",
+    "На рабочий стол"
+   ],
+   "routes": [
+    "/"
+   ],
+   "api": []
+  },
+  {
+   "id": "moderation",
+   "titles": [
+    "Модерация идей"
+   ],
+   "routes": [
+    "/moderation"
+   ],
+   "api": []
+  },
+  {
+   "id": "process",
+   "titles": [
+    "Процесс Stage-Gate"
+   ],
+   "routes": [
+    "/process"
+   ],
+   "api": []
+  },
+  {
+   "id": "changes",
+   "titles": [
+    "Изменения процессов"
+   ],
+   "routes": [
+    "/changes"
+   ],
+   "api": []
+  },
+  {
+   "id": "sla",
+   "titles": [
+    "Контроль SLA"
+   ],
+   "routes": [
+    "/sla"
+   ],
+   "api": []
+  },
+  {
+   "id": "community",
+   "titles": [
+    "Сообщество"
+   ],
+   "routes": [
+    "/community"
+   ],
+   "api": []
+  },
+  {
+   "id": "practices",
+   "titles": [
+    "Лучшие практики"
+   ],
+   "routes": [
+    "/practices"
+   ],
+   "api": []
+  },
+  {
+   "id": "institutions",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/institutions"
+   ]
+  },
+  {
+   "id": "awards",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "POST /api/awards"
+   ]
+  },
+  {
+   "id": "workflow",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/workflow/stages"
+   ]
+  },
+  {
+   "id": "categories",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/categories"
+   ]
+  },
+  {
+   "id": "pilot-kpis",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "PATCH /api/pilot-kpis/:id"
+   ]
+  },
+  {
+   "id": "incentive-types",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/incentive-types"
+   ]
+  },
+  {
+   "id": "process-changes?${params}",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/process-changes?${params}"
+   ]
+  },
+  {
+   "id": "process-changes?limit=1",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/process-changes?limit=1"
+   ]
+  },
+  {
+   "id": "tasks?status=open",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/tasks?status=open"
+   ]
+  },
+  {
+   "id": "initiatives?mine=1&limit=5",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/initiatives?mine=1&limit=5"
+   ]
+  },
+  {
+   "id": "initiatives?limit=6&sort=new",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/initiatives?limit=6&sort=new"
+   ]
+  },
+  {
+   "id": "forms?${params}",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/forms?${params}"
+   ]
+  },
+  {
+   "id": "ideas?${params}",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/ideas?${params}"
+   ]
+  },
+  {
+   "id": "initiatives?${params}",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/initiatives?${params}"
+   ]
+  },
+  {
+   "id": "knowledge?${params}",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/knowledge?${params}"
+   ]
+  },
+  {
+   "id": "search?q=${encodeURIComponent(text)}",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/search?q=${encodeURIComponent(text)}"
+   ]
+  },
+  {
+   "id": "knowledge?limit=1",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/knowledge?limit=1"
+   ]
+  },
+  {
+   "id": "initiatives?stage=4&limit=50",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/initiatives?stage=4&limit=50"
+   ]
+  },
+  {
+   "id": "providers?${params}",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/providers?${params}"
+   ]
+  },
+  {
+   "id": "rating?period=${period}${scope ? ",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/rating?period=${period}${scope ? "
+   ]
+  },
+  {
+   "id": "incentives${status ? ",
+   "titles": [],
+   "routes": [],
+   "api": [
+    "GET /api/incentives${status ? "
+   ]
+  }
+ ],
+ "summary": {
+  "files": 119,
+  "routes": 22,
+  "api": 327,
+  "actions": 0,
+  "models": 9,
+  "roles": 8,
+  "forms": 5,
+  "validation": 0,
+  "tests": 343,
+  "gaps": 3,
+  "docs": 1
+ }
+}

@@ -41,10 +41,10 @@ export async function changesBoard(view, query) {
              показать прямо на схеме и провести через согласование. Принятое изменение меняет работу платформы.</p>
         </div>
         ${can('process.propose') ? html`
-          <a class="btn btn--primary" href="/processes">Предложить изменение</a>` : ''}
+          <a data-ac="US-CHG-002/AC1" class="btn btn--primary" href="/processes">Предложить изменение</a>` : ''}
       </div>
       <div class="chip-row" style="margin-top:14px">
-        <button class="chip ${!status && !mine ? 'is-on' : ''}" data-go="${esc(link({ status: '', mine: '' }))}">Все</button>
+        <button data-ac="US-CHG-002/AC6" class="chip ${!status && !mine ? 'is-on' : ''}" data-go="${esc(link({ status: '', mine: '' }))}">Все</button>
         ${Object.entries(statuses).map(([code, s]) => html`
           <button class="chip ${status === code ? 'is-on' : ''}" data-go="${esc(link({ status: code }))}">${esc(s.title)}</button>`)}
         <button class="chip ${mine ? 'is-on' : ''}" data-go="${esc(link({ mine: mine ? '' : '1' }))}">Мои предложения</button>
@@ -122,7 +122,7 @@ export async function changeDetail(view, id) {
 
     <div class="chg-layout">
       <div class="stack">
-        <div class="card">
+        <div data-ac="US-CHG-002/AC3" class="card">
           <div class="card__head">
             <h3>Что меняется</h3>
             <span class="card__hint spacer">относительно действующей версии ${d.base_version}</span>
@@ -139,7 +139,7 @@ export async function changeDetail(view, id) {
           </div>
         </div>
 
-        <div class="card">
+        <div data-ac="US-CHG-002/AC2" class="card">
           <div class="card__head">
             <h3>Предлагаемая схема</h3>
             <span class="card__hint spacer">зелёное — добавлено, янтарное — изменено</span>
@@ -188,7 +188,7 @@ export async function changeDetail(view, id) {
       </div>
 
       <aside class="stack">
-        <div class="card">
+        <div data-ac="US-CHG-002/AC5" class="card">
           <div class="card__head"><h3>Поддержка коллег</h3></div>
           <div class="card__body">
             <div class="chg-votes">
@@ -202,7 +202,7 @@ export async function changeDetail(view, id) {
           </div>
         </div>
 
-        <div class="card">
+        <div data-ac="US-CHG-003/AC1 US-CHG-003/AC2 US-CHG-003/AC4" class="card">
           <div class="card__head"><h3>Лист согласования</h3></div>
           <div class="card__body">
             ${d.approvals.length ? html`
@@ -389,7 +389,7 @@ export async function changeEditor(view, id) {
         <a class="btn" href="/changes/${c.id}">К предложению</a>
       </div>
     </div>
-    <div id="editor-host"></div>`;
+    <div data-ac="US-CHG-002/AC2" id="editor-host"></div>`;
 
   const { mountEditor } = await import('./process-editor.js');
   mountEditor(view.querySelector('#editor-host'), {

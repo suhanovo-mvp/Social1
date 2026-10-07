@@ -104,9 +104,9 @@ export async function initiativesList(view, query) {
     </div>
 
     <div class="filters">
-      <input class="input" type="search" id="f-q" placeholder="Поиск по названию, номеру, описанию…"
+      <input data-ac="US-INI-003/AC2" class="input" type="search" id="f-q" placeholder="Поиск по названию, номеру, описанию…"
              value="${esc(query.get('q') || '')}" style="min-width:250px;flex:1;max-width:400px">
-      <select class="select" id="f-stage">
+      <select data-ac="US-INI-003/AC1" class="select" id="f-stage">
         <option value="">Все этапы</option>
         ${state.stages.map((s) => `<option value="${s.stage_no}" ${query.get('stage') == s.stage_no ? 'selected' : ''}>
           Этап ${s.tz_stage}. ${esc(s.stage_name)}</option>`)}
@@ -116,7 +116,7 @@ export async function initiativesList(view, query) {
         ${categories.map((c) => `<option value="${esc(c.name)}" ${query.get('category') === c.name ? 'selected' : ''}>
           ${esc(c.name)} (${c.count})</option>`)}
       </select>
-      <select class="select" id="f-sort">
+      <select data-ac="US-INI-003/AC4" class="select" id="f-sort">
         <option value="new" ${query.get('sort') === 'new' ? 'selected' : ''}>Сначала новые</option>
         <option value="old" ${query.get('sort') === 'old' ? 'selected' : ''}>Сначала старые</option>
         <option value="stage" ${query.get('sort') === 'stage' ? 'selected' : ''}>По этапу</option>
@@ -136,7 +136,7 @@ export async function initiativesList(view, query) {
       <div class="table-wrap">
         <table class="table">
           <thead><tr>
-            <th style="width:120px">Номер</th><th>Инициатива</th>
+            <th data-ac="US-INI-002/AC1" style="width:120px">Номер</th><th>Инициатива</th>
             <th style="width:190px">Этап</th><th style="width:150px">Учреждение</th>
             <th style="width:140px">Статус</th><th style="width:130px">Обновлена</th>
           </tr></thead>
@@ -219,7 +219,7 @@ export async function initiativeDetail(view, id) {
           </div>
         </div>
         <div class="row">
-          ${it.can_decide ? '<button class="btn btn--primary" data-decide>Принять решение на Gate</button>' : ''}
+          ${it.can_decide ? '<button class="btn btn--primary" data-decide data-ac="US-SG-002/AC1 US-SG-002/AC2 US-SG-002/AC3">Принять решение на Gate</button>' : ''}
           ${it.status === 'hold' && (it.is_author || can('admin')) ? '<button class="btn" data-resume>Возобновить</button>' : ''}
         </div>
       </div>
@@ -250,13 +250,13 @@ export async function initiativeDetail(view, id) {
           <div class="card__head"><h3>Предлагаемое решение</h3></div>
           <div class="card__body prose">${nl2br(it.solution)}</div>
         </div>
-        <div class="card">
+        <div class="card" data-ac="US-INI-001/AC2">
           <div class="card__head"><h3>Прогнозируемый эффект</h3>
             ${effect ? `<span class="badge badge--ok spacer">${effect}</span>` : ''}</div>
           <div class="card__body prose">${nl2br(it.expected_effect)}</div>
         </div>
 
-        <div class="card">
+        <div class="card" data-ac="US-INI-002/AC2 US-INI-002/AC3">
           <div class="card__head"><h3>Жизненный цикл</h3>
             <span class="card__hint spacer">Все решения документируются с аргументацией</span></div>
           <div class="card__body">
@@ -281,7 +281,7 @@ export async function initiativeDetail(view, id) {
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" data-ac="US-INI-004/AC1">
           <div class="card__head"><h3>Обсуждение</h3>
             <span class="card__hint spacer">${it.comments.length} ${it.comments.length === 1 ? 'комментарий' : 'комментариев'}</span></div>
           <div class="card__body--flush">
@@ -310,7 +310,7 @@ export async function initiativeDetail(view, id) {
       </div>
 
       <div class="stack">
-        <div class="card" data-tour="support">
+        <div class="card" data-tour="support" data-ac="US-INI-004/AC2 US-INI-004/AC5">
           <div class="card__head"><h3>Поддержка коллег</h3>
             ${it.followers ? `<span class="badge badge--outline spacer">${it.followers} ${it.followers === 1 ? 'подписчик' : 'подписчиков'}</span>` : ''}</div>
           <div class="card__body">
@@ -340,7 +340,7 @@ export async function initiativeDetail(view, id) {
           </div>` : ''}
         </div>
 
-        <div class="card">
+        <div data-ac="US-INI-002/AC6" class="card">
           <div class="card__head"><h3>Сведения</h3></div>
           <div class="card__body">
             <dl class="def">
@@ -366,13 +366,13 @@ export async function initiativeDetail(view, id) {
           </div>
         </div>` : ''}
 
-        <div class="card" id="ai-card">
+        <div class="card" id="ai-card" data-ac="US-AI-001/AC3">
           <div class="card__head"><h3>ИИ-помощник</h3></div>
           <div class="card__body"><div class="skeleton" style="height:130px"></div></div>
         </div>
 
         ${it.project ? html`
-        <div class="card">
+        <div data-ac="US-INI-002/AC4" class="card">
           <div class="card__head"><h3>Проект разработки</h3></div>
           <div class="card__body">
             <dl class="def">
@@ -384,7 +384,7 @@ export async function initiativeDetail(view, id) {
         </div>` : ''}
 
         ${it.pilots.length ? html`
-        <div class="card">
+        <div data-ac="US-INI-002/AC4" class="card">
           <div class="card__head"><h3>Пилотирование</h3></div>
           <div class="card__body--flush"><div class="list">
             ${it.pilots.map((p) => html`
@@ -587,7 +587,7 @@ export async function initiativeCreate(view) {
          технических навыков не требуется. После отправки инициатива автоматически поступит руководителю вашего учреждения.</p>
     </div>
     <div class="grid grid--2" style="align-items:start">
-      <form class="card" id="new-form">
+      <form class="card" id="new-form" data-ac="US-INI-001/AC1 US-INI-001/AC3">
         <div class="card__body">
           <div class="field">
             <label class="field__label" for="n-title">Краткое название <span class="req">*</span></label>
@@ -613,7 +613,7 @@ export async function initiativeCreate(view) {
           <div class="row" style="gap:12px;align-items:flex-start">
             <div class="field" style="flex:1;min-width:150px">
               <label class="field__label" for="n-etype">Тип эффекта</label>
-              <select class="select" id="n-etype" name="effect_type">
+              <select data-ac="US-INI-001/AC2" class="select" id="n-etype" name="effect_type">
                 <option value="time">Экономия времени</option>
                 <option value="cost">Снижение затрат</option>
                 <option value="quality">Качество услуги</option>
@@ -643,7 +643,7 @@ export async function initiativeCreate(view) {
       </form>
 
       <div class="stack">
-        <div class="card ai-box" id="ai-hint">
+        <div data-ac="US-AI-001/AC1 US-AI-001/AC2" class="card ai-box" id="ai-hint">
           <div class="ai-box__head">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9"/></svg>
@@ -652,7 +652,7 @@ export async function initiativeCreate(view) {
           <p class="fs-13 text-2">Начните описывать проблему — система автоматически определит тематическое
             направление и проверит, не решает ли кто-то похожую задачу.</p>
         </div>
-        <div class="card">
+        <div class="card" data-ac="US-INI-001/AC6 US-SG-001/AC1">
           <div class="card__head"><h3>Что произойдёт дальше</h3></div>
           <div class="card__body">
             <div class="timeline">

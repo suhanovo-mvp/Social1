@@ -44,7 +44,7 @@ export async function formsList(view, query) {
              показа — «уточняющий вопрос только тем, кто поставил высокую оценку», — и
              разошлите ссылку. Ответы сводятся автоматически, выгрузка в CSV рядом.</p>
         </div>
-        ${can_create ? '<button class="btn btn--primary" data-new>Создать форму</button>' : ''}
+        ${can_create ? '<button data-ac="US-FORM-001/AC6" class="btn btn--primary" data-new>Создать форму</button>' : ''}
       </div>
       <div class="chip-row" style="margin-top:14px">
         <button class="chip ${!status && !mine ? 'is-on' : ''}" data-go="${esc(link({ status: '', mine: '' }))}">Все</button>
@@ -226,7 +226,7 @@ export async function formEditor(view, id) {
 
           <div class="card add-q">
             <div class="card__body">
-              <div class="field__label">Добавить вопрос</div>
+              <div data-ac="US-FORM-001/AC1 US-FORM-002/AC1" class="field__label">Добавить вопрос</div>
               <div class="chip-row">
                 ${TYPE_ORDER.map((t) => html`
                   <button class="chip" data-add="${t}" title="${esc(QUESTION_TYPES[t].hint)}">
@@ -423,7 +423,7 @@ export async function formEditor(view, id) {
   function sidePanel() {
     const url = `${location.origin}/f/${form.slug}`;
     return html`
-      <div class="card">
+      <div data-ac="US-FORM-003/AC1 US-FORM-003/AC3" class="card">
         <div class="card__head"><h3>Публикация</h3>
           <span class="badge ${STATUS_BADGE[form.status]} spacer">${STATUS_TITLE[form.status]}</span></div>
         <div class="card__body">
@@ -444,7 +444,7 @@ export async function formEditor(view, id) {
             <div class="field" style="margin:16px 0 0">
               <label class="field__label">Ссылка для рассылки</label>
               <div class="row" style="flex-wrap:nowrap">
-                <input class="input mono" id="share-url" readonly value="${esc(url)}">
+                <input data-ac="US-FORM-003/AC4" class="input mono" id="share-url" readonly value="${esc(url)}">
                 <button class="btn btn--sm" data-copy-link>Копировать</button>
               </div>
               <div class="field__hint">Заполнить смогут все, у кого есть ссылка, — вход в Social1 не потребуется.</div>
@@ -452,7 +452,7 @@ export async function formEditor(view, id) {
         </div>
       </div>
 
-      <div class="card" style="margin-top:16px">
+      <div data-ac="US-FORM-003/AC5" class="card" style="margin-top:16px">
         <div class="card__head"><h3>Настройки</h3></div>
         <div class="card__body">
           <div class="field">

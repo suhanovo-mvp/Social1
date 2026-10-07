@@ -76,7 +76,7 @@ export async function providersView(view, query) {
         </div>
       </div>
     </div>
-    <div class="tabs" data-tour="pv-tabs">
+    <div data-ac="US-PROV-001/AC4 US-PROV-003/AC1" class="tabs" data-tour="pv-tabs">
       ${tabs.map(([k, t]) => `<button class="tab ${tab === k ? 'is-active' : ''}" data-tab="${k}">${t}</button>`)}
     </div>
     <div id="pv-panel"><div class="skeleton" style="height:320px"></div></div>`;
@@ -95,7 +95,7 @@ async function myCompanies(view) {
   const mine = await api.get('/api/providers/mine');
   if (mine.length === 1) { navigate(`/providers/${mine[0].id}`, true); return; }
   view.innerHTML = html`
-    <div class="page-head"><h2>Моя компания в каталоге</h2>
+    <div data-ac="US-PROV-004/AC1" class="page-head"><h2>Моя компания в каталоге</h2>
       <p>Каталог разработчиков ИИ-решений помогает ДТСЗН выбирать исполнителей. Здесь вы ведёте
          сведения о технологиях, проектах и решениях своей компании.</p>
       <div class="row" style="margin-top:10px"><a class="btn" href="/api/providers/guide/representative.pdf" download data-native>Инструкция представителя (PDF)</a></div></div>
@@ -140,7 +140,7 @@ async function listPanel(panel, query) {
           ${esc(t)} <b style="margin-left:4px">${n}</b></button>`)}
     </div>
 
-    <div class="filters" data-tour="pv-filters">
+    <div data-ac="US-PROV-001/AC1 US-PROV-001/AC2" class="filters" data-tour="pv-filters">
       <input class="input" id="pv-q" type="search" value="${esc(f.q)}" placeholder="Название, ИНН, технология…" style="min-width:230px">
       <select class="select" data-filter="competencies">${options(dict.competencies, f.competencies, 'Любая компетенция')}</select>
       <select class="select" data-filter="compliance">${options(dict.compliance, f.compliance, 'Любые требования')}</select>
@@ -159,7 +159,7 @@ async function listPanel(panel, query) {
         <h3>${providers.length} ${plural(providers.length, 'разработчик', 'разработчика', 'разработчиков')}</h3>
         <div class="row spacer" data-tour="pv-tools">
           <button class="btn btn--sm" data-compare disabled>Сравнить</button>
-          <select class="select btn--sm" id="pv-sort" style="width:auto;padding:5px 30px 5px 10px;font-size:12.5px">
+          <select data-ac="US-PROV-001/AC3 US-PROV-001/AC5" class="select btn--sm" id="pv-sort" style="width:auto;padding:5px 30px 5px 10px;font-size:12.5px">
             ${options(dict.sorts, f.sort || 'updated')}</select>
           <button class="btn btn--sm btn--ghost" data-dir title="Обратный порядок">${f.dir === 'asc' ? '↑' : '↓'}</button>
           <a class="btn btn--sm" href="/api/providers/export.csv?${esc(exportParams.toString())}" download data-native>Выгрузить CSV</a>
@@ -392,7 +392,7 @@ async function accessPanel(panel) {
       </div></div>`)}
     </div>
 
-    <div class="card" style="margin-bottom:16px">
+    <div data-ac="US-PROV-003/AC2" class="card" style="margin-bottom:16px">
       <div class="card__head"><div><h3>Выдать доступ</h3>
         <div class="card__hint">Найдите сотрудника по имени или почте. Выдача новой роли заменяет прежнюю роль каталога.</div></div></div>
       <div class="card__body">
@@ -538,7 +538,7 @@ export async function providerDetail(view, id, query) {
     ${p.stale ? html`<div class="hint-box" style="margin-bottom:14px">Сведения не обновлялись больше ${dict.stale_days} дней —
       проверьте, актуальны ли контакты, загрузка и решения.</div>` : ''}
 
-    <div class="tabs" data-tour="pv-card-tabs">
+    <div data-ac="US-PROV-002/AC5 US-PROV-002/AC8" class="tabs" data-tour="pv-card-tabs">
       ${tabs.map(([k, t]) => `<button class="tab ${tab === k ? 'is-active' : ''}" data-tab="${k}">${esc(t)}</button>`)}
     </div>
     <div id="pv-tab"></div>`;
@@ -595,7 +595,7 @@ function overviewTab(box, p, dict, { isRep, edit, reload }) {
           </div></div>
       </div>
       <div class="stack">
-        <div class="card" data-tour="pv-fill"><div class="card__head"><h3>Заполненность карточки</h3></div>
+        <div data-ac="US-PROV-002/AC4" class="card" data-tour="pv-fill"><div class="card__head"><h3>Заполненность карточки</h3></div>
           <div class="card__body">
             ${fillBar(p.completeness)}
             ${p.missing.length ? html`<div class="fs-12 text-3" style="margin-top:8px">Не хватает: ${esc(p.missing.join(', '))}</div>`
@@ -632,7 +632,7 @@ function overviewTab(box, p, dict, { isRep, edit, reload }) {
 // профиль, портфолио и решения своей компании. Привязывает модератор.
 function membersCard(p) {
   return html`
-    <div class="card" data-tour="pv-members"><div class="card__head"><div><h3>Представители компании</h3>
+    <div data-ac="US-PROV-004/AC1" class="card" data-tour="pv-members"><div class="card__head"><div><h3>Представители компании</h3>
       <div class="card__hint">Заполняют технологии, портфолио и решения. Их правки ждут вашего подтверждения.</div></div></div>
       <div class="card__body">
         ${p.members.length ? html`<div class="stack" style="gap:8px;margin-bottom:10px">${p.members.map((m) => html`
@@ -937,7 +937,7 @@ export async function providerEditor(view, id) {
         <div class="field"><label class="field__label" for="f-name">Название *</label>
           <input class="input" id="f-name" name="name" value="${esc(p.name || '')}" required maxlength="200"
             placeholder="Как разработчика называют в работе"></div>
-        <div id="pv-dups"></div>
+        <div data-ac="US-PROV-002/AC2" id="pv-dups"></div>
         <div class="grid grid--2" style="gap:12px" data-for="external">
           <div class="field"><label class="field__label" for="f-legal">Полное наименование юрлица</label>
             <input class="input" id="f-legal" name="legal_name" value="${esc(p.legal_name || '')}"></div>

@@ -60,11 +60,11 @@ export async function ratingView(view, query) {
     </div>
 
     <div class="idea-toolbar">
-      <div class="seg" id="periods">
+      <div data-ac="US-RATE-002/AC1" class="seg" id="periods">
         ${PERIODS.map(([k, t]) => `<button data-period="${k}" class="${period === k ? 'is-on' : ''}">${t}</button>`)}
       </div>
       ${can('analytics.institution') || can('analytics.all') ? html`
-        <div class="seg" id="scopes">
+        <div data-ac="US-RATE-002/AC2" class="seg" id="scopes">
           <button data-scope="institution" class="${data.scope === 'institution' ? 'is-on' : ''}">Моё учреждение</button>
           <button data-scope="all" class="${data.scope === 'all' ? 'is-on' : ''}">Вся экосистема</button>
         </div>` : ''}
@@ -88,7 +88,7 @@ export async function ratingView(view, query) {
       </div>` : ''}
 
       ${rest.length ? html`
-      <div class="card">
+      <div data-ac="US-RATE-002/AC1 US-CHG-003/AC7" class="card">
         <div class="card__head"><h3>Все социальные советники</h3>
           <span class="card__hint spacer">Период: ${esc(data.label)}</span></div>
         <div class="table-wrap"><table class="table">
@@ -125,7 +125,7 @@ export async function ratingView(view, query) {
         </div>
       </div></div>`}
 
-    <div class="card" style="margin-top:16px">
+    <div data-ac="US-RATE-002/AC3" class="card" style="margin-top:16px">
       <div class="card__head"><h3>Знаки отличия</h3>
         <span class="card__hint spacer">Присваиваются автоматически по фактическому вкладу</span></div>
       <div class="card__body">
@@ -153,7 +153,7 @@ export async function moderationView(view, query) {
   const tab = query.get('tab') || 'ideas';
   view.innerHTML = html`
     <div class="page-head">
-      <h2>Модерация идей и решений</h2>
+      <h2 data-ac="US-IDEA-003/AC1">Модерация идей и решений</h2>
       <p>Проверка новых идей, подтверждение проверенного опыта, разбор обращений и контроль
          начислений. Каждое действие фиксируется в журнале аудита платформы.</p>
     </div>
@@ -199,7 +199,7 @@ async function topProposalsPanel(panel) {
     <div class="card">
       <div class="card__head">
         <div>
-          <h3>Топ предложений</h3>
+          <h3 data-ac="US-REV-001/AC6">Топ предложений</h3>
           <div class="card__hint">Порядок задают оценки коллег в быстром ревью: лайк — единица,
             избранное — две. Предложение попадает в топ с ${d.threshold}
             ${plural(d.threshold, 'лайка', 'лайков', 'лайков')}. Очки автору лайки не начисляют —
@@ -362,7 +362,7 @@ function reportsQueue(panel, items, flags, reload) {
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--warn)">
       <div class="card__head">
         <div>
-          <h3>Сигналы антифрода</h3>
+          <h3 data-ac="US-REV-002/AC4">Сигналы антифрода</h3>
           <div class="card__hint">Система отслеживает механическое пролистывание карточек ревью.
             Сигнал — повод посмотреть на активность участника, а не обвинение: оценки могли быть
             быстрыми и по делу.</div>
@@ -393,7 +393,7 @@ function reportsQueue(panel, items, flags, reload) {
     </div>` : '';
 
   panel.innerHTML = antifraud + (items.length ? html`
-    <div class="card">
+    <div data-ac="US-IDEA-003/AC5" class="card">
       <div class="card__head"><h3>Обращения о нарушениях</h3>
         <span class="card__hint spacer">${items.length} ${plural(items.length, 'обращение', 'обращения', 'обращений')}</span></div>
       <div class="list">
@@ -438,7 +438,7 @@ async function pointsPanel(panel) {
   panel.innerHTML = html`
     <div class="card">
       <div class="card__head">
-        <div><h3>Журнал начислений</h3>
+        <div data-ac="US-RATE-001/AC4"><h3>Журнал начислений</h3>
           <div class="card__hint">Кто, когда и за что получил очки. Повторное начисление за одно
             и то же действие невозможно на уровне базы данных.</div></div>
         <span class="badge badge--outline spacer">${num(log.total)} записей</span>
@@ -508,14 +508,14 @@ export async function incentivesView(view, query) {
     <div class="page-head">
       <div class="page-head__row">
         <div style="flex:1;min-width:260px">
-          <h2>Рекомендации к поощрению</h2>
+          <h2 data-ac="US-RATE-003/AC1 US-RATE-003/AC2">Рекомендации к поощрению</h2>
           <p>Система фиксирует рекомендацию, а не выдаёт поощрение: итоговое решение принимает
              руководитель или уполномоченное лицо. Все меры применяются в рамках трудового
              законодательства, внутренних регламентов и правил государственной службы.</p>
         </div>
         <div class="row">
           ${data.can_propose ? '<button class="btn" data-build>Сформировать по итогам месяца</button>' : ''}
-          ${data.can_propose ? '<button class="btn btn--primary" data-new>Предложить поощрение</button>' : ''}
+          ${data.can_propose ? '<button data-ac="US-RATE-003/AC4" class="btn btn--primary" data-new>Предложить поощрение</button>' : ''}
         </div>
       </div>
     </div>

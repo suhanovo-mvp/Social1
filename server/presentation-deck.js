@@ -128,6 +128,7 @@ export const SECTIONS = [
     { title: 'Аналитика и КПЭ', path: '/analytics' },
     { title: 'Контроль SLA', path: '/sla' },
     { title: 'Сообщество', path: '/community' },
+    { title: 'Требования к платформе', path: '/requirements' },
   ] },
   { group: 'Администрирование', items: [
     { title: 'Настройки платформы', path: '/admin' },

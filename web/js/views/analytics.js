@@ -32,13 +32,13 @@ export async function analyticsView(view, query) {
         </div>
         <div class="row">
           ${allowed ? html`
-          <select class="select" id="scope" style="width:auto">
+          <select data-ac="US-ANL-004/AC1" class="select" id="scope" style="width:auto">
             <option value="all" ${scope === 'all' ? 'selected' : ''}>Вся экосистема</option>
             <option value="institution" ${scope === 'institution' ? 'selected' : ''}>Моё учреждение</option>
             <option value="mine" ${scope === 'mine' ? 'selected' : ''}>Мои инициативы</option>
           </select>` : ''}
           ${can('analytics.all') || can('analytics.institution')
-            ? '<a href="/api/analytics/export" class="btn" data-native download>Выгрузить отчёт (CSV)</a>' : ''}
+            ? '<a data-ac="US-ANL-004/AC4" href="/api/analytics/export" class="btn" data-native download>Выгрузить отчёт (CSV)</a>' : ''}
         </div>
       </div>
     </div>
@@ -53,7 +53,7 @@ export async function analyticsView(view, query) {
 
     <!-- ГРУППА 1 -->
     <section data-panel="g1">
-      <div class="grid grid--kpi" style="margin-bottom:16px">
+      <div class="grid grid--kpi" style="margin-bottom:16px" data-ac="US-ANL-001/AC1 US-ANL-001/AC3 US-ANL-001/AC4 US-ANL-001/AC5">
         ${kpi('Зарегистрировано инициатив', g1.total_initiatives, { meta: 'Базовый показатель активности экосистемы' })}
         ${kpi('Внедрено инициатив', g1.scaled_initiatives, { tone: 'ok',
           meta: 'Прошли все этапы и получили решение о масштабировании' })}
@@ -66,7 +66,7 @@ export async function analyticsView(view, query) {
       </div>
 
       <div class="grid grid--2" style="align-items:start">
-        <div class="card">
+        <div class="card" data-ac="US-ANL-004/AC2">
           <div class="card__head"><h3>Динамика подачи и внедрения</h3></div>
           <div class="card__body">
             ${lineChart(monthly, { series: [
@@ -80,7 +80,7 @@ export async function analyticsView(view, query) {
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" data-ac="US-ANL-001/AC2">
           <div class="card__head"><h3>Прохождение точек принятия решений</h3>
             <span class="card__hint spacer">Выявляет узкие места конвейера</span></div>
           <div class="card__body">
@@ -104,7 +104,7 @@ export async function analyticsView(view, query) {
           </div>
         </div>
 
-        <div class="card">
+        <div data-ac="US-ANL-004/AC2" class="card">
           <div class="card__head"><h3>Инициативы по направлениям</h3></div>
           <div class="card__body">
             ${o.by_category.length ? barList(o.by_category.map((c) => ({
@@ -114,7 +114,7 @@ export async function analyticsView(view, query) {
           </div>
         </div>
 
-        <div class="card">
+        <div data-ac="US-ANL-001/AC6" class="card">
           <div class="card__head"><h3>Валоризация эффекта</h3>
             <span class="card__hint spacer">Измеренный эффект внедрённых решений</span></div>
           <div class="card__body">
@@ -140,7 +140,7 @@ export async function analyticsView(view, query) {
 
     <!-- ГРУППА 2 -->
     <section data-panel="g2" hidden>
-      <div class="grid grid--kpi" style="margin-bottom:16px">
+      <div data-ac="US-ANL-002/AC1 US-ANL-002/AC3 US-ANL-002/AC4" class="grid grid--kpi" style="margin-bottom:16px">
         ${kpi('Полный цикл (медиана)', g2.cycle_median_days ?? '—', { unit: 'дн.',
           meta: 'От подачи инициативы до решения о масштабировании' })}
         ${kpi('Полный цикл (среднее)', g2.cycle_avg_days ?? '—', { unit: 'дн.',
@@ -155,7 +155,7 @@ export async function analyticsView(view, query) {
           meta: `Go на Gate 4 (${g2.pilot_go_g4}) к прошедшим Gate 3 (${g2.pilot_passed_g3})` })}
       </div>
 
-      <div class="card">
+      <div class="card" data-ac="US-ANL-002/AC2">
         <div class="card__head"><h3>Время прохождения этапов и соблюдение SLA</h3>
           <span class="card__hint spacer">Сравнение фактического времени со стандартом обслуживания</span></div>
         <div class="table-wrap">
@@ -190,7 +190,7 @@ export async function analyticsView(view, query) {
 
     <!-- ГРУППА 3 -->
     <section data-panel="g3" hidden>
-      <div class="grid grid--kpi" style="margin-bottom:16px">
+      <div data-ac="US-ANL-003/AC2" class="grid grid--kpi" style="margin-bottom:16px">
         ${kpi('Решений Kill', g3.kill_total, {
           meta: 'Не негативный показатель: система отсеивает нежизнеспособные проекты и экономит ресурсы' })}
         ${kpi('Решений Redirect', g3.redirect_total, { meta: 'Как часто инициативы требуют доработки' })}
@@ -201,7 +201,7 @@ export async function analyticsView(view, query) {
       </div>
 
       <div class="grid grid--2" style="align-items:start">
-        <div class="card">
+        <div class="card" data-ac="US-ANL-003/AC1">
           <div class="card__head"><h3>Структура решений на Gate</h3></div>
           <div class="card__body">
             <div class="row" style="gap:22px;align-items:center;flex-wrap:wrap">
@@ -224,7 +224,7 @@ export async function analyticsView(view, query) {
           </div>
         </div>
 
-        <div class="card">
+        <div data-ac="US-ANL-003/AC3" class="card">
           <div class="card__head"><h3>На каком этапе останавливаются инициативы</h3></div>
           <div class="card__body">
             ${g3.kill_by_stage.length ? barList(g3.kill_by_stage.map((k) => ({
@@ -242,7 +242,7 @@ export async function analyticsView(view, query) {
     <!-- УЧРЕЖДЕНИЯ -->
     ${institutions.length ? html`
     <section data-panel="inst" hidden>
-      <div class="card">
+      <div class="card" data-ac="US-ANL-004/AC3">
         <div class="card__head"><h3>Сравнение учреждений</h3>
           <span class="card__hint spacer">Активность, вовлечённость и результативность</span></div>
         <div class="table-wrap">
@@ -273,7 +273,7 @@ export async function analyticsView(view, query) {
 
     <!-- УЧАСТНИКИ -->
     <section data-panel="people" hidden>
-      <div class="card">
+      <div data-ac="US-ANL-001/AC7" class="card">
         <div class="card__head"><h3>Вклад участников</h3>
           <span class="card__hint spacer">Публичное признание — часть системы мотивации</span></div>
         <div class="card__body--flush">
@@ -332,7 +332,7 @@ export async function slaView(view) {
         meta: 'До истечения срока менее суток' })}
     </div>
 
-    <div class="card" style="margin-bottom:16px">
+    <div data-ac="US-SG-003/AC4 US-SG-003/AC5" class="card" style="margin-bottom:16px">
       <div class="card__head"><h3>Нарушенные сроки</h3>
         ${d.overdue.length ? `<span class="badge badge--danger spacer">${d.overdue.length}</span>` : ''}</div>
       ${d.overdue.length ? html`
@@ -353,7 +353,7 @@ export async function slaView(view) {
       </table></div>` : '<div class="empty"><h4>Нарушений нет</h4><p>Все решения принимаются в установленные сроки.</p></div>'}
     </div>
 
-    <div class="card">
+    <div data-ac="US-SG-003/AC3" class="card">
       <div class="card__head"><h3>Риск нарушения — менее суток до срока</h3></div>
       ${d.at_risk.length ? html`
       <div class="table-wrap"><table class="table">

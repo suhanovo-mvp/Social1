@@ -65,7 +65,7 @@ export async function reviewView(view, query) {
     </div>
 
     <div class="review" data-tour="review">
-      <div class="review__stage" id="stage"></div>
+      <div data-ac="US-REV-001/AC1 US-REV-001/AC2" class="review__stage" id="stage"></div>
       <div class="review__side stack">
         <div class="card">
           <div class="card__head"><h3>Что означают оценки</h3></div>

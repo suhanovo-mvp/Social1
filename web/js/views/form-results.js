@@ -55,7 +55,7 @@ export async function formResults(view, id, query) {
       ${kpi('Состояние', null, '', form.is_open ? 'Идёт сбор' : 'Сбор закрыт', form.is_open ? 'ok' : 'warn')}
     </div>
 
-    <div class="tabs">
+    <div data-ac="US-FORM-004/AC3" class="tabs">
       <div class="tab ${tab === 'summary' ? 'is-active' : ''}" data-tab="summary">Сводка</div>
       <div class="tab ${tab === 'responses' ? 'is-active' : ''}" data-tab="responses">Ответы построчно
         <span class="tab__count">${data.responses}</span></div>
@@ -103,7 +103,7 @@ function questionResult(q, i, total) {
     <div class="card">
       <div class="card__head">
         <div style="min-width:0">
-          <h3>${i + 1}. ${esc(q.title)}</h3>
+          <h3 data-ac="US-FORM-004/AC1 US-FORM-004/AC2">${i + 1}. ${esc(q.title)}</h3>
           <div class="card__hint">${esc(meta?.title ?? q.type)} · ${esc(coverage)}</div>
         </div>
         ${q.conditional ? '<span class="badge badge--purple spacer">Условный</span>' : ''}

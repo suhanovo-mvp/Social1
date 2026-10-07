@@ -1,0 +1,2754 @@
+{
+ "generatedAt": "2026-10-07T08:13:03.365Z",
+ "source": [
+  "junit"
+ ],
+ "totals": {
+  "tests": 316,
+  "tagged": 306
+ },
+ "results": {
+  "US-ANL-004/AC7": {
+   "passed": 4,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Время в состоянии › считает часы между переходами",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Время в состоянии › незавершённый предмет продолжает копить время в текущем состоянии",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Время в состоянии › узкие места отсортированы по среднему времени",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Восстановление истории переходов › события собираются из stage_transitions и повторно не дублируются",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-001/AC2": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Структура формы › вопросы сохраняются с ключами, порядком и вариантами",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Структура формы › вопрос без текста не сохраняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Структура формы › шкала не выходит за допустимые границы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-002/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Структура формы › условие не может ссылаться на вопрос ниже по форме",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Структура формы › сравнение проверяется по типу вопроса, на который ссылается условие",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-001/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Структура формы › правка структуры сохраняет уже собранные ответы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Структура формы › удалённый вопрос уносит свои ответы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-003/AC1": {
+   "passed": 4,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Публикация › форма без вопросов не публикуется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Публикация › форма из одних разделов вопросом не считается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Публикация › черновик не принимает ответы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Публикация › закрытая форма ответы не принимает, но результаты остаются",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-003/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Публикация › срок сбора закрывает форму сам",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Публикация › форму с ответами нельзя вернуть в черновик",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-002/AC3": {
+   "passed": 5,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Условные вопросы › скрытый вопрос не обязателен, даже если помечен обязательным",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Условные вопросы › показанный вопрос обязателен",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Условные вопросы › ответ на скрытый вопрос не сохраняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Условные вопросы › цепочка условий рвётся вместе с первым звеном",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Опросник ИИ-решений ДЗМ › короткая анкета проходит целиком: обязательны только показанные вопросы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-003/AC7": {
+   "passed": 4,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Проверка ответов › вариант не из списка отвергается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Проверка ответов › оценка вне шкалы отвергается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Проверка ответов › почта проверяется по написанию",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Проверка ответов › ошибки возвращаются списком по вопросам, а не первой попавшейся",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Проверка ответов › «другое» принимается только там, где оно разрешено",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-003/AC5": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сбор ответов › повторный ответ не принимается, когда так настроена форма",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Сбор ответов › при разрешении нескольких ответов принимается каждый",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Сбор ответов › анонимная форма не запоминает, кто отвечал",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-003/AC6": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сбор ответов › черновик ответа превращается в отправленный, а не во второй ответ",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Сбор ответов › чужой ответ не перезаписывается указанием его номера",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-003/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сбор ответов › форму «только участникам» нельзя заполнить по ссылке",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Сбор ответов › ответ по ссылке принимается без входа и остаётся безымянным",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-004/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Результаты › сводка считает среднее по шкале и распределение по вариантам",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Результаты › тексты свободных ответов возвращаются целиком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-004/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Результаты › у условного вопроса охват считается по тем, кому он показывался",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-004/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Результаты › выгрузка содержит заголовки вопросов и ответы построчно",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-001/AC5": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Доступ › чужую форму нельзя изменить",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Доступ › администратор форм ведёт любую",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Доступ › копия формы повторяет вопросы и начинается черновиком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-003/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Доступ › адрес формы читается и не повторяется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Доступ › адрес опубликованной формы не меняется вместе с названием",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-005/AC1": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Инструкции по каталогу разработчиков › есть инструкции пользователя, модератора и представителя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Инструкции по каталогу разработчиков › инструкция модератора охватывает добавление, представителей, ведение и доступ",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Инструкции по каталогу разработчиков › PDF собирается, текст в нём ищется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-005/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Инструкции по каталогу разработчиков › каждая схема и разбор ссылаются на схему из альбома, у которой есть разбор",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Инструкции по каталогу разработчиков › каждая инструкция показывает хотя бы одну схему вместе с её разбором",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-001/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Настройка модуля › правила начисления и меры поощрения загружены",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Настройка модуля › повторный запуск не создаёт дублей",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-001/AC2": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Настройка модуля › администратор меняет правило без изменения кода",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Начисление очков › очки начисляются по действующему правилу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Начисление очков › отключённое правило не начисляет очки",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-001/AC3": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Начисление очков › повторное начисление за то же действие отклоняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Начисление очков › самооценка не учитывается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Начисление очков › предел очков по одному объекту соблюдается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-001/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Начисление очков › модератор отменяет начисление, запись остаётся в журнале",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Начисление очков › отменённые очки не попадают в рейтинг",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-IDEA-001/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Защита от дублей › похожие тексты распознаются",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Защита от дублей › похожие идеи подсказываются автору",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-IDEA-002/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Защита от дублей › дублирующее предложение по той же идее находится",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-IDEA-003/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Модерация идей › принятая идея открывается для решений и приносит очки автору",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Модерация идей › неизвестное действие модерации отклоняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-IDEA-003/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Модерация идей › отклонение без причины невозможно",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-IDEA-003/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Модерация идей › объединение дублей требует указания основной идеи",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-IDEA-003/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Модерация идей › автор получает уведомление о решении модератора",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Аудит › решение модератора попадает в неизменяемый журнал",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-002/AC1": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Рейтинг социальных советников › границы периодов считаются корректно",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Рейтинг социальных советников › рейтинг упорядочен по очкам и содержит места",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Рейтинг социальных советников › прошлый период не содержит сегодняшних начислений",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-002/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Рейтинг социальных советников › рейтинг ограничивается учреждением",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-002/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Знаки отличия › «Активный социальный советник» присваивается за пять предложений",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Знаки отличия › «Проверенный опыт» присваивается после подтверждения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-002/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Знаки отличия › сводка вклада считает идеи, решения и подтверждения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-003/AC1": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Рекомендации к поощрению › формируются только для тех, кто превысил порог",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Рекомендации к поощрению › повторная рекомендация за тот же период не создаётся",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Рекомендации к поощрению › высокий порог не даёт рекомендаций",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-RATE-002/AC6": {
+   "passed": 6,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Переименование советчика в социального советника › склонение по всем падежам",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Переименование советчика в социального советника › заглавная буква сохраняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Переименование советчика в социального советника › слова, начинающиеся так же, не затрагиваются",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Переименование советчика в социального советника › прежние надписи в базе обновляются",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Переименование советчика в социального советника › повторный запуск миграции ничего не меняет",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Переименование советчика в социального советника › прежнее название не осталось в справочных данных модуля",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-001/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Документ и его разделы › заводится черновиком с номером своего вида",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Документ и его разделы › текст собирается из разделов, а не хранится отдельно",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-001/AC2": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Документ и его разделы › обязательные разделы названы, пока не заполнены",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Документ и его разделы › незаполненный документ не выносится на рецензирование",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Публикация и замена решения › неполный документ не публикуется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Документ и его разделы › чужой документ править нельзя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-001/AC4": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Рецензирование › состав рецензентов выводится из документа, а не задаётся списком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Рецензирование › если проект решения пишет архитектор, его рецензируют эксперты",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Заказчик как рецензент › автор идеи попадает в лист по своему предмету",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-001/AC5": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Рецензирование › рецензенту приходит задача со сроком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Рецензирование › автор не рецензирует свой документ",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Рецензирование › отказ требует пояснения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-001/AC6": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Рецензирование › согласование всеми рецензентами переводит документ в согласованные",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Публикация и замена решения › опубликованный документ виден в базе знаний",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Публикация и замена решения › опубликованный документ неизменяем",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-002/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "От решения к работе и обратно › принятый проект решения заводит задачу со ссылкой на себя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-002/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "От решения к работе и обратно › завершение задачи напоминает зафиксировать решение",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "От решения к работе и обратно › зафиксированное решение наследует контекст проекта решения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-001/AC7": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Публикация и замена решения › новая редакция заменяет прежнюю, не стирая её",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Журнал событий документа › путь документа виден по событиям",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-003/AC2": {
+   "passed": 5,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Презентация платформы: порядок слайдов › сначала титул, принципы взаимодействия, цели, участники и состав",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Презентация платформы: порядок слайдов › на титуле — название концепции и её автор",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Презентация платформы: порядок слайдов › каждый компонент — обзор, ключевые экраны и схема подряд",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Презентация платформы: содержание › у компонента есть задача, возможности, роли и хотя бы два кадра",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Презентация платформы: содержание › схемы совместной работы собраны корректно",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-003/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Презентация платформы: содержание › в презентации нет счётчиков из базы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-003/AC4": {
+   "passed": 4,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Презентация платформы: содержание › разделы и компоненты ссылаются на существующие маршруты портала",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Презентация платформы: содержание › каждый пункт бокового меню есть на карте платформы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Презентация платформы: содержание › у каждого кадра есть JPEG в assets/presentation",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Презентация платформы: файл › PDF собирается, текст ищется, скриншоты встроены",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-003/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Презентация платформы: файл › скачать презентацию может только администратор",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-001/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Замечания на шагах схемы › замечание привязывается к конкретному шагу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Замечания на шагах схемы › замечание к несуществующему шагу отклоняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-001/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Замечания на шагах схемы › счётчик замечаний по шагам собирается для меток на схеме",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Замечания на шагах схемы › закрытое замечание уходит из счётчика",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-001/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Замечания на шагах схемы › отметка полезности начисляет очки автору замечания",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Замечания на шагах схемы › своё замечание отметить нельзя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-002/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Предложение об изменении › обоснование обязательно",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Предложение об изменении › создаётся с черновой копией действующей схемы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-002/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Предложение об изменении › пустое изменение на обсуждение не выносится",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Предложение об изменении › правка схемы даёт понятную сводку",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-002/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Предложение об изменении › чужое предложение править нельзя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-002/AC5": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Предложение об изменении › вынесение на обсуждение начисляет очки и зовёт затронутые роли",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Предложение об изменении › коллеги поддерживают предложение",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Предложение об изменении › повторный голос заменяет прежний, а не добавляется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-003/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Согласование › маршрут выводится из затронутых дорожек",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-003/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Согласование › лист согласования создаётся с задачами и сроком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Согласование › автор не согласует собственное предложение",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-003/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Согласование › отказ требует пояснения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Согласование › отказ закрывает предложение с указанием причины",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-003/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Согласование › согласование всеми ролями переводит предложение в согласованные",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Согласование › публикация делает изменение действующим",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-003/AC6": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Изменение конвейера сообществом › сокращение срока Gate 2 проходит полный цикл и меняет конвейер",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-004/AC2": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Изменение конвейера сообществом › сокращение срока Gate 2 проходит полный цикл и меняет конвейер",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Проверка перед публикацией › срок этапа меняется и вступает в силу после публикации",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Правка этапа из настроек платформы › пишет в модель, а не в таблицу конвейера",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-003/AC7": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Изменение конвейера сообществом › вклад автора виден в общем рейтинге социальных советников",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Изменение конвейера сообществом › очки за одно и то же действие не начисляются дважды",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-CHG-003/AC5": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Просроченные согласования › просрочка эскалируется и помечает задачу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-004/AC1": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Проекция конвейера › совпадает с прежней конфигурацией Stage-Gate по всем полям",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Проекция конвейера › последний этап считается по факту, а не постоянной",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Проекция конвейера › повторная проекция не размножает этапы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-004/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Версии › черновик создаётся копией действующей версии",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Версии › удалить можно только черновик",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-004/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Версии › опубликованную версию править нельзя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Версии › публикация переводит прежнюю версию в замещённые",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-004/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Проверка перед публикацией › схема с разрывом потока не публикуется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-004/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Проверка перед публикацией › этап с живыми инициативами убрать нельзя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Проверка перед публикацией › перенумерация живого этапа отклоняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-002/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Правка этапа из настроек платформы › пишет в модель, а не в таблицу конвейера",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Правка этапа из настроек платформы › правка несуществующего этапа отклоняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-004/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Правка этапа из настроек платформы › история правок сохраняется версиями",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-001/AC6": {
+   "passed": 9,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Целостность схем › каждая схема начального наполнения проходит проверку модели",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность схем › идентификаторы схем уникальны",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность схем › используются только известные типы фигур",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность схем › валидатор ловит поток в несуществующий узел",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность схем › валидатор ловит узел вне объявленной дорожки",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность схем › валидатор ловит недостижимый узел",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность схем › валидатор ловит поток из завершающего события",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность схем › валидатор ловит подпись, не умещающуюся в фигуру",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Альбом из репозитория › действующие модели из репозитория проходят проверку",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-004/AC5": {
+   "passed": 5,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Конвейер инициатив в модели › конвейер отмечен ровно один",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Конвейер инициатив в модели › этапы описаны подряд, с первого по шестой",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Конвейер инициатив в модели › на каждой точке принятия решения указаны роль и допустимые решения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Конвейер инициатив в модели › разрыв в нумерации этапов не проходит проверку",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Конвейер инициатив в модели › срок этапа задан в известных единицах",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-001/AC1": {
+   "passed": 4,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Пользовательские пути › сценариев четыре и все наполнены",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Пользовательские пути › каждая схема отнесена к существующему сценарию",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Пользовательские пути › путь каталога разработчиков описан для всех трёх ролей каталога",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Пользовательские пути › совместная работа: изменение процессов, база знаний и опросы описаны схемами",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Пользовательские пути › схемы сценария идут в альбоме подряд",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-001/AC5": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Пользовательские пути › у каждой роли сценария описано, что она делает",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-002/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Пользовательские пути › путь обсуждения идей покрывает роли модуля",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Пользовательские пути › быстрое ревью описано отдельной схемой с разбором",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-001/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Отбор схем › фильтр по роли включает сквозные схемы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Отбор схем › перечень ролей покрывает все схемы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-004/AC5": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Альбом из репозитория › в репозиторий попали все схемы начального наполнения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Альбом из репозитория › порядок разделов в альбоме сохранён",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Альбом из репозитория › первая версия каждой схемы опубликована",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-BPMN-003/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Оглавление альбома › в оглавление попадают все схемы и ни одна страница не переполнена",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-003/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Доступ к каталогу › по умолчанию каталог видит только центральный аппарат",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-003/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Доступ к каталогу › выданная роль даёт права, повторная выдача заменяет прежнюю",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Доступ к каталогу › отзыв снимает все роли каталога",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-003/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Доступ к каталогу › поиск сотрудника не зависит от регистра кириллицы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-003/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Доступ к каталогу › чужую роль платформы через каталог не выдать",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Доступ к каталогу › администратор каталога по роли не может отозвать доступ у себя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-002/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Карточка разработчика › ввод проверяется, ссылка без схемы дополняется, опасная — отклоняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-002/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Карточка разработчика › второй вендор с тем же ИНН не заводится, похожее название распознаётся",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-002/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Карточка разработчика › у внутренней команды нет ИНН и признака МСП",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-002/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Карточка разработчика › заполненность растёт с портфолио и каталогом",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-002/AC6": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Карточка разработчика › оценка одна от участника и уточняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Карточка разработчика › чужую запись журнала редактор не удалит",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Фильтры, сортировка и каталог › фильтр по виду оставляет счётчики остальных видов",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-001/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Фильтры, сортировка и каталог › компетенции требуются все сразу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Фильтры, сортировка и каталог › архив скрыт, пока его не выбрали",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Фильтры, сортировка и каталог › сортировка по названию и по числу проектов",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-001/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Фильтры, сортировка и каталог › сквозной каталог находит решение по компетенции",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-001/AC5": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Фильтры, сортировка и каталог › выгрузка обезвреживает формулы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-005/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Демонстрационный набор › по три разработчика каждого вида, повторный запуск ничего не добавляет, удаление не трогает ручные",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-004/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Представитель разработчика › поставщик ведёт свою карточку, но не видит каталог",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-004/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Представитель разработчика › представителю не показываются оценки, журнал, статус и ориентир стоимости",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-004/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Представитель разработчика › правка профиля меняет только технологические поля и ставит карточку на проверку",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Представитель разработчика › модератор подтверждает сведения, представитель узнаёт об этом",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PROV-004/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Представитель разработчика › отвязанный представитель теряет доступ",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-001/AC3": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Оценки и полезность › счётчики обновляются сразу после оценки",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Оценки и полезность › избранное весит вдвое больше лайка",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Оценки и полезность › пропуски не уменьшают полезность",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-001/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Оценки и полезность › повторная оценка одного предложения невозможна",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Оценки и полезность › причины пропуска ограничены закрытым списком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-002/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Оценки не начисляют очки › лайки не создают записей в журнале начислений",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Оценки не начисляют очки › очки идут только за подтверждение вклада",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-002/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Антифрод › серия слишком быстрых оценок поднимает сигнал",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Антифрод › вдумчивые оценки сигнал не поднимают",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-002/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Антифрод › оценки нескольких учётных записей с одного устройства",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Антифрод › повторный сигнал не создаёт вторую запись",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-002/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Антифрод › частота оценок ограничена настройкой",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-001/AC6": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Топ предложений › порог попадания в топ задаётся настройкой",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Топ предложений › порядок топа определяется полезностью",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-REV-001/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Очередь ревью › предложения к неопубликованной идее в ревью не участвуют",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Очередь ревью › очередь исключает свои и уже оценённые предложения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-001/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Переезд прав в данные › каждая роль сохранила все прежние права",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Переезд прав в данные › роль не получила прав чужой роли",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-001/AC6": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Переезд прав в данные › без пользователя прав нет",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-001/AC4": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Несколько ролей у участника › права ролей объединяются",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Несколько ролей у участника › снятие роли забирает её права",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Несколько ролей у участника › назначение роли дважды не создаёт дубля",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Правка прав администратором › выданное право начинает действовать без перезапуска",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-001/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Правка прав администратором › новая роль заводится без правки кода",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ADM-001/AC5": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Права на работу с процессами › краудсорсинг открыт рядовому сотруднику",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Права на работу с процессами › публикация версии доступна только центральному аппарату",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Права на работу с процессами › согласование доступно ролям, отвечающим за дорожки",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-003/AC1": {
+   "passed": 5,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Приведение слова к основе › все формы одного слова дают одну основу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Приведение слова к основе › разные слова не сливаются в одну основу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Приведение слова к основе › регистр и «ё» не влияют на основу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Поиск по базе знаний › документ находится по другой форме слова",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Поиск по базе знаний › в выдаче есть фрагмент с найденным словом",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-003/AC2": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Поиск по базе знаний › пустой и бессмысленный запрос не ломает поиск",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Поиск по базе знаний › кавычки в запросе не ломают разбор",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Поиск по базе знаний › фильтр по виду сущности сужает выдачу",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-003/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Поддержание индекса › черновик в поиск не попадает, опубликованный попадает",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Поддержание индекса › заменённое решение уходит из выдачи, а заменившее остаётся",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-KB-003/AC4": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Поддержание индекса › полная пересборка индекса возвращает то же, что событийная",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Подсказка «это уже разбирали» › по тексту идеи находится готовое решение",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Подсказка «это уже разбирали» › сам предмет из подсказок исключается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-IDEA-001/AC5": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Подсказка «это уже разбирали» › по тексту идеи находится готовое решение",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-005/AC1": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Опросник ИИ-решений ДЗМ › форма опубликована и доступна по ссылке без входа",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Опросник ИИ-решений ДЗМ › повторный запуск форму не задваивает",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-005/AC2": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Опросник ИИ-решений ДЗМ › пять блоков требований стали разделами формы",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Опросник ИИ-решений ДЗМ › каждое из пяти решений ДЗМ оценивается по шкале от 1 до 5",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Опросник ИИ-решений ДЗМ › вопросы требований на месте — 24 плюс условное описание ограничений",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-005/AC3": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Опросник ИИ-решений ДЗМ › уточнения об эффектах показываются только при оценке 3 и выше",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Опросник ИИ-решений ДЗМ › описание ограничений безопасности открывается только строгим ответом",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-FORM-005/AC4": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Опросник ИИ-решений ДЗМ › демонстрационные ответы собраны и сводка их считает",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Опросник ИИ-решений ДЗМ › выгрузка содержит все вопросы анкеты",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SEC-004/AC5": {
+   "passed": 6,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Целостность сборки › каждый серверный модуль загружается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность сборки › каждый общий модуль загружается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность сборки › каждый клиентский модуль разбирается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность сборки › каждая таблица учтена в очистке сида",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность сборки › прежнее название сущности не вернулось в исходники",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Целостность сборки › маршруты API зарегистрированы и не дублируются",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Подача инициативы › обязательные поля проверяются, короткое значение не принимается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-001/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Подача инициативы › эффект сохраняется числом с типом и единицей",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Подача инициативы › ссылки на материалы прикладываются к инициативе",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-001/AC5": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Подача инициативы › роль без права подачи получает отказ",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Маршрутизация по этапам › после подачи инициатива сама уходит на Gate 1",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-001/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Маршрутизация по этапам › шесть стадий с пятью Gate в порядке ТЗ",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Маршрутизация по этапам › задача на Gate 1 создаётся руководителю учреждения автора со сроком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-001/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Маршрутизация по этапам › автор узнаёт о подаче, руководитель — о нужном решении",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-HOME-002/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Маршрутизация по этапам › задачу видит руководитель своего учреждения, но не чужого",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-HOME-002/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Маршрутизация по этапам › чужую задачу нельзя отметить выполненной",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › решение без аргументации не принимается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › решает только ответственная роль, Gate 1 — руководитель своего учреждения, ДТСЗН — на любом",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC2": {
+   "passed": 2,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › на каждом Gate доступны только его решения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Решения на Gate › недопустимое для Gate решение отклоняется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › Go ведёт по всем стадиям, на последней — «Масштабирована» и награда автору",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC5": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › Kill останавливает, Hold приостанавливает, Redirect возвращает на выбранную стадию",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC9": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › по остановленной или приостановленной решение не принимается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC7": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › возобновить может автор, срок отсчитывается заново",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-002/AC8": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Решения на Gate › решение фиксирует оценки по критериям, длительность и соблюдение срока",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-003/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сроки и эскалация › сроки этапов по ТЗ",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-003/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сроки и эскалация › рабочие дни пропускают субботу и воскресенье",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-003/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сроки и эскалация › три уровня состояния срока",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-003/AC6": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сроки и эскалация › остановленное дело срок не нарушает",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SG-003/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Сроки и эскалация › просрочка эскалируется координатору ДТСЗН с записью в аудит",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-003/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Реестр: поиск, фильтры, голоса › фильтр по этапу, статусу и учреждению; поиск по номеру и тексту",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-003/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Реестр: поиск, фильтры, голоса › фильтр по этапу, статусу и учреждению; поиск по номеру и тексту",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-003/AC6": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Реестр: поиск, фильтры, голоса › поставщик видит только дошедшие до разработки",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-004/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Реестр: поиск, фильтры, голоса › повторный голос снимает свой, по завершённой голосовать нельзя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-004/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Реестр: поиск, фильтры, голоса › повторный голос снимает свой, по завершённой голосовать нельзя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-INI-004/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Реестр: поиск, фильтры, голоса › короткий комментарий не публикуется, автор узнаёт о новом",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-DEV-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Разработка и пилот › проект создаёт команда разработки, второй на ту же инициативу не создаётся",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PIL-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Разработка и пилот › заявка площадки: повторная от того же учреждения не принимается",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PIL-001/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Разработка и пилот › одобрение создаёт пилот на 30 дней и уведомляет заявителя",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-PIL-003/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Разработка и пилот › на опрос пилота отвечают один раз, закрытый ответов не принимает",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ANL-004/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Аналитика › масштаб определяется правами: ДТСЗН — всё, руководитель — учреждение, сотрудник — свои",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ANL-001/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Аналитика › прохождение Gate разложено по решениям",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ANL-002/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Аналитика › успешность пилотирования = Go на Gate 4 / прошедшие Gate 3",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ANL-003/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Аналитика › риск «заморозки» считает активные с просроченным сроком",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-ANL-004/AC4": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Аналитика › выгрузка недоступна сотруднику",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SEC-002/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Журнал аудита и пароли › цепочка хэшей цела и проверяется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SEC-002/AC2": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Журнал аудита и пароли › цепочка хэшей цела и проверяется",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SEC-002/AC3": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Журнал аудита и пароли › изменить или удалить запись журнала не даёт база данных",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-SEC-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Журнал аудита и пароли › пароль хранится scrypt-хэшем с индивидуальной солью",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-EDU-001/AC3": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Обучающие сценарии › сценарии разобраны и шаги у каждого есть",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Обучающие сценарии › каждый маршрут шага существует в таблице маршрутов",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Обучающие сценарии › каждый селектор шага встречается в разметке разделов",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-EDU-001/AC5": {
+   "passed": 3,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Обучающие сценарии › у сценария изменений процессов описан весь путь предложения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Обучающие сценарии › тур проходит и по доске, и по карточке предложения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    },
+    {
+     "name": "Обучающие сценарии › сценарий предложен только тем, кто может предлагать изменения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  },
+  "US-EDU-001/AC1": {
+   "passed": 1,
+   "failed": 0,
+   "skipped": 0,
+   "tests": [
+    {
+     "name": "Обучающие сценарии › сценарий предложен только тем, кто может предлагать изменения",
+     "status": "passed",
+     "file": "prd/.reports/node.xml"
+    }
+   ]
+  }
+ },
+ "unknown": []
+}

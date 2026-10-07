@@ -4,7 +4,9 @@
   "private": true,
   "description": "Social1 — управленческая платформа системных инноваций ДТСЗН",
   "type": "module",
-  "engines": { "node": ">=22.5.0" },
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "start": "node --no-warnings server/index.js",
     "seed": "node --no-warnings server/seed.js",
@@ -12,6 +14,12 @@
     "seed:providers": "node --no-warnings server/seed-providers.js",
     "seed:providers:remove": "node --no-warnings server/seed-providers.js --remove",
     "screens": "node --no-warnings scripts/presentation-screens.mjs",
-    "test": "node --no-warnings --test \"tests/**/*.test.js\""
+    "test": "node --no-warnings --test \"tests/**/*.test.js\"",
+    "prd:inventory": "node prd/scripts/inventory.mjs .",
+    "prd:check": "node prd/scripts/validate-prd.mjs prd/prd.js --src web/js",
+    "prd:lock": "node prd/scripts/validate-prd.mjs prd/prd.js --write-lock",
+    "prd:tests": "node prd/scripts/collect-tests.mjs --run \"node --no-warnings --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=prd/.reports/node.xml tests/**/*.test.js\"",
+    "prd:snapshot": "node prd/scripts/prd-release.mjs snapshot",
+    "prd:draft": "node prd/scripts/prd-release.mjs draft"
   }
 }

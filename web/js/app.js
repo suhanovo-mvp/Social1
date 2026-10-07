@@ -19,6 +19,8 @@ import { formFill, publicForm } from './views/form-fill.js';
 import { formResults } from './views/form-results.js';
 import { providersView, providerDetail, providerEditor } from './views/providers.js';
 import { adminView } from './views/admin.js';
+import { requirementsView, requirementsPublic } from './views/requirements.js';
+import { mountReviewPanel } from '/prd/lib/review-ui.js';
 
 const root = document.getElementById('root');
 
@@ -63,9 +65,18 @@ const ROUTES = [
   [/^\/practices$/,           'Лучшие практики',         (v) => practicesView(v)],
   [/^\/profile\/(\d+)$/,      'Профиль участника',       (v, m) => profileView(v, m[1])],
   [/^\/admin$/,               'Настройки платформы',     (v, m, q) => adminView(v, q)],
+  [/^\/requirements$/,        'Требования к платформе',  (v) => requirementsView(v)],
 ];
 
 let lastShellKey = null;
+
+// Переменные панели рецензента через токены портала: панель живёт в shadow root,
+// куда стили страницы не проникают, а пользовательские свойства — наследуются
+const PRD_THEME = `.prd-root.prd-root{--prd-bg:var(--bg);--prd-card:var(--surface);--prd-surface:var(--surface-2);
+--prd-text:var(--text);--prd-muted:var(--text-3);--prd-line:var(--border);--prd-accent:var(--brand-600);
+--prd-accent-soft:var(--brand-50);--prd-on-accent:#fff;--prd-good:var(--ok);--prd-good-soft:var(--ok-bg);
+--prd-warn:var(--warn);--prd-warn-soft:var(--warn-bg);--prd-bad:var(--danger);--prd-bad-soft:var(--danger-bg);
+--prd-font:var(--font)}`;
 
 async function render(route) {
   // Форма, открытая по ссылке, живёт до входа в систему: её заполняют сотрудники
@@ -74,6 +85,14 @@ async function render(route) {
   if (route.path.startsWith('/f/')) {
     lastShellKey = null;
     await publicForm(root, route.path.slice(3));
+    return;
+  }
+
+  // Требования к платформе открыты и без входа: рецензенты заказчика приходят
+  // без учётной записи портала
+  if (route.path === '/requirements' && !state.user) {
+    lastShellKey = null;
+    requirementsPublic(root);
     return;
   }
 
@@ -138,6 +157,11 @@ async function boot() {
   onRoute(render);
   startRouter();
 
+  // Панель рецензента требований: включается ссылкой «Показать в прототипе» или ?review=1
+  // и ничего не делает, пока режим рецензирования выключен. Цвета — из токенов портала,
+  // чтобы панель следовала выбранной теме, а не системной.
+  mountReviewPanel({ api: '/api/prd', css: PRD_THEME });
+
   if (state.user) {
     const { offerFirstRun } = await import('./tour.js');
     offerFirstRun();
@@ -148,6 +172,8 @@ async function boot() {
     if (!state.user) return;
     const before = `${state.counts.tasks}:${state.counts.notifications}`;
     await refreshMe();
+    // Страницу требований не перерисовываем: рецензент мог не дописать комментарий
+    if (currentRoute().path === '/requirements') return;
     if (state.user && `${state.counts.tasks}:${state.counts.notifications}` !== before) {
       lastShellKey = null;
       render(currentRoute());

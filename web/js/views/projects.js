@@ -18,7 +18,7 @@ export async function projectsList(view) {
       ${projects.map((p) => {
         const pct = p.items_total ? Math.round((p.items_done / p.items_total) * 100) : 0;
         return html`
-        <div class="card is-clickable" data-goto="/projects/${p.id}" style="cursor:pointer">
+        <div data-ac="US-DEV-001/AC6" class="card is-clickable" data-goto="/projects/${p.id}" style="cursor:pointer">
           <div class="card__body">
             <div class="row fs-12 text-3" style="margin-bottom:8px">
               <span class="mono">${esc(p.number)}</span>
@@ -82,7 +82,7 @@ export async function projectDetail(view, id) {
         </div>
       </div>` : ''}
 
-      <div class="board">
+      <div data-ac="US-DEV-001/AC3 US-DEV-001/AC4" class="board">
         ${COLUMNS.map((col) => html`
           <div class="board__col" data-col="${col}">
             <div class="board__col-head">
@@ -154,7 +154,7 @@ export async function projectDetail(view, id) {
     <div id="board-area"></div>
 
     ${p.documents.length ? html`
-    <div class="card" style="margin-top:18px">
+    <div data-ac="US-DEV-002/AC1 US-DEV-002/AC2" class="card" style="margin-top:18px">
       <div class="card__head"><h3>Хранилище документов</h3>
         <span class="card__hint spacer">Техническая документация, архитектура, результаты тестирования</span></div>
       <div class="card__body--flush"><div class="list">

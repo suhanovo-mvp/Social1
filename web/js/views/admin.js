@@ -12,12 +12,12 @@ export async function adminView(view, query) {
           <p>Конфигурация экосистемы: маршруты движения инициатив, SLA и критерии Gate настраиваются
              без изменения кода — это обеспечивает адаптивность процесса к меняющимся условиям.</p>
         </div>
-        <a class="btn" href="/api/admin/presentation.pdf" download data-native data-tour="admin-presentation"
+        <a data-ac="US-ADM-003/AC1" class="btn" href="/api/admin/presentation.pdf" download data-native data-tour="admin-presentation"
            title="Слайды 16:9: как работают компоненты, цели платформы, каждый компонент со скриншотами и схемой совместной работы">
           Презентация платформы (PDF)</a>
       </div>
     </div>
-    <div class="tabs">
+    <div data-ac="US-ADM-002/AC1" class="tabs">
       ${[['workflow', 'Процесс Stage-Gate'], ['ideahub', 'Идеи и решения'], ['roles', 'Роли и права'],
          ['users', 'Участники'], ['audit', 'Журнал аудита'], ['system', 'Состояние системы']]
         .map(([k, t]) => `<button class="tab ${tab === k ? 'is-active' : ''}" data-tab="${k}">${t}</button>`)}
@@ -46,7 +46,7 @@ async function rolesPanel(panel) {
     <div class="card">
       <div class="card__head">
         <div>
-          <h3>Роли платформы</h3>
+          <h3 data-ac="US-ADM-001/AC1 US-ADM-001/AC2">Роли платформы</h3>
           <div class="card__hint">Полномочия хранятся в базе: изменение действует сразу,
             без перезапуска и правки кода. Участник может держать несколько ролей — права складываются.</div>
         </div>
@@ -196,7 +196,7 @@ async function ideaHubPanel(panel) {
         </div>
       </div>
       <div class="card__foot row">
-        <button class="btn btn--sm" id="refresh-badges">Пересчитать знаки отличия</button>
+        <button data-ac="US-RATE-002/AC7" class="btn btn--sm" id="refresh-badges">Пересчитать знаки отличия</button>
         <button class="btn btn--sm btn--primary spacer" id="save-settings">Сохранить настройки</button>
       </div>
     </div>
@@ -245,7 +245,7 @@ async function ideaHubPanel(panel) {
       </div>
     </div>
 
-    <div class="card" style="margin-bottom:16px">
+    <div data-ac="US-RATE-001/AC1 US-RATE-001/AC2" class="card" style="margin-bottom:16px">
       <div class="card__head"><h3>Правила начисления очков</h3>
         <span class="card__hint spacer">Значения меняются без изменения кода</span></div>
       <div class="table-wrap"><table class="table">
@@ -265,7 +265,7 @@ async function ideaHubPanel(panel) {
       </table></div>
     </div>
 
-    <div class="card">
+    <div data-ac="US-RATE-003/AC5" class="card">
       <div class="card__head"><h3>Меры поощрения</h3>
         <span class="card__hint spacer">Применяются только в рамках трудового законодательства
           и внутренних регламентов</span></div>
@@ -391,7 +391,7 @@ async function workflowPanel(panel) {
         <div class="card">
           <div class="card__head">
             <div>
-              <h3>Этап ${s.tz_stage}. ${esc(s.stage_name)}</h3>
+              <h3 data-ac="US-SG-004/AC2 US-ADM-002/AC4">Этап ${s.tz_stage}. ${esc(s.stage_name)}</h3>
               <div class="card__hint">${s.gate_no ? `Gate ${s.gate_no} — ${esc(s.gate_name || '')}` : 'Без точки принятия решения'}</div>
             </div>
             ${s.gate_no ? `<button class="btn btn--sm spacer" data-edit="${s.stage_no}">Изменить</button>` : ''}
@@ -591,7 +591,7 @@ async function auditPanel(panel) {
       </div>
     </div>
 
-    <div class="card">
+    <div data-ac="US-SEC-002/AC2 US-SEC-002/AC4" class="card">
       <div class="card__head"><h3>Журнал действий</h3>
         <span class="card__hint spacer">Последние ${log.entries.length} из ${num(log.total)}</span></div>
       <div class="table-wrap"><table class="table">
@@ -626,7 +626,7 @@ async function systemPanel(panel) {
         <div class="kpi"><div class="kpi__label">${esc(LABELS[k] || k)}</div>
           <div class="kpi__value">${num(v)}</div></div>`)}
     </div>
-    <div class="card">
+    <div data-ac="US-ADM-002/AC5" class="card">
       <div class="card__head"><h3>Среда исполнения</h3></div>
       <div class="card__body">
         <dl class="def">

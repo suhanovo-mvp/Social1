@@ -12,3 +12,7 @@ node_modules/
 
 # Локальные настройки Claude Code
 .claude/
+
+# Рецензирование требований (prd-review)
+prd/.reports/
+var/

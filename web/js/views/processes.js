@@ -84,7 +84,7 @@ export async function processesView(view, query) {
           </button>`)}
       </div>
 
-      <div class="chip-row" style="margin-top:14px" data-tour="proc-roles">
+      <div data-ac="US-BPMN-001/AC4" class="chip-row" style="margin-top:14px" data-tour="proc-roles">
         ${ROLE_ORDER.map((r) => {
           const n = r === 'all' ? inScenario.length : inScenario.filter((d) => d.role === r).length;
           if (!n) return '';
@@ -96,7 +96,7 @@ export async function processesView(view, query) {
     <div class="card" style="margin-bottom:16px">
       <div class="card__head">
         <div>
-          <h3>${esc(scenario.title)}</h3>
+          <h3 data-ac="US-BPMN-001/AC1 US-BPMN-001/AC5">${esc(scenario.title)}</h3>
           <div class="card__hint">${esc(scenario.description)}</div>
         </div>
       </div>
@@ -114,7 +114,7 @@ export async function processesView(view, query) {
     </div>
 
     <div class="proc-layout">
-      <aside class="proc-side card" data-tour="proc-list">
+      <aside data-ac="US-BPMN-001/AC3" class="proc-side card" data-tour="proc-list">
         <div class="card__body" style="padding:12px">
           ${groups.map((g) => html`
             <div class="proc-group">
@@ -130,7 +130,7 @@ export async function processesView(view, query) {
 
       <div class="stack">
         <div class="card">
-          <div class="proc-head" data-tour="proc-header">
+          <div data-ac="US-BPMN-001/AC2 US-SG-004/AC1 US-CHG-001/AC1 US-CHG-001/AC2" class="proc-head" data-tour="proc-header">
             <div style="flex:1;min-width:260px">
               <h3>Раздел ${seqOf(current)}. ${esc(current.title)}</h3>
               <p>${esc(current.description)}</p>
@@ -186,7 +186,7 @@ export async function processesView(view, query) {
           </div>
         </div>
 
-        <div class="card">
+        <div data-ac="US-BPMN-002/AC1" class="card">
           <div class="card__head"><h3>Обучение по этому процессу</h3></div>
           <div class="card__body">
             <p class="prose" style="margin-bottom:14px">
@@ -201,7 +201,7 @@ export async function processesView(view, query) {
           </div>
         </div>
 
-        <div class="card">
+        <div data-ac="US-BPMN-003/AC1" class="card">
           <div class="card__head"><h3>Выгрузка в PDF</h3>
             <span class="card__hint spacer">Лист A3, альбомная ориентация</span></div>
           <div class="card__body">

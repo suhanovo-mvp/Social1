@@ -14,6 +14,7 @@ import { ensureSearchIndex } from './search.js';
 import { sweepApprovals } from './process-changes.js';
 import { logAction } from './audit.js';
 import { q } from './db.js';
+import { prdHandler } from '../prd/server.js';
 
 // Регистрация маршрутов
 import './api/auth.js';
@@ -35,6 +36,9 @@ import './api/providers.js';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const WEB = join(ROOT, 'web');
 const SHARED = join(ROOT, 'shared');  // модули, общие для браузера и сервера
+// Из модулей рецензирования требований браузеру нужны только два — остальные серверные
+const PRD_LIB = join(ROOT, 'prd', 'lib');
+const PRD_BROWSER = new Set(['/review-ui.js', '/prd-core.js']);
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 
@@ -54,9 +58,11 @@ ensureStageEvents();
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
+  // Портал встраивается только в собственные страницы: режим «Проверять подряд»
+  // на странице требований показывает проверяемый экран во фрейме рядом с критерием
+  'X-Frame-Options': 'SAMEORIGIN',
   'Referrer-Policy': 'same-origin',
-  'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'",
+  'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'",
 };
 
 const server = createServer(async (req, res) => {
@@ -68,6 +74,14 @@ const server = createServer(async (req, res) => {
   const send = (status, data) => sendJson(res, status, data);
 
   try {
+    // Рецензирование требований: свой API со своими сессиями — рецензенту не нужна
+    // учётная запись портала
+    if (await prdHandler(req, res)) return;
+    if (pathname.startsWith('/prd/lib/')) {
+      const file = pathname.slice('/prd/lib'.length);
+      if (!PRD_BROWSER.has(file)) throw new HttpError(404, 'Не найдено');
+      return await serveStatic(res, PRD_LIB, file, { spaFallback: false });
+    }
     // Общие модели (раскладка, схема, сравнение версий) грузятся браузером как ES-модули
     if (pathname.startsWith('/shared/')) {
       return await serveStatic(res, SHARED, pathname.slice('/shared'.length), { spaFallback: false });

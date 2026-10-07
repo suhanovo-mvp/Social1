@@ -19,12 +19,12 @@ export async function communityView(view, query) {
           <p>Тематические обсуждения для обмена опытом между сотрудниками разных учреждений.
              Здесь разбирают методологию подачи инициатив, делятся опытом пилотов и находят единомышленников.</p>
         </div>
-        <button class="btn btn--primary" data-new-topic>Создать тему</button>
+        <button data-ac="US-COMM-001/AC1" class="btn btn--primary" data-new-topic>Создать тему</button>
       </div>
     </div>
 
     <div class="chip-row" style="margin-bottom:16px">
-      <button class="chip ${!cat ? 'is-on' : ''}" data-cat="">Все темы</button>
+      <button data-ac="US-COMM-001/AC3" class="chip ${!cat ? 'is-on' : ''}" data-cat="">Все темы</button>
       ${Object.entries(CATEGORIES).map(([k, v]) => `<button class="chip ${cat === k ? 'is-on' : ''}" data-cat="${k}">${esc(v)}</button>`)}
     </div>
 
@@ -102,7 +102,7 @@ export async function topicDetail(view, id) {
           </div>`)}
       </div>
       <div class="card__foot">
-        <form id="reply-form">
+        <form data-ac="US-COMM-001/AC2" id="reply-form">
           <textarea class="textarea" name="body" placeholder="Ваш ответ…" style="min-height:80px;margin-bottom:9px" required></textarea>
           <button class="btn btn--primary btn--sm" type="submit">Ответить</button>
         </form>
@@ -134,7 +134,7 @@ export async function practicesView(view) {
     ${practices.length ? html`
     <div class="stack">
       ${practices.map((p) => html`
-        <div class="card">
+        <div data-ac="US-PRAC-001/AC2" class="card">
           <div class="card__head">
             <h3>${esc(p.title)}</h3>
             <div class="row spacer">
@@ -164,7 +164,7 @@ export async function practicesView(view) {
     </div>` : '<div class="card"><div class="empty"><h4>Практик пока нет</h4><p>Библиотека наполняется по мере того, как инициативы доказывают эффект на пилотах.</p></div></div>'}
 
     ${rollouts.length ? html`
-    <div class="card" style="margin-top:18px">
+    <div data-ac="US-PRAC-001/AC3 US-PRAC-002/AC1 US-PRAC-002/AC3" class="card" style="margin-top:18px">
       <div class="card__head"><h3>Ход масштабирования</h3>
         <span class="card__hint spacer">Внедрение решений в учреждениях</span></div>
       <div class="table-wrap"><table class="table">
@@ -222,7 +222,7 @@ export async function profileView(view, id) {
     </div>
 
     <div class="grid grid--2" style="align-items:start">
-      <div class="card">
+      <div data-ac="US-COMM-002/AC1" class="card">
         <div class="card__head"><h3>Инициативы</h3></div>
         <div class="card__body--flush">
           ${u.initiatives.length ? html`<div class="list">
@@ -241,7 +241,7 @@ export async function profileView(view, id) {
         </div>
       </div>
 
-      <div class="card">
+      <div data-ac="US-COMM-002/AC1 US-COMM-002/AC2" class="card">
         <div class="card__head"><h3>Признание и награды</h3>
           <span class="card__hint spacer">Нематериальное стимулирование участников</span></div>
         <div class="card__body--flush">
@@ -284,7 +284,7 @@ export async function processView(view) {
         <div class="card">
           <div class="card__head">
             <div>
-              <h3>Этап ${s.tz_stage}. ${esc(s.tz_stage_name)}</h3>
+              <h3 data-ac="US-SG-001/AC2 US-SG-001/AC5 US-SG-003/AC1">Этап ${s.tz_stage}. ${esc(s.tz_stage_name)}</h3>
               <div class="card__hint">${esc(s.stage_name)}</div>
             </div>
             ${s.gate_no ? `<span class="badge badge--info spacer">Gate ${s.gate_no}</span>`

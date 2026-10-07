@@ -29,7 +29,7 @@ export async function dashboard(view) {
     </div>
 
     ${tasks.length ? html`
-    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--brand-600)">
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--brand-600)" data-ac="US-HOME-001/AC6">
       <div class="card__head">
         <h3>Требуют вашего решения</h3>
         <span class="badge badge--${tasks.some((t) => t.overdue) ? 'danger' : 'info'} spacer">
@@ -63,7 +63,7 @@ export async function dashboard(view) {
         bar: g2.sla_compliance_overall, meta: `${g3.frozen_count} ${plural(g3.frozen_count, 'инициатива вышла', 'инициативы вышли', 'инициатив вышли')} за срок` })}
     </div>
 
-    <div class="card" style="margin-bottom:16px">
+    <div class="card" style="margin-bottom:16px" data-ac="US-HOME-001/AC5">
       <div class="card__head">
         <h3>Конвейер Stage-Gate</h3>
         <span class="card__hint spacer">Инициатив на каждом этапе прямо сейчас</span>
@@ -94,7 +94,7 @@ export async function dashboard(view) {
       </div>
 
       ${can('initiative.create') ? html`
-      <div class="card">
+      <div class="card" data-ac="US-HOME-001/AC1">
         <div class="card__head"><h3>Мои инициативы</h3>
           <a href="/initiatives/new" class="btn btn--sm btn--primary spacer">Подать</a></div>
         <div class="card__body--flush">
@@ -171,7 +171,7 @@ function roleWidget(o) {
   }
   if (role === 'expert') {
     const passage = o.group1.gate_passage.find((g) => g.gate_no === 2);
-    return html`<div class="card">
+    return html`<div data-ac="US-HOME-001/AC3" class="card">
       <div class="card__head"><h3>Поток инициатив на экспертизу</h3></div>
       <div class="card__body">
         <p class="prose" style="margin-bottom:14px">На <b>Gate 2</b> вы оцениваете стратегическую значимость,
@@ -190,7 +190,7 @@ function roleWidget(o) {
     </div>`;
   }
   if (role === 'developer' || role === 'supplier') {
-    return html`<div class="card">
+    return html`<div data-ac="US-HOME-001/AC4" class="card">
       <div class="card__head"><h3>Разработка прототипов</h3>
         <a href="/projects" class="btn btn--sm spacer">Проекты</a></div>
       <div class="card__body">
@@ -204,7 +204,7 @@ function roleWidget(o) {
     </div>`;
   }
   if (role === 'pilot_coordinator') {
-    return html`<div class="card">
+    return html`<div data-ac="US-HOME-001/AC4" class="card">
       <div class="card__head"><h3>Пилотирование</h3>
         <a href="/pilots" class="btn btn--sm spacer">Все пилоты</a></div>
       <div class="card__body">
@@ -219,7 +219,7 @@ function roleWidget(o) {
     </div>`;
   }
   // ДТСЗН
-  return html`<div class="card">
+  return html`<div data-ac="US-HOME-001/AC5" class="card">
     <div class="card__head"><h3>Портфель инициатив</h3>
       <a href="/analytics" class="btn btn--sm spacer">Подробно</a></div>
     <div class="card__body">
@@ -257,7 +257,7 @@ export async function tasksView(view) {
     <div class="card">
       ${tasks.length ? html`<div class="list">
         ${tasks.map((t) => html`
-          <div class="list__item is-clickable" data-goto="/initiatives/${t.initiative_id}">
+          <div data-ac="US-HOME-002/AC1 US-HOME-002/AC2 US-SG-001/AC3" class="list__item is-clickable" data-goto="/initiatives/${t.initiative_id}">
             <div class="list__main">
               <div class="list__title">${esc(t.title)}</div>
               <div class="list__meta">

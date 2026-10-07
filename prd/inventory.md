@@ -1,0 +1,457 @@
+# Опись проекта для восстановления PRD
+
+Сформировано 2026-10-06 · стек: не определён
+
+| Что | Сколько |
+|---|---|
+| Файлов кода | 119 |
+| Экраны (маршруты UI) | 22 |
+| Методы API | 327 |
+| Server actions | 0 |
+| Модели данных | 9 |
+| Роли | 8 |
+| Файлы с формами | 5 |
+| Правила валидации | 0 |
+| Тесты | 343 |
+| Признаки недоделок | 3 |
+| Документы-кандидаты в PRD | 1 |
+
+## Документы, которые стоит прочитать первыми
+
+- Экосистема «Social1»- Техническое задание на создание управленческой платформы для системных инноваций в ДТСЗН.pdf (217 КБ, совпадений 2)
+
+## Кандидаты в модули
+
+- **providers** — Каталог разработчиков ИИ-решений / Моя компания в каталоге: 1 экр., 45 API
+- **admin** — Настройки платформы: 1 экр., 31 API
+- **ideas** — Идеи и решения: 1 экр., 27 API
+- **forms** — Формы и опросы: 1 экр., 25 API
+- **knowledge** — База знаний: 1 экр., 21 API
+- **process-changes**: 0 экр., 21 API
+- **initiatives** — Инициативы / Реестр инициатив: 1 экр., 17 API
+- **processes** — Схемы процессов: 1 экр., 13 API
+- **review** — Ревью предложений: 1 экр., 10 API
+- **projects** — Разработка прототипов / Разработка: 1 экр., 8 API
+- **proposals**: 0 экр., 9 API
+- **pilots** — Пилотирование: 1 экр., 6 API
+- **forum**: 0 экр., 7 API
+- **incentives** — Рекомендации к поощрению / Поощрения: 1 экр., 5 API
+- **analytics** — Аналитика и КПЭ: 1 экр., 5 API
+- **surveys**: 0 экр., 6 API
+- **auth**: 0 экр., 5 API
+- **process-versions**: 0 экр., 5 API
+- **points**: 0 экр., 5 API
+- **public**: 0 экр., 4 API
+- **pilot-applications**: 0 экр., 4 API
+- **tasks** — Мои задачи: 1 экр., 2 API
+- **rating** — Рейтинг социальных советников: 1 экр., 2 API
+- **users**: 0 экр., 3 API
+- **rollouts**: 0 экр., 3 API
+- **search**: 0 экр., 3 API
+- **process-comments**: 0 экр., 3 API
+- **board-items**: 0 экр., 3 API
+- **best-practices**: 0 экр., 2 API
+- **reports**: 0 экр., 2 API
+- **ai**: 0 экр., 2 API
+- **notifications**: 0 экр., 2 API
+- **web** — Social1 — платформа системных инноваций ДТСЗН: 1 экр., 0 API
+- **home** — Рабочий стол / На рабочий стол: 1 экр., 0 API
+- **moderation** — Модерация идей: 1 экр., 0 API
+- **process** — Процесс Stage-Gate: 1 экр., 0 API
+- **changes** — Изменения процессов: 1 экр., 0 API
+- **sla** — Контроль SLA: 1 экр., 0 API
+- **community** — Сообщество: 1 экр., 0 API
+- **practices** — Лучшие практики: 1 экр., 0 API
+- **institutions**: 0 экр., 1 API
+- **awards**: 0 экр., 1 API
+- **workflow**: 0 экр., 1 API
+- **categories**: 0 экр., 1 API
+- **pilot-kpis**: 0 экр., 1 API
+- **incentive-types**: 0 экр., 1 API
+- **process-changes?${params}**: 0 экр., 1 API
+- **process-changes?limit=1**: 0 экр., 1 API
+- **tasks?status=open**: 0 экр., 1 API
+- **initiatives?mine=1&limit=5**: 0 экр., 1 API
+- **initiatives?limit=6&sort=new**: 0 экр., 1 API
+- **forms?${params}**: 0 экр., 1 API
+- **ideas?${params}**: 0 экр., 1 API
+- **initiatives?${params}**: 0 экр., 1 API
+- **knowledge?${params}**: 0 экр., 1 API
+- **search?q=${encodeURIComponent(text)}**: 0 экр., 1 API
+- **knowledge?limit=1**: 0 экр., 1 API
+- **initiatives?stage=4&limit=50**: 0 экр., 1 API
+- **providers?${params}**: 0 экр., 1 API
+- **rating?period=${period}${scope ? **: 0 экр., 1 API
+- **incentives${status ? **: 0 экр., 1 API
+
+## Экраны
+
+- `/web` — Social1 — платформа системных инноваций ДТСЗН (web/index.html:1)
+- `/` — Рабочий стол (web/js/app.js:27)
+- `/tasks` — Мои задачи (web/js/app.js:28)
+- `/ideas` — Идеи и решения (web/js/app.js:29)
+- `/review` — Ревью предложений (web/js/app.js:32)
+- `/rating` — Рейтинг социальных советников (web/js/app.js:33)
+- `/moderation` — Модерация идей (web/js/app.js:34)
+- `/incentives` — Рекомендации к поощрению (web/js/app.js:35)
+- `/initiatives` — Инициативы (web/js/app.js:36)
+- `/process` — Процесс Stage-Gate (web/js/app.js:39)
+- `/processes` — Схемы процессов (web/js/app.js:40)
+- `/changes` — Изменения процессов (web/js/app.js:41)
+- `/knowledge` — База знаний (web/js/app.js:44)
+- `/projects` — Разработка прототипов (web/js/app.js:46)
+- `/pilots` — Пилотирование (web/js/app.js:48)
+- `/forms` — Формы и опросы (web/js/app.js:51)
+- `/providers` — Каталог разработчиков ИИ-решений (web/js/app.js:55)
+- `/analytics` — Аналитика и КПЭ (web/js/app.js:59)
+- `/sla` — Контроль SLA (web/js/app.js:60)
+- `/community` — Сообщество (web/js/app.js:61)
+- `/practices` — Лучшие практики (web/js/app.js:63)
+- `/admin` — Настройки платформы (web/js/app.js:65)
+
+## API
+
+- `GET /api/admin/presentation.pdf` (server/api/admin.js:19)
+- `GET /api/admin/workflow` (server/api/admin.js:34)
+- `PATCH /api/admin/workflow/:stage` (server/api/admin.js:47)
+- `GET /api/admin/roles` (server/api/admin.js:79)
+- `POST /api/admin/roles` (server/api/admin.js:93)
+- `PATCH /api/admin/roles/:code` (server/api/admin.js:107)
+- `PUT /api/admin/roles/:code/permissions` (server/api/admin.js:117)
+- `GET /api/admin/users/:id/roles` (server/api/admin.js:138)
+- `POST /api/admin/users/:id/roles` (server/api/admin.js:143)
+- `DELETE /api/admin/users/:id/roles/:code` (server/api/admin.js:155)
+- `GET /api/admin/users` (server/api/admin.js:163)
+- `POST /api/admin/users` (server/api/admin.js:171)
+- `PATCH /api/admin/users/:id` (server/api/admin.js:185)
+- `POST /api/admin/institutions` (server/api/admin.js:198)
+- `GET /api/admin/audit` (server/api/admin.js:211)
+- `GET /api/admin/audit/verify` (server/api/admin.js:229)
+- `GET /api/admin/sla` (server/api/admin.js:235)
+- `POST /api/admin/sla/sweep` (server/api/admin.js:260)
+- `GET /api/admin/system` (server/api/admin.js:268)
+- `GET /api/analytics/overview` (server/api/analytics.js:180)
+- `GET /api/analytics/institutions` (server/api/analytics.js:220)
+- `GET /api/analytics/contributors` (server/api/analytics.js:241)
+- `GET /api/analytics/export` (server/api/analytics.js:255)
+- `POST /api/auth/login` (server/api/auth.js:6)
+- `POST /api/auth/logout` (server/api/auth.js:22)
+- `GET /api/auth/me` (server/api/auth.js:29)
+- `GET /api/auth/roles` (server/api/auth.js:40)
+- `GET /api/auth/demo-accounts` (server/api/auth.js:45)
+- `GET /api/forum/topics` (server/api/community.js:9)
+- `POST /api/forum/topics` (server/api/community.js:23)
+- `GET /api/forum/topics/:id` (server/api/community.js:34)
+- `POST /api/forum/topics/:id/posts` (server/api/community.js:46)
+- `GET /api/users/:id` (server/api/community.js:57)
+- `GET /api/users` (server/api/community.js:70)
+- `GET /api/best-practices` (server/api/community.js:79)
+- `POST /api/best-practices` (server/api/community.js:91)
+- `GET /api/rollouts` (server/api/community.js:105)
+- `POST /api/rollouts` (server/api/community.js:116)
+- `PATCH /api/rollouts/:id` (server/api/community.js:133)
+- `GET /api/institutions` (server/api/community.js:144)
+- `POST /api/awards` (server/api/community.js:149)
+- `GET /api/forms/meta` (server/api/forms.js:25)
+- `GET /api/forms` (server/api/forms.js:37)
+- `POST /api/forms` (server/api/forms.js:50)
+- `GET /api/forms/:id` (server/api/forms.js:56)
+- `PATCH /api/forms/:id` (server/api/forms.js:69)
+- `PUT /api/forms/:id/questions` (server/api/forms.js:73)
+- `POST /api/forms/:id/publish` (server/api/forms.js:79)
+- `POST /api/forms/:id/status` (server/api/forms.js:83)
+- `POST /api/forms/:id/duplicate` (server/api/forms.js:88)
+- `DELETE /api/forms/:id` (server/api/forms.js:92)
+- `POST /api/forms/:id/responses` (server/api/forms.js:99)
+- `PUT /api/forms/:id/draft` (server/api/forms.js:107)
+- `GET /api/forms/:id/results` (server/api/forms.js:122)
+- `GET /api/forms/:id/responses` (server/api/forms.js:126)
+- `GET /api/forms/:id/export` (server/api/forms.js:130)
+- `GET /api/public/forms/:slug` (server/api/forms.js:169)
+- `POST /api/public/forms/:slug/responses` (server/api/forms.js:173)
+- `GET /api/ideas/templates` (server/api/ideas.js:70)
+- `GET /api/ideas/categories` (server/api/ideas.js:81)
+- `POST /api/ideas/similar` (server/api/ideas.js:87)
+- `GET /api/ideas/draft` (server/api/ideas.js:93)
+- `PUT /api/ideas/draft` (server/api/ideas.js:98)
+- `DELETE /api/ideas/draft` (server/api/ideas.js:108)
+- `GET /api/ideas/moderation` (server/api/ideas.js:114)
+- `GET /api/ideas` (server/api/ideas.js:136)
+- `POST /api/ideas` (server/api/ideas.js:181)
+- `GET /api/ideas/:id` (server/api/ideas.js:231)
+- `PATCH /api/ideas/:id` (server/api/ideas.js:283)
+- `POST /api/ideas/:id/moderate` (server/api/ideas.js:302)
+- `POST /api/ideas/:id/reactions` (server/api/ideas.js:315)
+- `POST /api/ideas/:id/comments` (server/api/ideas.js:353)
+- `POST /api/ideas/:id/report` (server/api/ideas.js:385)
+- `POST /api/proposals/:id/report` (server/api/ideas.js:389)
+- `POST /api/reports/:id/resolve` (server/api/ideas.js:393)
+- `POST /api/ideas/:id/proposals` (server/api/ideas.js:406)
+- `PATCH /api/proposals/:id` (server/api/ideas.js:461)
+- `POST /api/proposals/:id/useful` (server/api/ideas.js:483)
+- `POST /api/proposals/:id/endorse` (server/api/ideas.js:504)
+- `POST /api/proposals/:id/decide` (server/api/ideas.js:534)
+- `POST /api/ideas/:id/promote` (server/api/ideas.js:590)
+- `GET /api/ideas/contribution/:userId` (server/api/ideas.js:635)
+- `GET /api/workflow/stages` (server/api/initiatives.js:67)
+- `GET /api/initiatives` (server/api/initiatives.js:70)
+- `POST /api/initiatives` (server/api/initiatives.js:108)
+- `GET /api/initiatives/:id` (server/api/initiatives.js:144)
+- `PATCH /api/initiatives/:id` (server/api/initiatives.js:198)
+- `POST /api/initiatives/:id/gate` (server/api/initiatives.js:217)
+- `POST /api/initiatives/:id/resume` (server/api/initiatives.js:227)
+- `POST /api/initiatives/:id/comments` (server/api/initiatives.js:248)
+- `POST /api/initiatives/:id/vote` (server/api/initiatives.js:265)
+- `POST /api/initiatives/:id/follow` (server/api/initiatives.js:307)
+- `POST /api/ai/classify` (server/api/initiatives.js:325)
+- `POST /api/ai/similar` (server/api/initiatives.js:330)
+- `GET /api/initiatives/:id/prediction` (server/api/initiatives.js:335)
+- `GET /api/categories` (server/api/initiatives.js:342)
+- `GET /api/knowledge` (server/api/knowledge.js:17)
+- `GET /api/knowledge/template/:kind` (server/api/knowledge.js:35)
+- `POST /api/knowledge` (server/api/knowledge.js:41)
+- `GET /api/knowledge/:id` (server/api/knowledge.js:54)
+- `PUT /api/knowledge/:id` (server/api/knowledge.js:74)
+- `POST /api/knowledge/:id/review` (server/api/knowledge.js:82)
+- `POST /api/knowledge/:id/verdict` (server/api/knowledge.js:88)
+- `POST /api/knowledge/:id/publish` (server/api/knowledge.js:95)
+- `POST /api/knowledge/:id/revise` (server/api/knowledge.js:101)
+- `POST /api/knowledge/:id/decision` (server/api/knowledge.js:107)
+- `GET /api/knowledge/:id/versions/:versionId` (server/api/knowledge.js:112)
+- `GET /api/search` (server/api/knowledge.js:121)
+- `POST /api/search/similar` (server/api/knowledge.js:132)
+- `POST /api/search/reindex` (server/api/knowledge.js:141)
+- `POST /api/knowledge/:id/comments` (server/api/knowledge.js:149)
+- `GET /api/knowledge/:id/comments` (server/api/knowledge.js:166)
+- `GET /api/pilots` (server/api/pilots.js:9)
+- `POST /api/pilot-applications` (server/api/pilots.js:28)
+- `GET /api/pilot-applications` (server/api/pilots.js:45)
+- `POST /api/pilot-applications/:id/approve` (server/api/pilots.js:58)
+- `GET /api/pilots/:id` (server/api/pilots.js:75)
+- `PATCH /api/pilots/:id` (server/api/pilots.js:95)
+- `POST /api/pilots/:id/kpis` (server/api/pilots.js:108)
+- `PATCH /api/pilot-kpis/:id` (server/api/pilots.js:119)
+- `POST /api/surveys` (server/api/pilots.js:133)
+- `GET /api/surveys/:id` (server/api/pilots.js:147)
+- `POST /api/surveys/:id/respond` (server/api/pilots.js:169)
+- `GET /api/surveys` (server/api/pilots.js:186)
+- `GET /api/processes/:key/comments` (server/api/process-changes.js:15)
+- `POST /api/processes/:key/comments` (server/api/process-changes.js:27)
+- `POST /api/process-comments/:id/useful` (server/api/process-changes.js:36)
+- `POST /api/process-comments/:id/resolve` (server/api/process-changes.js:41)
+- `GET /api/process-changes` (server/api/process-changes.js:48)
+- `POST /api/process-changes` (server/api/process-changes.js:62)
+- `GET /api/process-changes/:id` (server/api/process-changes.js:73)
+- `PUT /api/process-changes/:id/model` (server/api/process-changes.js:89)
+- `POST /api/process-changes/:id/submit` (server/api/process-changes.js:95)
+- `POST /api/process-changes/:id/withdraw` (server/api/process-changes.js:99)
+- `POST /api/process-changes/:id/vote` (server/api/process-changes.js:105)
+- `DELETE /api/process-changes/:id/vote` (server/api/process-changes.js:110)
+- `GET /api/process-changes/:id/route` (server/api/process-changes.js:116)
+- `POST /api/process-changes/:id/to-approval` (server/api/process-changes.js:120)
+- `POST /api/process-changes/:id/approve` (server/api/process-changes.js:124)
+- `POST /api/process-changes/:id/publish` (server/api/process-changes.js:132)
+- `GET /api/processes` (server/api/processes.js:48)
+- `GET /api/processes/index` (server/api/processes.js:58)
+- `GET /api/processes/album/pdf` (server/api/processes.js:67)
+- `GET /api/processes/:id` (server/api/processes.js:74)
+- `GET /api/processes/:id/pdf` (server/api/processes.js:85)
+- `GET /api/processes/:id/versions` (server/api/processes.js:92)
+- `GET /api/process-versions/:id` (server/api/processes.js:98)
+- `POST /api/processes/:id/draft` (server/api/processes.js:108)
+- `PUT /api/process-versions/:id` (server/api/processes.js:121)
+- `DELETE /api/process-versions/:id` (server/api/processes.js:132)
+- `GET /api/process-versions/:id/validate` (server/api/processes.js:140)
+- `POST /api/process-versions/:id/publish` (server/api/processes.js:144)
+- `GET /api/processes/pipeline/usage` (server/api/processes.js:156)
+- `GET /api/providers` (server/api/providers.js:53)
+- `GET /api/providers/export.csv` (server/api/providers.js:62)
+- `GET /api/providers/dictionaries` (server/api/providers.js:74)
+- `POST /api/providers/duplicates` (server/api/providers.js:80)
+- `GET /api/providers/solutions` (server/api/providers.js:86)
+- `POST /api/providers` (server/api/providers.js:103)
+- `GET /api/providers/guide/:file` (server/api/providers.js:112)
+- `GET /api/providers/mine` (server/api/providers.js:129)
+- `GET /api/providers/members/candidates` (server/api/providers.js:133)
+- `GET /api/providers/access` (server/api/providers.js:141)
+- `GET /api/providers/access/candidates` (server/api/providers.js:146)
+- `POST /api/providers/access` (server/api/providers.js:151)
+- `DELETE /api/providers/access/:userId` (server/api/providers.js:157)
+- `GET /api/providers/:id` (server/api/providers.js:165)
+- `PUT /api/providers/:id` (server/api/providers.js:177)
+- `POST /api/providers/:id/confirm` (server/api/providers.js:185)
+- `GET /api/providers/:id/members` (server/api/providers.js:191)
+- `POST /api/providers/:id/members` (server/api/providers.js:195)
+- `DELETE /api/providers/:id/members/:userId` (server/api/providers.js:200)
+- `POST /api/providers/:id/status` (server/api/providers.js:205)
+- `DELETE /api/providers/:id` (server/api/providers.js:211)
+- `POST /api/providers/:id/cases` (server/api/providers.js:221)
+- `PUT /api/providers/:id/cases/:caseId` (server/api/providers.js:227)
+- `DELETE /api/providers/:id/cases/:caseId` (server/api/providers.js:233)
+- `POST /api/providers/:id/solutions` (server/api/providers.js:241)
+- `PUT /api/providers/:id/solutions/:solutionId` (server/api/providers.js:247)
+- `DELETE /api/providers/:id/solutions/:solutionId` (server/api/providers.js:253)
+- `PUT /api/providers/:id/review` (server/api/providers.js:261)
+- `DELETE /api/providers/:id/review` (server/api/providers.js:265)
+- `POST /api/providers/:id/notes` (server/api/providers.js:272)
+- `DELETE /api/providers/:id/notes/:noteId` (server/api/providers.js:276)
+- `GET /api/rating` (server/api/rating.js:26)
+- `GET /api/rating/export` (server/api/rating.js:46)
+- `GET /api/points/ledger` (server/api/rating.js:72)
+- `POST /api/points/:id/revoke` (server/api/rating.js:105)
+- `POST /api/points/grant` (server/api/rating.js:116)
+- `GET /api/incentive-types` (server/api/rating.js:133)
+- `GET /api/incentives` (server/api/rating.js:137)
+- `POST /api/incentives` (server/api/rating.js:167)
+- `POST /api/incentives/build` (server/api/rating.js:190)
+- `PATCH /api/incentives/:id` (server/api/rating.js:210)
+- `GET /api/admin/ideahub` (server/api/rating.js:238)
+- `PATCH /api/admin/ideahub/rules/:code` (server/api/rating.js:257)
+- `PATCH /api/admin/ideahub/settings` (server/api/rating.js:287)
+- `PATCH /api/admin/ideahub/incentive-types/:code` (server/api/rating.js:302)
+- `POST /api/admin/ideahub/refresh-badges` (server/api/rating.js:318)
+- `GET /api/review/filters` (server/api/review.js:46)
+- `GET /api/review/queue` (server/api/review.js:68)
+- `GET /api/review/top` (server/api/review.js:123)
+- `GET /api/review/flags` (server/api/review.js:159)
+- `POST /api/review/flags/:id/resolve` (server/api/review.js:175)
+- `POST /api/review/:id` (server/api/review.js:186)
+- `DELETE /api/review/:id` (server/api/review.js:239)
+- `GET /api/tasks` (server/api/work.js:10)
+- `POST /api/tasks/:id/done` (server/api/work.js:26)
+- `GET /api/notifications` (server/api/work.js:37)
+- `POST /api/notifications/read` (server/api/work.js:45)
+- `GET /api/projects` (server/api/work.js:53)
+- `POST /api/projects` (server/api/work.js:65)
+- `GET /api/projects/:id` (server/api/work.js:77)
+- `POST /api/projects/:id/sprints` (server/api/work.js:93)
+- `POST /api/projects/:id/items` (server/api/work.js:104)
+- `PATCH /api/board-items/:id` (server/api/work.js:117)
+- `DELETE /api/board-items/:id` (server/api/work.js:139)
+- `POST /api/projects/:id/documents` (server/api/work.js:147)
+- `PUT /api/admin/roles/${role.code}/permissions` (web/js/views/admin.js:109)
+- `PATCH /api/admin/ideahub/incentive-types/${cb.dataset.type}` (web/js/views/admin.js:331)
+- `PATCH /api/admin/ideahub/rules/${rule.code}` (web/js/views/admin.js:371)
+- `PATCH /api/admin/workflow/${s.stage_no}` (web/js/views/admin.js:457)
+- `GET /api/admin/audit?limit=150` (web/js/views/admin.js:562)
+- `GET /api/admin/users/${user.id}/roles` (web/js/views/admin.js:647)
+- `POST /api/admin/users/${user.id}/roles` (web/js/views/admin.js:684)
+- `GET /api/analytics/overview?scope=${scope}` (web/js/views/analytics.js:13)
+- `GET /api/process-changes?${params}` (web/js/views/changes.js:26)
+- `GET /api/process-changes/${id}` (web/js/views/changes.js:94)
+- `GET /api/process-changes?limit=1` (web/js/views/changes.js:96)
+- `POST /api/process-changes/${c.id}/submit` (web/js/views/changes.js:278)
+- `GET /api/process-changes/${c.id}/route` (web/js/views/changes.js:281)
+- `POST /api/process-changes/${c.id}/to-approval` (web/js/views/changes.js:287)
+- `POST /api/process-changes/${c.id}/publish` (web/js/views/changes.js:317)
+- `POST /api/process-changes/${c.id}/withdraw` (web/js/views/changes.js:323)
+- `POST /api/process-changes/${c.id}/vote` (web/js/views/changes.js:330)
+- `POST /api/processes/${c.def_key}/comments` (web/js/views/changes.js:338)
+- `POST /api/process-changes/${c.id}/approve` (web/js/views/changes.js:360)
+- `PUT /api/process-changes/${c.id}/model` (web/js/views/changes.js:400)
+- `GET /api/forum/topics${cat ? ` (web/js/views/community.js:13)
+- `GET /api/forum/topics/${id}` (web/js/views/community.js:84)
+- `POST /api/forum/topics/${id}/posts` (web/js/views/community.js:114)
+- `GET /api/users/${id}` (web/js/views/community.js:198)
+- `GET /api/tasks?status=open` (web/js/views/dashboard.js:12)
+- `GET /api/initiatives?mine=1&limit=5` (web/js/views/dashboard.js:13)
+- `GET /api/initiatives?limit=6&sort=new` (web/js/views/dashboard.js:14)
+- `GET /api/forms/${id}` (web/js/views/form-fill.js:236)
+- `PUT /api/forms/${form.id}/draft` (web/js/views/form-fill.js:286)
+- `POST /api/forms/${form.id}/responses` (web/js/views/form-fill.js:299)
+- `GET /api/public/forms/${encodeURIComponent(slug)}` (web/js/views/form-fill.js:329)
+- `POST /api/public/forms/${encodeURIComponent(slug)}/responses` (web/js/views/form-fill.js:392)
+- `GET /api/forms/${id}/results` (web/js/views/form-results.js:17)
+- `GET /api/forms/${formId}/responses` (web/js/views/form-results.js:164)
+- `GET /api/forms?${params}` (web/js/views/forms.js:30)
+- `PUT /api/forms/${form.id}/questions` (web/js/views/forms.js:163)
+- `PATCH /api/forms/${form.id}` (web/js/views/forms.js:504)
+- `POST /api/forms/${form.id}/publish` (web/js/views/forms.js:576)
+- `POST /api/forms/${form.id}/status` (web/js/views/forms.js:587)
+- `POST /api/forms/${form.id}/duplicate` (web/js/views/forms.js:594)
+- `GET /api/ideas?${params}` (web/js/views/ideas.js:69)
+- `POST /api/ideas/${id}/reactions` (web/js/views/ideas.js:189)
+- `GET /api/ideas/${id}` (web/js/views/ideas.js:428)
+- `POST /api/proposals/${b.dataset.endorse}/endorse` (web/js/views/ideas.js:602)
+- `POST /api/proposals/${b.dataset.useful}/useful` (web/js/views/ideas.js:614)
+- `POST /api/ideas/${id}/comments` (web/js/views/ideas.js:630)
+- `POST /api/ideas/${idea.id}/proposals` (web/js/views/ideas.js:750)
+- `POST /api/proposals/${proposalId}/decide` (web/js/views/ideas.js:792)
+- `POST /api/ideas/${idea.id}/moderate` (web/js/views/ideas.js:854)
+- `POST /api/ideas/${idea.id}/promote` (web/js/views/ideas.js:870)
+- `PATCH /api/ideas/${idea.id}` (web/js/views/ideas.js:892)
+- `POST /api/initiatives/${id}/vote` (web/js/views/initiatives.js:37)
+- `GET /api/initiatives?${params}` (web/js/views/initiatives.js:85)
+- `GET /api/initiatives/${id}` (web/js/views/initiatives.js:188)
+- `POST /api/initiatives/${id}/follow` (web/js/views/initiatives.js:429)
+- `POST /api/initiatives/${id}/comments` (web/js/views/initiatives.js:439)
+- `GET /api/initiatives/${id}/prediction` (web/js/views/initiatives.js:448)
+- `POST /api/initiatives/${it.id}/gate` (web/js/views/initiatives.js:544)
+- `POST /api/initiatives/${it.id}/resume` (web/js/views/initiatives.js:572)
+- `GET /api/knowledge?${params}` (web/js/views/knowledge.js:31)
+- `GET /api/search?q=${encodeURIComponent(text)}` (web/js/views/knowledge.js:92)
+- `GET /api/knowledge/${id}` (web/js/views/knowledge.js:195)
+- `GET /api/knowledge?limit=1` (web/js/views/knowledge.js:199)
+- `PUT /api/knowledge/${doc.id}` (web/js/views/knowledge.js:368)
+- `POST /api/knowledge/${doc.id}/comments` (web/js/views/knowledge.js:389)
+- `POST /api/knowledge/${doc.id}/review` (web/js/views/knowledge.js:398)
+- `POST /api/knowledge/${doc.id}/publish` (web/js/views/knowledge.js:404)
+- `POST /api/knowledge/${doc.id}/revise` (web/js/views/knowledge.js:413)
+- `POST /api/knowledge/${doc.id}/decision` (web/js/views/knowledge.js:421)
+- `POST /api/knowledge/${doc.id}/verdict` (web/js/views/knowledge.js:442)
+- `POST /api/pilot-applications/${b.dataset.approve}/approve` (web/js/views/pilots.js:69)
+- `GET /api/initiatives?stage=4&limit=50` (web/js/views/pilots.js:78)
+- `GET /api/pilots/${id}` (web/js/views/pilots.js:111)
+- `POST /api/pilots/${pilotId}/kpis` (web/js/views/pilots.js:258)
+- `GET /api/surveys/${id}` (web/js/views/pilots.js:302)
+- `POST /api/surveys/${id}/respond` (web/js/views/pilots.js:396)
+- `GET /api/processes/${diagram.id}/comments` (web/js/views/processes.js:268)
+- `POST /api/processes/${diagram.id}/comments` (web/js/views/processes.js:336)
+- `POST /api/process-comments/${b.dataset.useful}/useful` (web/js/views/processes.js:344)
+- `GET /api/projects/${id}` (web/js/views/projects.js:45)
+- `PATCH /api/board-items/${itemId}` (web/js/views/projects.js:137)
+- `POST /api/projects/${project.id}/items` (web/js/views/projects.js:214)
+- `GET /api/providers?${params}` (web/js/views/providers.js:121)
+- `GET /api/providers/${id}` (web/js/views/providers.js:268)
+- `GET /api/providers/solutions?${params}` (web/js/views/providers.js:306)
+- `GET /api/providers/access/candidates?q=${encodeURIComponent(text)}` (web/js/views/providers.js:443)
+- `POST /api/providers/${p.id}/status` (web/js/views/providers.js:549)
+- `POST /api/providers/${p.id}/confirm` (web/js/views/providers.js:553)
+- `GET /api/providers/members/candidates?q=${encodeURIComponent(text)}` (web/js/views/providers.js:653)
+- `POST /api/providers/${p.id}/members` (web/js/views/providers.js:660)
+- `PUT /api/providers/${p.id}/cases/${c.id}` (web/js/views/providers.js:735)
+- `POST /api/providers/${p.id}/cases` (web/js/views/providers.js:736)
+- `PUT /api/providers/${p.id}/solutions/${s.id}` (web/js/views/providers.js:801)
+- `POST /api/providers/${p.id}/solutions` (web/js/views/providers.js:802)
+- `PUT /api/providers/${p.id}/review` (web/js/views/providers.js:857)
+- `POST /api/providers/${p.id}/notes` (web/js/views/providers.js:900)
+- `PUT /api/providers/${p.id}` (web/js/views/providers.js:1053)
+- `GET /api/rating?period=${period}${scope ? ` (web/js/views/rating.js:34)
+- `POST /api/ideas/${ideaId}/moderate` (web/js/views/rating.js:298)
+- `POST /api/proposals/${b.dataset.decide}/decide` (web/js/views/rating.js:351)
+- `POST /api/reports/${b.dataset.resolve}/resolve` (web/js/views/rating.js:422)
+- `POST /api/review/flags/${b.dataset.flag}/resolve` (web/js/views/rating.js:429)
+- `GET /api/points/ledger?limit=200` (web/js/views/rating.js:437)
+- `POST /api/points/${b.dataset.revoke}/revoke` (web/js/views/rating.js:481)
+- `GET /api/incentives${status ? ` (web/js/views/rating.js:501)
+- `PATCH /api/incentives/${id}` (web/js/views/rating.js:679)
+- `GET /api/ideas/contribution/${userId}` (web/js/views/rating.js:693)
+- `GET /api/review/queue?${params}` (web/js/views/review.js:44)
+- `POST /api/review/${current.id}` (web/js/views/review.js:286)
+
+## Роли
+
+- head
+- supplier
+- dtszn
+- employee
+- admin
+- expert
+- developer
+- pilot_coordinator
+
+## Признаки недоделок
+
+- stub: В разработке (server/api/initiatives.js:37)
+- stub: в разработке (server/auth.js:177)
+- stub: В разработке (web/js/views/dashboard.js:200)

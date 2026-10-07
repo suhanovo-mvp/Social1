@@ -46,13 +46,13 @@ export async function knowledgeView(view, query) {
              какие варианты рассмотрели и почему отклонили, чем в итоге пришлось пожертвовать.
              Прежде чем разбирать задачу заново, поищите — возможно, её уже разобрали.</p>
         </div>
-        ${can('doc.propose') ? '<button class="btn btn--primary" data-new>Завести документ</button>' : ''}
+        ${can('doc.propose') ? '<button data-ac="US-KB-001/AC1" class="btn btn--primary" data-new>Завести документ</button>' : ''}
       </div>
 
       <div class="kb-search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input class="input" id="kb-q" value="${esc(q)}" placeholder="Например: возврат заявления, очередь на путёвку">
+        <input data-ac="US-KB-003/AC1" class="input" id="kb-q" value="${esc(q)}" placeholder="Например: возврат заявления, очередь на путёвку">
       </div>
 
       <div class="chip-row" style="margin-top:12px">
@@ -66,7 +66,7 @@ export async function knowledgeView(view, query) {
 
     <div id="kb-results"></div>
 
-    <div id="kb-list">
+    <div data-ac="US-KB-001/AC8" id="kb-list">
       ${docs.length ? html`
         <div class="stack">
           ${docs.map((d) => docCard(d, kinds, statuses))}
@@ -240,7 +240,7 @@ export async function documentView(view, id) {
 
       <aside class="stack">
         ${d.reviews.length ? html`
-          <div class="card">
+          <div data-ac="US-KB-001/AC4 US-KB-001/AC5" class="card">
             <div class="card__head"><h3>Рецензенты</h3></div>
             <div class="card__body">
               <div class="appr">
@@ -288,7 +288,7 @@ export async function documentView(view, id) {
             </div>
           </div>` : ''}
 
-        <div class="card">
+        <div data-ac="US-KB-001/AC7" class="card">
           <div class="card__head"><h3>История версий</h3></div>
           <div class="card__body--flush">
             <div class="list">
@@ -305,7 +305,7 @@ export async function documentView(view, id) {
         </div>
 
         ${doc.decision_note ? html`
-          <div class="card">
+          <div data-ac="US-KB-002/AC1" class="card">
             <div class="card__head"><h3>Основание решения</h3></div>
             <div class="card__body"><p class="prose">${esc(doc.decision_note)}</p></div>
           </div>` : ''}
@@ -320,7 +320,7 @@ function sectionCard(s, d, editable) {
   const text = d.version.sections[s.key] ?? '';
   const comments = d.comments.filter((c) => c.node_id === s.key);
   return html`
-    <div class="card kb-section" data-section="${esc(s.key)}">
+    <div data-ac="US-KB-001/AC2 US-KB-001/AC9" class="card kb-section" data-section="${esc(s.key)}">
       <div class="card__head">
         <h3>${esc(s.title)}${s.required ? '<span class="req"> *</span>' : ''}</h3>
         <span class="spacer"></span>

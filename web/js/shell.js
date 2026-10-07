@@ -23,6 +23,7 @@ const ICONS = {
   moderation: '<path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9-4.8-1.1-8-4.5-8-9V6l8-3zM9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   forms: '<path d="M6.5 4.5h11v15h-11zM9.5 3h5v3h-5zM9.5 11h5M9.5 15h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>',
   providers: '<path d="M4 20V9l4-3 4 3v11M12 20V5l4-2 4 2v15M2 20h20M7 12h2M7 16h2M15 8h2M15 12h2M15 16h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+  requirements: '<path d="M9 4h6v3H9zM7 5.5H5.5v15h13v-15H17M8.5 12l1.6 1.6 3.4-3.4M8.5 17h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
   incentives: '<path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>',
 };
 const icon = (name) => html`<svg class="nav__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${ICONS[name] || ''}</svg>`;
@@ -61,6 +62,7 @@ function navItems() {
       ...(can('analytics.all') || can('analytics.institution')
         ? [{ path: '/sla', title: 'Контроль SLA', icon: 'sla' }] : []),
       { path: '/community', title: 'Сообщество', icon: 'community' },
+      { path: '/requirements', title: 'Требования к платформе', icon: 'requirements' },
     ]},
   ];
   if (can('admin')) {
@@ -105,25 +107,31 @@ export function renderShell(content, { title = '' } = {}) {
     </aside>
     <div class="main">
       <header class="header">
-        <button class="icon-btn burger" data-burger aria-label="Меню">
+        <button data-ac="US-SEC-004/AC1" class="icon-btn burger" data-burger aria-label="Меню">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         </button>
         <div class="header__title">${esc(title)}</div>
-        <div class="header__search">
+        <div class="header__search" data-ac="US-INI-003/AC5">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
             stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           <input type="search" placeholder="Поиск инициатив…" id="global-search" aria-label="Поиск инициатив">
         </div>
-        <button class="icon-btn" data-notifications title="Уведомления" aria-label="Уведомления">
+        <button data-ac="US-HOME-002/AC4 US-SG-001/AC4" class="icon-btn" data-notifications title="Уведомления" aria-label="Уведомления">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg>
           ${state.counts.notifications ? '<span class="dot"></span>' : ''}
         </button>
-        <button class="icon-btn tour-launch" data-tour-launch title="Интерактивное обучение" aria-label="Интерактивное обучение">
+        <button data-ac="US-EDU-001/AC1" class="icon-btn tour-launch" data-tour-launch title="Интерактивное обучение" aria-label="Интерактивное обучение">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/>
             <path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        </button>
+        <button class="icon-btn review-toggle ${reviewMode() ? 'is-on' : ''}" data-review-toggle
+                aria-pressed="${reviewMode()}" title="${reviewMode() ? 'Выключить' : 'Включить'} режим рецензирования требований"
+                aria-label="Режим рецензирования требований">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9zM7 5.5H5.5v15h13v-15H17M8.5 12.5l2 2 4-4"/></svg>
         </button>
         <button class="icon-btn" data-theme-toggle title="Сменить оформление" aria-label="Сменить оформление">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -135,7 +143,12 @@ export function renderShell(content, { title = '' } = {}) {
   </div>`;
 }
 
+// Режим рецензирования требований живёт в панели prd-review (sessionStorage вкладки):
+// кнопка в шапке только показывает его состояние и переключает его
+const reviewMode = () => { try { return JSON.parse(sessionStorage.getItem('prd-review-mode')) === true; } catch { return false; } };
+
 export function bindShell(root) {
+  root.querySelector('[data-review-toggle]')?.addEventListener('click', () => window.PRDReview?.toggle());
   root.querySelector('[data-logout]')?.addEventListener('click', async () => {
     await api.post('/api/auth/logout');
     state.user = null;
@@ -232,7 +245,7 @@ export async function renderLogin(root) {
       <div class="login__foot">Департамент труда и социальной защиты населения города Москвы</div>
     </div>
     <div class="login__panel">
-      <form class="login__form" id="login-form">
+      <form data-ac="US-SEC-001/AC3" class="login__form" id="login-form">
         <h2>Вход в платформу</h2>
         <p>Используйте служебную учётную запись</p>
         <div class="field">
