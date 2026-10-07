@@ -59,7 +59,7 @@ before(() => {
 
 // ── Счётчики и полезность ────────────────────────────────────
 describe('Оценки и полезность', () => {
-  test('счётчики обновляются сразу после оценки', () => {
+  test('счётчики обновляются сразу после оценки [US-REV-001/AC3]', () => {
     const p = makeProposal(idea.id, advisor.id, 'Решение для подсчёта оценок');
     assert.deepEqual(hub.reviewCounts(p), { likes: 0, favorites: 0, skips: 0 });
     review(p, makeUser().id, 'like');
@@ -69,7 +69,7 @@ describe('Оценки и полезность', () => {
     assert.deepEqual(hub.reviewCounts(p), { likes: 2, favorites: 1, skips: 1 });
   });
 
-  test('избранное весит вдвое больше лайка', () => {
+  test('избранное весит вдвое больше лайка [US-REV-001/AC3]', () => {
     const p = makeProposal(idea.id, advisor.id, 'Решение для проверки веса избранного');
     review(p, makeUser().id, 'like');
     review(p, makeUser().id, 'favorite');
@@ -78,7 +78,7 @@ describe('Оценки и полезность', () => {
     assert.equal(usefulness, 3, 'лайк даёт 1, избранное — 2');
   });
 
-  test('пропуски не уменьшают полезность', () => {
+  test('пропуски не уменьшают полезность [US-REV-001/AC3]', () => {
     const p = makeProposal(idea.id, advisor.id, 'Решение, которое многие пропустили');
     review(p, makeUser().id, 'like');
     for (let i = 0; i < 5; i++) review(p, makeUser().id, 'skip', { reason: 'unclear' });
@@ -87,14 +87,14 @@ describe('Оценки и полезность', () => {
     assert.equal(usefulness, 1);
   });
 
-  test('повторная оценка одного предложения невозможна', () => {
+  test('повторная оценка одного предложения невозможна [US-REV-001/AC4]', () => {
     const p = makeProposal(idea.id, advisor.id, 'Решение для проверки повторной оценки');
     const user = makeUser();
     review(p, user.id, 'like');
     assert.throws(() => review(p, user.id, 'skip'), /UNIQUE|constraint/i);
   });
 
-  test('причины пропуска ограничены закрытым списком', () => {
+  test('причины пропуска ограничены закрытым списком [US-REV-001/AC1]', () => {
     assert.ok(hub.SKIP_REASONS.unclear);
     assert.ok(hub.SKIP_REASONS.against_rules);
     assert.equal(hub.SKIP_REASONS.whatever, undefined);
@@ -103,7 +103,7 @@ describe('Оценки и полезность', () => {
 });
 
 // ── Оценки и очки разделены ──────────────────────────────────
-describe('Оценки не начисляют очки', () => {
+describe('Оценки не начисляют очки [US-REV-002/AC1]', () => {
   test('лайки не создают записей в журнале начислений', () => {
     const p = makeProposal(idea.id, advisor.id, 'Решение, которое лайкнут много раз');
     const before = q.get('SELECT COUNT(*) AS c FROM points_ledger').c;
@@ -130,7 +130,7 @@ describe('Антифрод', () => {
     q.run("UPDATE review_flags SET status='reviewed'");
   });
 
-  test('серия слишком быстрых оценок поднимает сигнал', () => {
+  test('серия слишком быстрых оценок поднимает сигнал [US-REV-002/AC3]', () => {
     const user = makeUser();
     const limit = Number(hub.settings().review_burst_limit);
     let flagged = null;
@@ -144,7 +144,7 @@ describe('Антифрод', () => {
     assert.ok(flag, 'сигнал попал в очередь модератора');
   });
 
-  test('вдумчивые оценки сигнал не поднимают', () => {
+  test('вдумчивые оценки сигнал не поднимают [US-REV-002/AC3]', () => {
     const user = makeUser();
     const limit = Number(hub.settings().review_burst_limit);
     let flagged = null;
@@ -156,7 +156,7 @@ describe('Антифрод', () => {
     assert.equal(flagged, null);
   });
 
-  test('оценки нескольких учётных записей с одного устройства', () => {
+  test('оценки нескольких учётных записей с одного устройства [US-REV-002/AC4]', () => {
     const a = makeUser(), b = makeUser();
     const p1 = makeProposal(idea.id, advisor.id, 'Первое решение для проверки устройства');
     const p2 = makeProposal(idea.id, advisor.id, 'Второе решение для проверки устройства');
@@ -166,7 +166,7 @@ describe('Антифрод', () => {
     assert.equal(hub.detectReviewAbuse(b.id, 'shared-1'), 'shared_device');
   });
 
-  test('повторный сигнал не создаёт вторую запись', () => {
+  test('повторный сигнал не создаёт вторую запись [US-REV-002/AC4]', () => {
     const user = makeUser();
     hub.raiseReviewFlag(user.id, 'burst', { count: 5 });
     hub.raiseReviewFlag(user.id, 'burst', { count: 9 });
@@ -175,7 +175,7 @@ describe('Антифрод', () => {
     assert.equal(JSON.parse(rows[0].details).count, 9, 'сигнал обновляется свежими данными');
   });
 
-  test('частота оценок ограничена настройкой', () => {
+  test('частота оценок ограничена настройкой [US-REV-002/AC2]', () => {
     const user = makeUser();
     hub.setSetting('review_per_minute', '3');
     for (let i = 0; i < 3; i++) {
@@ -193,7 +193,7 @@ describe('Антифрод', () => {
 
 // ── Топ предложений ──────────────────────────────────────────
 describe('Топ предложений', () => {
-  test('порог попадания в топ задаётся настройкой', () => {
+  test('порог попадания в топ задаётся настройкой [US-REV-001/AC6]', () => {
     hub.setSetting('review_top_threshold', '3');
     const p = makeProposal(idea.id, advisor.id, 'Решение на границе порога топа');
     review(p, makeUser().id, 'like');
@@ -204,7 +204,7 @@ describe('Топ предложений', () => {
     hub.setSetting('review_top_threshold', '5');
   });
 
-  test('порядок топа определяется полезностью', () => {
+  test('порядок топа определяется полезностью [US-REV-001/AC6]', () => {
     const strong = makeProposal(idea.id, advisor.id, 'Сильное решение с избранным');
     const weak = makeProposal(idea.id, advisor.id, 'Слабое решение с парой лайков');
     for (let i = 0; i < 2; i++) review(strong, makeUser().id, 'favorite');
@@ -218,14 +218,14 @@ describe('Топ предложений', () => {
 
 // ── Видимость очереди ────────────────────────────────────────
 describe('Очередь ревью', () => {
-  test('предложения к неопубликованной идее в ревью не участвуют', () => {
+  test('предложения к неопубликованной идее в ревью не участвуют [US-REV-001/AC2]', () => {
     assert.equal(hub.OPEN_FOR_PROPOSALS.includes('new'), false);
     assert.equal(hub.OPEN_FOR_PROPOSALS.includes('rejected'), false);
     assert.equal(hub.OPEN_FOR_PROPOSALS.includes('archived'), false);
     assert.ok(hub.OPEN_FOR_PROPOSALS.includes('accepted'));
   });
 
-  test('очередь исключает свои и уже оценённые предложения', () => {
+  test('очередь исключает свои и уже оценённые предложения [US-REV-001/AC2]', () => {
     const reviewer = makeUser();
     const own = makeProposal(idea.id, reviewer.id, 'Собственное решение ревьюера');
     const seen = makeProposal(idea.id, advisor.id, 'Уже оценённое решение');

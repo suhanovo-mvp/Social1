@@ -58,7 +58,7 @@ const parts = (sel) => sel
   .flatMap((part) => part.match(/\[[\w-]+(?:="[^"]*")?\]|[#.][\w-]+/g) ?? []);
 
 describe('Обучающие сценарии', () => {
-  test('сценарии разобраны и шаги у каждого есть', () => {
+  test('сценарии разобраны и шаги у каждого есть [US-EDU-001/AC3]', () => {
     assert.ok(scenarios.length >= 9, `сценариев подозрительно мало: ${scenarios.length}`);
     assert.ok(scenarios.some((s) => s.id === 'process-changes'), 'нет сценария по изменениям процессов');
     for (const s of scenarios) {
@@ -66,7 +66,7 @@ describe('Обучающие сценарии', () => {
     }
   });
 
-  test('каждый маршрут шага существует в таблице маршрутов', () => {
+  test('каждый маршрут шага существует в таблице маршрутов [US-EDU-001/AC3]', () => {
     for (const s of scenarios) {
       for (const step of stepsOf(s.id)) {
         if (!step.route) continue;
@@ -77,7 +77,7 @@ describe('Обучающие сценарии', () => {
     }
   });
 
-  test('каждый селектор шага встречается в разметке разделов', () => {
+  test('каждый селектор шага встречается в разметке разделов [US-EDU-001/AC3]', () => {
     for (const s of scenarios) {
       for (const step of stepsOf(s.id)) {
         if (!step.target) continue;
@@ -103,7 +103,7 @@ describe('Обучающие сценарии', () => {
     }
   });
 
-  test('у сценария изменений процессов описан весь путь предложения', () => {
+  test('у сценария изменений процессов описан весь путь предложения [US-EDU-001/AC5]', () => {
     const steps = stepsOf('process-changes');
     assert.ok(steps.length >= 12, `слишком короткий разбор: шагов ${steps.length}`);
     const targets = steps.map((s) => s.target).join(' ');
@@ -121,13 +121,13 @@ describe('Обучающие сценарии', () => {
     }
   });
 
-  test('тур проходит и по доске, и по карточке предложения', () => {
+  test('тур проходит и по доске, и по карточке предложения [US-EDU-001/AC5]', () => {
     const routes = stepsOf('process-changes').map((s) => s.route).filter(Boolean);
     assert.ok(routes.includes('/changes'), 'тур не заходит на доску предложений');
     assert.ok(routes.includes('/processes'), 'тур не показывает, где рождается предложение');
   });
 
-  test('сценарий предложен только тем, кто может предлагать изменения', () => {
+  test('сценарий предложен только тем, кто может предлагать изменения [US-EDU-001/AC5] [US-EDU-001/AC1]', () => {
     const block = tourSrc.slice(tourSrc.indexOf("id: 'process-changes'"));
     const roles = block.match(/roles: \[([^\]]+)\]/)?.[1] ?? '';
     assert.ok(roles.includes('employee'), 'сотрудник должен видеть сценарий');

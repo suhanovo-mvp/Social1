@@ -51,7 +51,7 @@ const loadUser = (id) => q.get(`SELECT u.*, (SELECT group_concat(ur.role_code) F
                                 FROM users u WHERE u.id = ?`, id);
 
 describe('Переезд прав в данные', () => {
-  test('каждая роль сохранила все прежние права', () => {
+  test('каждая роль сохранила все прежние права [US-ADM-001/AC1]', () => {
     for (const [role, perms] of Object.entries(BEFORE_MIGRATION)) {
       const user = { role };
       for (const p of perms) {
@@ -60,7 +60,7 @@ describe('Переезд прав в данные', () => {
     }
   });
 
-  test('роль не получила прав чужой роли', () => {
+  test('роль не получила прав чужой роли [US-ADM-001/AC1]', () => {
     // Полномочия точек принятия решений и администрирования не расползлись
     const exclusive = ['gate.1', 'gate.2', 'gate.3', 'gate.4', 'gate.5', 'admin', 'audit.read', 'idea.admin'];
     for (const [role, perms] of Object.entries(BEFORE_MIGRATION)) {
@@ -79,13 +79,13 @@ describe('Переезд прав в данные', () => {
     }
   });
 
-  test('без пользователя прав нет', () => {
+  test('без пользователя прав нет [US-ADM-001/AC6]', () => {
     assert.equal(auth.can(null, 'admin'), false);
     assert.equal(auth.can(undefined, 'initiative.read'), false);
   });
 });
 
-describe('Несколько ролей у участника', () => {
+describe('Несколько ролей у участника [US-ADM-001/AC4]', () => {
   test('права ролей объединяются', () => {
     const id = makeUser('multi@social1.mos.ru', 'employee');
     assert.ok(!auth.can(loadUser(id), 'gate.1'), 'сотруднику решение Gate 1 недоступно');
@@ -114,7 +114,7 @@ describe('Несколько ролей у участника', () => {
 });
 
 describe('Правка прав администратором', () => {
-  test('выданное право начинает действовать без перезапуска', () => {
+  test('выданное право начинает действовать без перезапуска [US-ADM-001/AC3]', () => {
     assert.ok(!auth.can({ role: 'employee' }, 'process.publish'));
     auth.setRolePermissions('employee', [...auth.permissionsOf('employee'), 'process.publish']);
     assert.ok(auth.can({ role: 'employee' }, 'process.publish'), 'кэш прав не сброшен после правки');
@@ -123,7 +123,7 @@ describe('Правка прав администратором', () => {
     assert.ok(!auth.can({ role: 'employee' }, 'process.publish'));
   });
 
-  test('новая роль заводится без правки кода', () => {
+  test('новая роль заводится без правки кода [US-ADM-001/AC2]', () => {
     auth.upsertRole({ code: 'auditor', title: 'Внутренний аудитор', short: 'Аудитор' });
     auth.setRolePermissions('auditor', ['audit.read', 'process.read']);
     assert.ok(auth.can({ role: 'auditor' }, 'audit.read'));
@@ -132,7 +132,7 @@ describe('Правка прав администратором', () => {
   });
 });
 
-describe('Права на работу с процессами', () => {
+describe('Права на работу с процессами [US-ADM-001/AC5]', () => {
   test('краудсорсинг открыт рядовому сотруднику', () => {
     const user = { role: 'employee' };
     for (const p of ['process.read', 'process.comment', 'process.propose']) {

@@ -19,13 +19,13 @@ const routeExists = (path) => ROUTES.some((re) => re.test(path.split('?')[0]));
 const shotFile = (file) => new URL(`../assets/presentation/${file}.jpg`, import.meta.url);
 
 describe('Презентация платформы: порядок слайдов', () => {
-  test('сначала титул, принципы взаимодействия, цели, участники и состав', () => {
+  test('сначала титул, принципы взаимодействия, цели, участники и состав [US-ADM-003/AC2]', () => {
     assert.deepEqual(SLIDES.slice(0, 5).map((s) => s.id),
       ['cover', 'interaction', 'goals', 'participants', 'components']);
     assert.equal(SLIDES.at(-1).id, 'finale');
   });
 
-  test('на титуле — название концепции и её автор', () => {
+  test('на титуле — название концепции и её автор [US-ADM-003/AC2]', () => {
     const { title, author } = deck.PRODUCT;
     assert.equal(title, 'Концепция единой цифровой платформы для комплексного управления реинжинирингом социальных процессов');
     for (const k of ['label', 'name', 'position', 'credentials', 'photo']) {
@@ -38,7 +38,7 @@ describe('Презентация платформы: порядок слайдо
     assert.ok(cover.includes('PRODUCT.author'), 'первый слайд не выводит автора концепции');
   });
 
-  test('каждый компонент — обзор, ключевые экраны и схема подряд', () => {
+  test('каждый компонент — обзор, ключевые экраны и схема подряд [US-ADM-003/AC2]', () => {
     for (const c of deck.COMPONENTS) {
       const i = SLIDES.findIndex((s) => s.id === `c-${c.id}`);
       assert.ok(i > 0, `нет обзора компонента «${c.title}»`);
@@ -49,14 +49,14 @@ describe('Презентация платформы: порядок слайдо
 });
 
 describe('Презентация платформы: содержание', () => {
-  test('в презентации нет счётчиков из базы', () => {
+  test('в презентации нет счётчиков из базы [US-ADM-003/AC3]', () => {
     for (const f of ['presentation-deck.js', 'presentation-pdf.js']) {
       const src = readFileSync(new URL(`../server/${f}`, import.meta.url), 'utf8');
       assert.ok(!/from '\.\/db\.js'/.test(src), `${f} не должен обращаться к базе`);
     }
   });
 
-  test('у компонента есть задача, возможности, роли и хотя бы два кадра', () => {
+  test('у компонента есть задача, возможности, роли и хотя бы два кадра [US-ADM-003/AC2]', () => {
     const ids = new Set();
     for (const c of deck.COMPONENTS) {
       assert.ok(!ids.has(c.id), `повтор компонента ${c.id}`); ids.add(c.id);
@@ -66,19 +66,19 @@ describe('Презентация платформы: содержание', () =
     }
   });
 
-  test('разделы и компоненты ссылаются на существующие маршруты портала', () => {
+  test('разделы и компоненты ссылаются на существующие маршруты портала [US-ADM-003/AC4]', () => {
     const paths = [...deck.SECTIONS.flatMap((g) => g.items.map((i) => i.path)),
                    ...deck.COMPONENTS.flatMap((c) => [...c.paths, ...c.screens.map((s) => s.shot.path)])];
     for (const p of new Set(paths)) assert.ok(routeExists(p), `маршрута ${p} нет в портале`);
   });
 
-  test('каждый пункт бокового меню есть на карте платформы', () => {
+  test('каждый пункт бокового меню есть на карте платформы [US-ADM-003/AC4]', () => {
     const menu = [...shellSrc.matchAll(/path: '([^']+)', title:/g)].map((m) => m[1]);
     const mapped = new Set(deck.SECTIONS.flatMap((g) => g.items.map((i) => i.path)));
     for (const p of new Set(menu)) assert.ok(mapped.has(p), `раздел ${p} из меню не попал в презентацию`);
   });
 
-  test('у каждого кадра есть JPEG в assets/presentation', () => {
+  test('у каждого кадра есть JPEG в assets/presentation [US-ADM-003/AC4]', () => {
     for (const s of deck.SCREENS) {
       assert.ok(existsSync(shotFile(s.file)), `нет файла ${s.file}.jpg — снимите: npm run screens -- ${s.file}`);
       const { width, height } = jpegInfo(readFileSync(shotFile(s.file)));
@@ -86,7 +86,7 @@ describe('Презентация платформы: содержание', () =
     }
   });
 
-  test('схемы совместной работы собраны корректно', () => {
+  test('схемы совместной работы собраны корректно [US-ADM-003/AC2]', () => {
     for (const c of deck.COMPONENTS) {
       const sc = c.scheme;
       assert.ok(sc.title && sc.result, `${c.id}: у схемы нет заголовка или результата`);
@@ -112,7 +112,7 @@ describe('Презентация платформы: содержание', () =
 });
 
 describe('Презентация платформы: файл', () => {
-  test('PDF собирается, текст ищется, скриншоты встроены', () => {
+  test('PDF собирается, текст ищется, скриншоты встроены [US-ADM-003/AC4]', () => {
     const buf = presentationPdf();
     assert.equal(buf.subarray(0, 5).toString(), '%PDF-');
     assert.ok(buf.includes('/ToUnicode'), 'текст презентации должен искаться');
@@ -130,7 +130,7 @@ describe('Презентация платформы: файл', () => {
     assert.throws(() => jpegInfo(Buffer.from('not a jpeg')), /Не JPEG/);
   });
 
-  test('скачать презентацию может только администратор', () => {
+  test('скачать презентацию может только администратор [US-ADM-003/AC1]', () => {
     const src = readFileSync(new URL('../server/api/admin.js', import.meta.url), 'utf8');
     const block = src.slice(src.indexOf("'/api/admin/presentation.pdf'"));
     assert.ok(block.slice(0, 200).includes('requireAdmin(user)'));

@@ -22,11 +22,11 @@ before(() => { auth.ensureRoles(); repo.ensureProcesses(); });
 const blocksOf = (g) => g.sections.flatMap((s) => s.blocks);
 
 describe('Инструкции по каталогу разработчиков', () => {
-  test('есть инструкции пользователя, модератора и представителя', () => {
+  test('есть инструкции пользователя, модератора и представителя [US-PROV-005/AC1]', () => {
     for (const f of ['user', 'moderator', 'representative']) assert.ok(guideByFile(f), `нет инструкции «${f}»`);
   });
 
-  test('каждая схема и разбор ссылаются на схему из альбома, у которой есть разбор', () => {
+  test('каждая схема и разбор ссылаются на схему из альбома, у которой есть разбор [US-PROV-005/AC2]', () => {
     const album = repo.album();
     for (const g of Object.values(GUIDES)) {
       for (const b of blocksOf(g)) {
@@ -39,7 +39,7 @@ describe('Инструкции по каталогу разработчиков'
     }
   });
 
-  test('каждая инструкция показывает хотя бы одну схему вместе с её разбором', () => {
+  test('каждая инструкция показывает хотя бы одну схему вместе с её разбором [US-PROV-005/AC2]', () => {
     for (const g of Object.values(GUIDES)) {
       const diagrams = blocksOf(g).filter((b) => b.diagram).map((b) => b.diagram);
       const walks = blocksOf(g).filter((b) => b.walk).map((b) => b.walk);
@@ -48,12 +48,12 @@ describe('Инструкции по каталогу разработчиков'
     }
   });
 
-  test('инструкция модератора охватывает добавление, представителей, ведение и доступ', () => {
+  test('инструкция модератора охватывает добавление, представителей, ведение и доступ [US-PROV-005/AC1]', () => {
     const ids = blocksOf(guideByFile('moderator')).filter((b) => b.diagram).map((b) => b.diagram);
     assert.deepEqual(ids, ['prov-add', 'prov-self', 'prov-keep', 'prov-access']);
   });
 
-  test('PDF собирается, текст в нём ищется', () => {
+  test('PDF собирается, текст в нём ищется [US-PROV-005/AC1]', () => {
     for (const f of ['user', 'moderator', 'representative']) {
       const buf = guidePdf(f);
       assert.equal(buf.subarray(0, 5).toString(), '%PDF-', `${f}: не PDF`);

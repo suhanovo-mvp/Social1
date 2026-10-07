@@ -36,7 +36,7 @@ const pipeline = () => repo.pipelineDef();
 const pipelineModel = () => repo.currentVersion(pipeline().id).model;
 
 describe('Проекция конвейера', () => {
-  test('совпадает с прежней конфигурацией Stage-Gate по всем полям', () => {
+  test('совпадает с прежней конфигурацией Stage-Gate по всем полям [US-SG-004/AC1]', () => {
     const got = wf.stages();
     assert.equal(got.length, wf.DEFAULT_WORKFLOW.length, 'изменилось число этапов конвейера');
     for (const want of wf.DEFAULT_WORKFLOW) {
@@ -52,11 +52,11 @@ describe('Проекция конвейера', () => {
     }
   });
 
-  test('последний этап считается по факту, а не постоянной', () => {
+  test('последний этап считается по факту, а не постоянной [US-SG-004/AC1]', () => {
     assert.equal(wf.lastStage(), 6);
   });
 
-  test('повторная проекция не размножает этапы', () => {
+  test('повторная проекция не размножает этапы [US-SG-004/AC1]', () => {
     repo.projectPipeline();
     repo.projectPipeline();
     assert.equal(wf.stages().length, 6);
@@ -64,7 +64,7 @@ describe('Проекция конвейера', () => {
 });
 
 describe('Версии', () => {
-  test('черновик создаётся копией действующей версии', () => {
+  test('черновик создаётся копией действующей версии [US-BPMN-004/AC1]', () => {
     const def = repo.defByKey('emp-submit');
     const draft = repo.createDraft({ defId: def.id, userId: admin.id, notes: 'Проба' });
     assert.equal(draft.status, 'draft');
@@ -72,14 +72,14 @@ describe('Версии', () => {
     assert.deepEqual(draft.model, repo.currentVersion(def.id).model, 'черновик не совпал с исходником');
   });
 
-  test('опубликованную версию править нельзя', () => {
+  test('опубликованную версию править нельзя [US-BPMN-004/AC2]', () => {
     const def = repo.defByKey('emp-pilot');
     const published = repo.currentVersion(def.id);
     assert.throws(() => repo.saveDraft({ versionId: published.id, model: published.model, userId: admin.id }),
       /неизменяема/, 'опубликованная версия оказалась изменяемой');
   });
 
-  test('публикация переводит прежнюю версию в замещённые', () => {
+  test('публикация переводит прежнюю версию в замещённые [US-BPMN-004/AC2]', () => {
     const def = repo.defByKey('emp-pilot');
     const was = repo.currentVersion(def.id);
     const draft = repo.createDraft({ defId: def.id, userId: admin.id });
@@ -94,7 +94,7 @@ describe('Версии', () => {
       'Пройти короткое обучение по прототипу', 'альбом не подхватил новую версию');
   });
 
-  test('удалить можно только черновик', () => {
+  test('удалить можно только черновик [US-BPMN-004/AC1]', () => {
     const def = repo.defByKey('head-gate1');
     const published = repo.currentVersion(def.id);
     assert.throws(() => repo.deleteDraft(published.id), /черновик/);
@@ -105,7 +105,7 @@ describe('Версии', () => {
 });
 
 describe('Проверка перед публикацией', () => {
-  test('схема с разрывом потока не публикуется', () => {
+  test('схема с разрывом потока не публикуется [US-BPMN-004/AC3]', () => {
     const def = repo.defByKey('expert-gate2');
     const draft = repo.createDraft({ defId: def.id, userId: admin.id });
     const model = structuredClone(draft.model);
@@ -119,7 +119,7 @@ describe('Проверка перед публикацией', () => {
     assert.equal(repo.currentVersion(def.id).version, 1);
   });
 
-  test('этап с живыми инициативами убрать нельзя', () => {
+  test('этап с живыми инициативами убрать нельзя [US-SG-004/AC3]', () => {
     const author = q.insert(`INSERT INTO users (email, full_name, password_hash, password_salt, role, institution_id)
                              VALUES ('a@s.ru','Автор','x','y','employee',?)`, institution);
     q.run(`INSERT INTO initiatives (number, title, problem, solution, expected_effect,
@@ -144,7 +144,7 @@ describe('Проверка перед публикацией', () => {
     repo.deleteDraft(draft.id);
   });
 
-  test('перенумерация живого этапа отклоняется', () => {
+  test('перенумерация живого этапа отклоняется [US-SG-004/AC3]', () => {
     // Этап остаётся в схеме, но получает другой номер. Инициатива, стоящая на нём,
     // оказалась бы на чужой работе — номер занят, и обычная проверка «этап есть»
     // такую подмену пропускает.
@@ -164,7 +164,7 @@ describe('Проверка перед публикацией', () => {
     repo.deleteDraft(draft.id);
   });
 
-  test('срок этапа меняется и вступает в силу после публикации', () => {
+  test('срок этапа меняется и вступает в силу после публикации [US-SG-004/AC2]', () => {
     const draft = repo.createDraft({ defId: pipeline().id, userId: admin.id });
     const model = structuredClone(draft.model);
     model.nodes.find((n) => n.stage?.stage_no === 3).stage.sla_value = 3;
@@ -177,7 +177,7 @@ describe('Проверка перед публикацией', () => {
 });
 
 describe('Правка этапа из настроек платформы', () => {
-  test('пишет в модель, а не в таблицу конвейера', () => {
+  test('пишет в модель, а не в таблицу конвейера [US-ADM-002/AC4] [US-SG-004/AC2]', () => {
     const before = repo.currentVersion(pipeline().id).version;
     repo.patchStage({ stageNo: 2, patch: { sla_value: 2, sla_text: 'Решение за 2 рабочих дня.' }, user: admin });
 
@@ -187,12 +187,12 @@ describe('Правка этапа из настроек платформы', () 
     assert.equal(stage.sla_value, 2, 'модель не содержит новый срок');
   });
 
-  test('правка несуществующего этапа отклоняется', () => {
+  test('правка несуществующего этапа отклоняется [US-ADM-002/AC4]', () => {
     assert.throws(() => repo.patchStage({ stageNo: 99, patch: { sla_value: 1 }, user: admin }),
       /не найден/);
   });
 
-  test('история правок сохраняется версиями', () => {
+  test('история правок сохраняется версиями [US-SG-004/AC4]', () => {
     const versions = repo.versionsOf(pipeline().id);
     assert.ok(versions.length >= 3, 'история версий конвейера не ведётся');
     assert.equal(versions.filter((v) => v.status === 'published').length, 1,

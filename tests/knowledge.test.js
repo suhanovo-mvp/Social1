@@ -57,14 +57,14 @@ const newRfc = (user = employee, subject = {}) => kn.createDoc({
 });
 
 describe('Документ и его разделы', () => {
-  test('заводится черновиком с номером своего вида', () => {
+  test('заводится черновиком с номером своего вида [US-KB-001/AC1]', () => {
     const d = newRfc();
     assert.equal(d.status, 'draft');
     assert.match(d.number, /^РД-\d{4}-\d{4}$/);
     assert.equal(d.current_version, 1);
   });
 
-  test('обязательные разделы названы, пока не заполнены', () => {
+  test('обязательные разделы названы, пока не заполнены [US-KB-001/AC2]', () => {
     const d = newRfc();
     const issues = kn.validate(d.id);
     assert.equal(issues.length, 4, 'у проекта решения четыре обязательных раздела');
@@ -72,7 +72,7 @@ describe('Документ и его разделы', () => {
       'раздел с альтернативами обязателен — ради него документ и заводится');
   });
 
-  test('текст собирается из разделов, а не хранится отдельно', () => {
+  test('текст собирается из разделов, а не хранится отдельно [US-KB-001/AC1]', () => {
     const d = newRfc();
     kn.saveDraft({ docId: d.id, sections: FULL_RFC, user: employee });
     const v = kn.currentVersion(d.id);
@@ -83,13 +83,13 @@ describe('Документ и его разделы', () => {
       'разделы идут в заданном шаблоном порядке');
   });
 
-  test('чужой документ править нельзя', () => {
+  test('чужой документ править нельзя [US-KB-001/AC3]', () => {
     const d = newRfc();
     assert.throws(() => kn.saveDraft({ docId: d.id, sections: FULL_RFC, user: expert }),
       /может его автор/);
   });
 
-  test('незаполненный документ не выносится на рецензирование', () => {
+  test('незаполненный документ не выносится на рецензирование [US-KB-001/AC2]', () => {
     const d = newRfc();
     assert.throws(() => kn.submitForReview({ docId: d.id, user: employee }), /не полностью/);
   });
@@ -102,7 +102,7 @@ describe('Рецензирование', () => {
     kn.saveDraft({ docId: doc.id, sections: FULL_RFC, user: employee });
   });
 
-  test('состав рецензентов выводится из документа, а не задаётся списком', () => {
+  test('состав рецензентов выводится из документа, а не задаётся списком [US-KB-001/AC4]', () => {
     const sheet = kn.submitForReview({ docId: doc.id, user: employee });
     const roles = sheet.map((s) => s.role_code);
     assert.ok(roles.includes('architect'), 'проект решения смотрит архитектор');
@@ -110,24 +110,24 @@ describe('Рецензирование', () => {
     assert.equal(kn.getDoc(doc.id).status, 'review');
   });
 
-  test('рецензенту приходит задача со сроком', () => {
+  test('рецензенту приходит задача со сроком [US-KB-001/AC5]', () => {
     const t = q.get("SELECT * FROM tasks WHERE knowledge_doc_id = ? AND type = 'doc_review'", doc.id);
     assert.ok(t, 'задача рецензенту не создана');
     assert.ok(t.due_at, 'у рецензирования нет срока');
   });
 
-  test('автор не рецензирует свой документ', () => {
+  test('автор не рецензирует свой документ [US-KB-001/AC5]', () => {
     const check = kn.canReview(employee, doc.id);
     assert.equal(check.ok, false);
     assert.match(check.reason, /Автор не согласует/);
   });
 
-  test('отказ требует пояснения', () => {
+  test('отказ требует пояснения [US-KB-001/AC5]', () => {
     assert.throws(() => kn.decideReview({ docId: doc.id, user: architect, verdict: 'reject', comment: 'нет' }),
       /Укажите причину/);
   });
 
-  test('согласование всеми рецензентами переводит документ в согласованные', () => {
+  test('согласование всеми рецензентами переводит документ в согласованные [US-KB-001/AC6]', () => {
     const byRole = { architect, expert, dtszn: director };
     let last;
     for (const row of kn.reviewSheet(doc.id)) {
@@ -140,7 +140,7 @@ describe('Рецензирование', () => {
       'задачи рецензентам не закрыты');
   });
 
-  test('если проект решения пишет архитектор, его рецензируют эксперты', () => {
+  test('если проект решения пишет архитектор, его рецензируют эксперты [US-KB-001/AC4]', () => {
     const own = kn.createDoc({ kind: 'rfc', title: 'Решение от архитектора', user: architect });
     kn.saveDraft({ docId: own.id, sections: FULL_RFC, user: architect });
     const sheet = kn.submitForReview({ docId: own.id, user: architect });
@@ -151,7 +151,7 @@ describe('Рецензирование', () => {
 });
 
 describe('Заказчик как рецензент', () => {
-  test('автор идеи попадает в лист по своему предмету', () => {
+  test('автор идеи попадает в лист по своему предмету [US-KB-001/AC4]', () => {
     const ideaAuthor = makeUser('ideaowner@s.ru', 'employee');
     const ideaId = q.insert(`INSERT INTO ideas (number, title, problem, desired_result, author_id, institution_id)
                              VALUES ('IDEA-T-1','Идея','П','Р',?,?)`, ideaAuthor.id, institution);
@@ -180,7 +180,7 @@ describe('От решения к работе и обратно', () => {
                         VALUES (?,'Проект по инициативе','active')`, initiative);
   });
 
-  test('принятый проект решения заводит задачу со ссылкой на себя', () => {
+  test('принятый проект решения заводит задачу со ссылкой на себя [US-KB-002/AC1]', () => {
     rfc = kn.createDoc({ kind: 'rfc', title: 'Как реализуем приём заявлений',
                          subjectType: 'initiative', subjectId: initiative, user: employee });
     kn.saveDraft({ docId: rfc.id, sections: FULL_RFC, user: employee });
@@ -197,7 +197,7 @@ describe('От решения к работе и обратно', () => {
     assert.equal(kn.getDoc(rfc.id).task_id, item.id, 'документ не знает свою задачу');
   });
 
-  test('завершение задачи напоминает зафиксировать решение', () => {
+  test('завершение задачи напоминает зафиксировать решение [US-KB-002/AC2]', () => {
     const item = q.get('SELECT * FROM board_items WHERE knowledge_doc_id = ?', rfc.id);
     q.run("UPDATE board_items SET status = 'done' WHERE id = ?", item.id);
     ev.emit('task.completed', { subjectType: 'task', subjectId: item.id, actorId: developer.id,
@@ -207,7 +207,7 @@ describe('От решения к работе и обратно', () => {
     assert.ok(t, 'напоминание зафиксировать решение не создано');
   });
 
-  test('зафиксированное решение наследует контекст проекта решения', () => {
+  test('зафиксированное решение наследует контекст проекта решения [US-KB-002/AC2]', () => {
     const adr = flow.draftDecisionFrom(rfc.id, developer);
     const v = kn.currentVersion(adr.id);
     assert.equal(adr.kind, 'adr');
@@ -231,20 +231,20 @@ describe('Публикация и замена решения', () => {
     return kn.publishDoc({ docId: d.id, user: director });
   };
 
-  test('опубликованный документ виден в базе знаний', () => {
+  test('опубликованный документ виден в базе знаний [US-KB-001/AC6]', () => {
     const d = publish('Приём заявлений через портал');
     assert.equal(d.status, 'published');
     assert.ok(d.published_at);
     assert.equal(kn.currentVersion(d.id).status, 'published');
   });
 
-  test('опубликованный документ неизменяем', () => {
+  test('опубликованный документ неизменяем [US-KB-001/AC6]', () => {
     const d = publish('Неизменяемое решение');
     assert.throws(() => kn.saveDraft({ docId: d.id, sections: { decision: 'иначе' }, user: director }),
       /неизменяем/);
   });
 
-  test('новая редакция заменяет прежнюю, не стирая её', () => {
+  test('новая редакция заменяет прежнюю, не стирая её [US-KB-001/AC7]', () => {
     const first = publish('Решение, которое передумают');
     const next = kn.reviseDoc({ docId: first.id, user: director });
     kn.saveDraft({ docId: next.id, user: director, sections: {
@@ -259,7 +259,7 @@ describe('Публикация и замена решения', () => {
     assert.ok(kn.currentVersion(first.id), 'текст прежнего решения обязан сохраниться');
   });
 
-  test('неполный документ не публикуется', () => {
+  test('неполный документ не публикуется [US-KB-001/AC2]', () => {
     const d = kn.createDoc({ kind: 'adr', title: 'Решение без последствий', user: director });
     kn.saveDraft({ docId: d.id, sections: { decision: 'Что-то решили' }, user: director });
     assert.throws(() => kn.publishDoc({ docId: d.id, user: director }), /не полностью/);
@@ -267,7 +267,7 @@ describe('Публикация и замена решения', () => {
 });
 
 describe('Журнал событий документа', () => {
-  test('путь документа виден по событиям', () => {
+  test('путь документа виден по событиям [US-KB-001/AC7]', () => {
     const d = kn.createDoc({ kind: 'adr', title: 'Документ для журнала', user: director });
     kn.saveDraft({ docId: d.id, user: director, sections: {
       context: 'К', decision: 'Р', consequences: 'П',

@@ -53,17 +53,17 @@ before(() => {
 
 // ── Справочники ──────────────────────────────────────────────
 describe('Настройка модуля', () => {
-  test('правила начисления и меры поощрения загружены', () => {
+  test('правила начисления и меры поощрения загружены [US-RATE-001/AC1]', () => {
     assert.equal(q.get('SELECT COUNT(*) AS c FROM points_rules').c, hub.DEFAULT_POINTS_RULES.length);
     assert.equal(q.get('SELECT COUNT(*) AS c FROM incentive_types').c, hub.INCENTIVE_TYPES.length);
   });
 
-  test('повторный запуск не создаёт дублей', () => {
+  test('повторный запуск не создаёт дублей [US-RATE-001/AC1]', () => {
     hub.ensureIdeaHub();
     assert.equal(q.get('SELECT COUNT(*) AS c FROM points_rules').c, hub.DEFAULT_POINTS_RULES.length);
   });
 
-  test('администратор меняет правило без изменения кода', () => {
+  test('администратор меняет правило без изменения кода [US-RATE-001/AC2]', () => {
     q.run("UPDATE points_rules SET points=9 WHERE code='proposal.created'");
     assert.equal(hub.rule('proposal.created').points, 9);
     q.run("UPDATE points_rules SET points=3 WHERE code='proposal.created'");
@@ -78,14 +78,14 @@ describe('Настройка модуля', () => {
 
 // ── Начисление очков ─────────────────────────────────────────
 describe('Начисление очков', () => {
-  test('очки начисляются по действующему правилу', () => {
+  test('очки начисляются по действующему правилу [US-RATE-001/AC2]', () => {
     const idea = makeIdea(author.id, 'Идея для начисления');
     const r = hub.awardPoints({ userId: author.id, code: 'idea.approved', ideaId: idea.id });
     assert.equal(r.awarded, true);
     assert.equal(r.points, 2);
   });
 
-  test('повторное начисление за то же действие отклоняется', () => {
+  test('повторное начисление за то же действие отклоняется [US-RATE-001/AC3]', () => {
     const idea = makeIdea(author.id, 'Идея для проверки повтора');
     assert.equal(hub.awardPoints({ userId: author.id, code: 'idea.approved', ideaId: idea.id }).awarded, true);
     const second = hub.awardPoints({ userId: author.id, code: 'idea.approved', ideaId: idea.id });
@@ -93,7 +93,7 @@ describe('Начисление очков', () => {
     assert.match(second.reason, /уже начислены/);
   });
 
-  test('самооценка не учитывается', () => {
+  test('самооценка не учитывается [US-RATE-001/AC3]', () => {
     const idea = makeIdea(author.id, 'Идея с самооценкой');
     const pid = makeProposal(idea.id, author.id, 'Решение от автора идеи');
     const r = hub.awardPoints({
@@ -104,7 +104,7 @@ describe('Начисление очков', () => {
     assert.match(r.reason, /Самооценка/);
   });
 
-  test('предел очков по одному объекту соблюдается', () => {
+  test('предел очков по одному объекту соблюдается [US-RATE-001/AC3]', () => {
     const idea = makeIdea(author.id, 'Идея с множеством подтверждений');
     const pid = makeProposal(idea.id, advisor.id, 'Решение, которое подтвердят многие');
     // Правило «поддержано другими» даёт по очку и ограничено десятью
@@ -122,7 +122,7 @@ describe('Начисление очков', () => {
     assert.equal(total, 10);
   });
 
-  test('отключённое правило не начисляет очки', () => {
+  test('отключённое правило не начисляет очки [US-RATE-001/AC2]', () => {
     q.run("UPDATE points_rules SET is_active=0 WHERE code='proposal.implemented'");
     const idea = makeIdea(author.id, 'Идея с отключённым правилом');
     const pid = makeProposal(idea.id, advisor.id, 'Решение при отключённом правиле');
@@ -134,7 +134,7 @@ describe('Начисление очков', () => {
     q.run("UPDATE points_rules SET is_active=1 WHERE code='proposal.implemented'");
   });
 
-  test('модератор отменяет начисление, запись остаётся в журнале', () => {
+  test('модератор отменяет начисление, запись остаётся в журнале [US-RATE-001/AC4]', () => {
     const idea = makeIdea(author.id, 'Идея для отмены начисления');
     hub.awardPoints({ userId: author.id, code: 'idea.approved', ideaId: idea.id });
     const entry = q.get('SELECT * FROM points_ledger WHERE idea_id=? ORDER BY id DESC LIMIT 1', idea.id);
@@ -144,7 +144,7 @@ describe('Начисление очков', () => {
     assert.throws(() => hub.revokePoints(entry.id, moderator.id, 'Повторная отмена'));
   });
 
-  test('отменённые очки не попадают в рейтинг', () => {
+  test('отменённые очки не попадают в рейтинг [US-RATE-001/AC4]', () => {
     const before = hub.rating({ period: 'all' }).items.find((i) => i.id === author.id)?.points ?? 0;
     const idea = makeIdea(author.id, 'Идея, начисление по которой отменят');
     hub.awardPoints({ userId: author.id, code: 'idea.approved', ideaId: idea.id });
@@ -157,14 +157,14 @@ describe('Начисление очков', () => {
 
 // ── Защита от дублей ─────────────────────────────────────────
 describe('Защита от дублей', () => {
-  test('похожие тексты распознаются', () => {
+  test('похожие тексты распознаются [US-IDEA-001/AC3]', () => {
     const a = 'Передача смены занимает сорок минут и информация теряется';
     const b = 'Информация теряется, потому что передача смены занимает сорок минут';
     assert.ok(hub.similarity(a, b) > 0.6, 'перестановка слов не мешает распознать дубль');
     assert.ok(hub.similarity(a, 'Пандус обледеневает у входа в учреждение') < 0.2);
   });
 
-  test('дублирующее предложение по той же идее находится', () => {
+  test('дублирующее предложение по той же идее находится [US-IDEA-002/AC3]', () => {
     const idea = makeIdea(author.id, 'Идея для поиска дублей');
     makeProposal(idea.id, advisor.id,
       'Согласовывать заявки параллельно всем участникам вместо последовательной цепочки');
@@ -174,7 +174,7 @@ describe('Защита от дублей', () => {
     assert.equal(hub.findDuplicateProposal(idea.id, 'Повесить расписание на экран в холле'), null);
   });
 
-  test('похожие идеи подсказываются автору', () => {
+  test('похожие идеи подсказываются автору [US-IDEA-001/AC3]', () => {
     makeIdea(author.id, 'Пандус у входа обледеневает по утрам до обработки', 'accepted');
     const found = hub.similarIdeas('Обледенение пандуса у входа по утрам до обработки реагентом');
     assert.ok(found.length > 0);
@@ -186,7 +186,7 @@ describe('Защита от дублей', () => {
 describe('Модерация идей', () => {
   const mod = () => ({ id: moderator.id, role: 'expert' });
 
-  test('принятая идея открывается для решений и приносит очки автору', () => {
+  test('принятая идея открывается для решений и приносит очки автору [US-IDEA-003/AC1]', () => {
     const idea = makeIdea(author.id, 'Идея, которую примут к обсуждению');
     const updated = hub.moderateIdea({ user: mod(), ideaId: idea.id, action: 'approve', note: 'Понятно изложено' });
     assert.equal(updated.status, 'accepted');
@@ -196,13 +196,13 @@ describe('Модерация идей', () => {
     assert.ok(entry, 'автору начислены очки за прохождение модерации');
   });
 
-  test('отклонение без причины невозможно', () => {
+  test('отклонение без причины невозможно [US-IDEA-003/AC2]', () => {
     const idea = makeIdea(author.id, 'Идея, которую отклонят без причины');
     assert.throws(() => hub.moderateIdea({ user: mod(), ideaId: idea.id, action: 'reject' }),
       /Укажите причину/);
   });
 
-  test('объединение дублей требует указания основной идеи', () => {
+  test('объединение дублей требует указания основной идеи [US-IDEA-003/AC3]', () => {
     const idea = makeIdea(author.id, 'Идея-дубль');
     assert.throws(() => hub.moderateIdea({ user: mod(), ideaId: idea.id, action: 'merge' }),
       /Укажите идею/);
@@ -214,13 +214,13 @@ describe('Модерация идей', () => {
     assert.equal(merged.duplicate_of_id, main.id);
   });
 
-  test('неизвестное действие модерации отклоняется', () => {
+  test('неизвестное действие модерации отклоняется [US-IDEA-003/AC1]', () => {
     const idea = makeIdea(author.id, 'Идея с неизвестным действием');
     assert.throws(() => hub.moderateIdea({ user: mod(), ideaId: idea.id, action: 'delete' }),
       /Неизвестное действие/);
   });
 
-  test('автор получает уведомление о решении модератора', () => {
+  test('автор получает уведомление о решении модератора [US-IDEA-003/AC4]', () => {
     const idea = makeIdea(author.id, 'Идея с уведомлением автору');
     hub.moderateIdea({ user: mod(), ideaId: idea.id, action: 'clarify', note: 'Уточните, о каком отделении речь' });
     const n = q.get(`SELECT * FROM notifications WHERE idea_id=? AND type='idea_clarify'`, idea.id);
@@ -231,7 +231,7 @@ describe('Модерация идей', () => {
 
 // ── Рейтинг и периоды ────────────────────────────────────────
 describe('Рейтинг социальных советников', () => {
-  test('границы периодов считаются корректно', () => {
+  test('границы периодов считаются корректно [US-RATE-002/AC1]', () => {
     const ref = new Date(2026, 4, 17);         // 17 мая 2026
     assert.deepEqual(hub.periodBounds('month', ref).from, '2026-05-01');
     assert.deepEqual(hub.periodBounds('month', ref).to, '2026-06-01');
@@ -241,7 +241,7 @@ describe('Рейтинг социальных советников', () => {
     assert.equal(hub.periodBounds('quarter', ref).label, '2 квартал 2026');
   });
 
-  test('рейтинг упорядочен по очкам и содержит места', () => {
+  test('рейтинг упорядочен по очкам и содержит места [US-RATE-002/AC1]', () => {
     const r = hub.rating({ period: 'all' });
     assert.ok(r.items.length > 0);
     assert.equal(r.items[0].rank, 1);
@@ -251,14 +251,14 @@ describe('Рейтинг социальных советников', () => {
     }
   });
 
-  test('прошлый период не содержит сегодняшних начислений', () => {
+  test('прошлый период не содержит сегодняшних начислений [US-RATE-002/AC1]', () => {
     const past = hub.rating({ period: 'month' });
     const shifted = hub.periodBounds('month', new Date(2020, 0, 15));
     assert.notEqual(past.from, shifted.from);
     assert.ok(past.items.length >= 0);
   });
 
-  test('рейтинг ограничивается учреждением', () => {
+  test('рейтинг ограничивается учреждением [US-RATE-002/AC2]', () => {
     const other = q.insert(`INSERT INTO institutions (name, short_name) VALUES ('Другое учреждение','ДУ')`);
     const outsider = makeUser('outsider@test', 'employee');
     q.run('UPDATE users SET institution_id=? WHERE id=?', other, outsider.id);
@@ -271,7 +271,7 @@ describe('Рейтинг социальных советников', () => {
 
 // ── Знаки отличия ────────────────────────────────────────────
 describe('Знаки отличия', () => {
-  test('«Активный социальный советник» присваивается за пять предложений', () => {
+  test('«Активный социальный советник» присваивается за пять предложений [US-RATE-002/AC3]', () => {
     const helper = makeUser('helper@test', 'employee');
     const idea = makeIdea(author.id, 'Идея для знака отличия', 'accepted');
     for (let i = 0; i < 5; i++) makeProposal(idea.id, helper.id, `Решение номер ${i}`);
@@ -281,7 +281,7 @@ describe('Знаки отличия', () => {
     assert.equal(hub.refreshBadges(helper.id).includes('active_advisor'), false);
   });
 
-  test('«Проверенный опыт» присваивается после подтверждения', () => {
+  test('«Проверенный опыт» присваивается после подтверждения [US-RATE-002/AC3]', () => {
     const expert = makeUser('experienced@test', 'employee');
     const idea = makeIdea(author.id, 'Идея с проверенным опытом', 'accepted');
     const pid = makeProposal(idea.id, expert.id, 'Опыт, который уже применялся', 'experience');
@@ -290,7 +290,7 @@ describe('Знаки отличия', () => {
     assert.ok(hub.refreshBadges(expert.id).includes('verified_experience'));
   });
 
-  test('сводка вклада считает идеи, решения и подтверждения', () => {
+  test('сводка вклада считает идеи, решения и подтверждения [US-RATE-002/AC4]', () => {
     const s = hub.advisorStats(advisor.id);
     assert.ok(s.proposals >= 1);
     assert.ok(s.points >= 10);
@@ -299,7 +299,7 @@ describe('Знаки отличия', () => {
 
 // ── Рекомендации к поощрению ─────────────────────────────────
 describe('Рекомендации к поощрению', () => {
-  test('формируются только для тех, кто превысил порог', () => {
+  test('формируются только для тех, кто превысил порог [US-RATE-003/AC1]', () => {
     hub.setSetting('incentive_threshold', '1');
     hub.setSetting('incentive_top', '3');
     const r = hub.buildIncentiveRecommendations({ period: 'all', proposedBy: moderator.id });
@@ -312,13 +312,13 @@ describe('Рекомендации к поощрению', () => {
     }
   });
 
-  test('повторная рекомендация за тот же период не создаётся', () => {
+  test('повторная рекомендация за тот же период не создаётся [US-RATE-003/AC1]', () => {
     const before = q.get('SELECT COUNT(*) AS c FROM incentives').c;
     hub.buildIncentiveRecommendations({ period: 'all', proposedBy: moderator.id });
     assert.equal(q.get('SELECT COUNT(*) AS c FROM incentives').c, before);
   });
 
-  test('высокий порог не даёт рекомендаций', () => {
+  test('высокий порог не даёт рекомендаций [US-RATE-003/AC1]', () => {
     hub.setSetting('incentive_threshold', '100000');
     const before = q.get('SELECT COUNT(*) AS c FROM incentives').c;
     hub.buildIncentiveRecommendations({ period: 'year', proposedBy: moderator.id });
@@ -329,7 +329,7 @@ describe('Рекомендации к поощрению', () => {
 
 // ── Журнал действий ──────────────────────────────────────────
 describe('Аудит', () => {
-  test('решение модератора попадает в неизменяемый журнал', () => {
+  test('решение модератора попадает в неизменяемый журнал [US-IDEA-003/AC4]', () => {
     const idea = makeIdea(author.id, 'Идея, решение по которой попадёт в аудит');
     hub.moderateIdea({ user: { id: moderator.id, role: 'expert' }, ideaId: idea.id,
       action: 'approve', note: 'Проверка записи в журнал', ip: '127.0.0.1' });
@@ -345,7 +345,7 @@ describe('Аудит', () => {
 // только в пустые таблицы, поэтому у работающей установки надписи остались бы
 // прежними — их правит отдельная миграция. Склонение проверяется по всем падежам:
 // механическая замена без падежей дала бы «очки советчику» → «очки социальный советник».
-describe('Переименование советчика в социального советника', () => {
+describe('Переименование советчика в социального советника [US-RATE-002/AC6]', () => {
   test('склонение по всем падежам', () => {
     const формы = {
       'советчик': 'социальный советник',

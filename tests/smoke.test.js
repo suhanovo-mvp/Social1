@@ -16,7 +16,7 @@ process.on('exit', () => rmSync(DIR, { recursive: true, force: true }));
 const ROOT = new URL('..', import.meta.url);
 const listing = (dir) => readdirSync(new URL(dir, ROOT)).filter((f) => f.endsWith('.js'));
 
-describe('Целостность сборки', () => {
+describe('Целостность сборки [US-SEC-004/AC5]', () => {
   test('каждый серверный модуль загружается', async () => {
     // index.js исключён: он поднимает сервер и фоновые таймеры
     const files = listing('server/').filter((f) => f !== 'index.js' && f !== 'seed.js');

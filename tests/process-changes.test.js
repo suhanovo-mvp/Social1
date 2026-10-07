@@ -48,7 +48,7 @@ before(() => {
 describe('Замечания на шагах схемы', () => {
   let comment;
 
-  test('замечание привязывается к конкретному шагу', () => {
+  test('замечание привязывается к конкретному шагу [US-CHG-001/AC1]', () => {
     comment = ch.addComment({
       defKey: 'emp-submit', nodeId: 'search', user: employee,
       body: 'На этом шаге теряется время: доску приходится смотреть в другом разделе.',
@@ -58,29 +58,29 @@ describe('Замечания на шагах схемы', () => {
     assert.equal(comment.author_name, 'Участник employee');
   });
 
-  test('замечание к несуществующему шагу отклоняется', () => {
+  test('замечание к несуществующему шагу отклоняется [US-CHG-001/AC1]', () => {
     assert.throws(() => ch.addComment({
       defKey: 'emp-submit', nodeId: 'нет-такого', user: employee, body: 'Текст',
     }), /отсутствует в схеме/);
   });
 
-  test('счётчик замечаний по шагам собирается для меток на схеме', () => {
+  test('счётчик замечаний по шагам собирается для меток на схеме [US-CHG-001/AC2]', () => {
     const counts = ch.commentCountsByNode('emp-submit');
     assert.equal(counts.search, 1);
   });
 
-  test('отметка полезности начисляет очки автору замечания', () => {
+  test('отметка полезности начисляет очки автору замечания [US-CHG-001/AC3]', () => {
     const before = hub.advisorStats(employee.id).points;
     ch.markCommentUseful({ commentId: comment.id, user: head });
     assert.equal(ch.commentById(comment.id).useful, 1);
     assert.ok(hub.advisorStats(employee.id).points > before, 'очки за полезное замечание не начислены');
   });
 
-  test('своё замечание отметить нельзя', () => {
+  test('своё замечание отметить нельзя [US-CHG-001/AC3]', () => {
     assert.throws(() => ch.markCommentUseful({ commentId: comment.id, user: employee }), /Своё замечание/);
   });
 
-  test('закрытое замечание уходит из счётчика', () => {
+  test('закрытое замечание уходит из счётчика [US-CHG-001/AC2]', () => {
     ch.resolveComment({ commentId: comment.id, user: employee });
     assert.equal(ch.commentCountsByNode('emp-submit').search, undefined);
   });
@@ -89,13 +89,13 @@ describe('Замечания на шагах схемы', () => {
 describe('Предложение об изменении', () => {
   let change;
 
-  test('обоснование обязательно', () => {
+  test('обоснование обязательно [US-CHG-002/AC1]', () => {
     assert.throws(() => ch.createChange({
       defKey: 'emp-submit', title: 'Убрать шаг', rationale: 'надо', user: employee,
     }), /Обоснование обязательно/);
   });
 
-  test('создаётся с черновой копией действующей схемы', () => {
+  test('создаётся с черновой копией действующей схемы [US-CHG-002/AC1]', () => {
     change = ch.createChange({
       defKey: 'emp-submit', title: 'Убрать отдельный шаг проверки дублей',
       rationale: 'Поиск похожих идей уже встроен в форму подачи, отдельный шаг только удлиняет путь.',
@@ -108,12 +108,12 @@ describe('Предложение об изменении', () => {
     assert.deepEqual(draft.model, repo.getVersion(change.base_version_id).model);
   });
 
-  test('пустое изменение на обсуждение не выносится', () => {
+  test('пустое изменение на обсуждение не выносится [US-CHG-002/AC3]', () => {
     assert.throws(() => ch.submitForDiscussion({ changeId: change.id, user: employee }),
       /нет содержательных изменений/);
   });
 
-  test('правка схемы даёт понятную сводку', () => {
+  test('правка схемы даёт понятную сводку [US-CHG-002/AC3]', () => {
     const draft = repo.getVersion(change.draft_version_id);
     const model = structuredClone(draft.model);
     // Убираем шаг проверки дублей и перекидываем поток напрямую
@@ -130,20 +130,20 @@ describe('Предложение об изменении', () => {
     assert.ok(result.summary.some((l) => l.startsWith('Затронуты дорожки')), 'в сводке нет затронутых дорожек');
   });
 
-  test('чужое предложение править нельзя', () => {
+  test('чужое предложение править нельзя [US-CHG-002/AC4]', () => {
     const draft = repo.getVersion(change.draft_version_id);
     assert.throws(() => ch.saveChangeModel({ changeId: change.id, model: draft.model, user: head }),
       /только его автор/);
   });
 
-  test('вынесение на обсуждение начисляет очки и зовёт затронутые роли', () => {
+  test('вынесение на обсуждение начисляет очки и зовёт затронутые роли [US-CHG-002/AC5]', () => {
     const before = hub.advisorStats(employee.id).points;
     ch.submitForDiscussion({ changeId: change.id, user: employee });
     assert.equal(ch.getChange(change.id).status, 'discussion');
     assert.ok(hub.advisorStats(employee.id).points > before, 'очки за предложение не начислены');
   });
 
-  test('коллеги поддерживают предложение', () => {
+  test('коллеги поддерживают предложение [US-CHG-002/AC5]', () => {
     ch.vote({ changeId: change.id, user: head, value: 1 });
     ch.vote({ changeId: change.id, user: expert, value: 1 });
     ch.vote({ changeId: change.id, user: developer, value: -1 });
@@ -153,7 +153,7 @@ describe('Предложение об изменении', () => {
     assert.equal(s.my, 1);
   });
 
-  test('повторный голос заменяет прежний, а не добавляется', () => {
+  test('повторный голос заменяет прежний, а не добавляется [US-CHG-002/AC5]', () => {
     ch.vote({ changeId: change.id, user: developer, value: 1 });
     const s = ch.voteSummary(change.id);
     assert.equal(s.support, 3);
@@ -176,7 +176,7 @@ describe('Согласование', () => {
     ch.submitForDiscussion({ changeId: change.id, user: employee });
   });
 
-  test('маршрут выводится из затронутых дорожек', () => {
+  test('маршрут выводится из затронутых дорожек [US-CHG-003/AC1]', () => {
     const route = ch.buildApprovalRoute(change.id);
     // Шаг лежит в дорожке сотрудника — согласует его руководитель? Нет: дорожка
     // сотрудника, значит роль employee. Автор себя не согласует, поэтому роль выпадает.
@@ -184,7 +184,7 @@ describe('Согласование', () => {
     assert.ok(!route.roles.includes('employee'), 'автор не должен согласовывать сам себя');
   });
 
-  test('лист согласования создаётся с задачами и сроком', () => {
+  test('лист согласования создаётся с задачами и сроком [US-CHG-003/AC2]', () => {
     // Правим схему так, чтобы затронуть чужую дорожку — координатора пилотов
     const c2 = ch.createChange({
       defKey: 'emp-pilot', title: 'Уточнить анализ откликов',
@@ -206,20 +206,20 @@ describe('Согласование', () => {
     change = c2;
   });
 
-  test('автор не согласует собственное предложение', () => {
+  test('автор не согласует собственное предложение [US-CHG-003/AC2]', () => {
     const check = ch.canApprove(employee, change.id);
     assert.equal(check.ok, false);
     assert.match(check.reason, /Автор не согласует/);
   });
 
-  test('отказ требует пояснения', () => {
+  test('отказ требует пояснения [US-CHG-003/AC3]', () => {
     const role = ch.approvalSheet(change.id)[0].role_code;
     const approver = { employee, head, expert, developer, pilot_coordinator: coordinator, dtszn: director }[role];
     assert.throws(() => ch.decideApproval({ changeId: change.id, user: approver, verdict: 'reject', comment: 'нет' }),
       /Укажите причину/);
   });
 
-  test('согласование всеми ролями переводит предложение в согласованные', () => {
+  test('согласование всеми ролями переводит предложение в согласованные [US-CHG-003/AC4]', () => {
     const byRole = { employee, head, expert, developer, pilot_coordinator: coordinator, dtszn: director };
     let last;
     for (const row of ch.approvalSheet(change.id)) {
@@ -231,7 +231,7 @@ describe('Согласование', () => {
       'задачи согласующим не закрыты');
   });
 
-  test('публикация делает изменение действующим', () => {
+  test('публикация делает изменение действующим [US-CHG-003/AC4]', () => {
     const before = hub.advisorStats(employee.id).points;
     ch.publishChange({ changeId: change.id, user: director });
     assert.equal(ch.getChange(change.id).status, 'published');
@@ -240,7 +240,7 @@ describe('Согласование', () => {
     assert.ok(hub.advisorStats(employee.id).points > before, 'очки за вступившее в силу изменение не начислены');
   });
 
-  test('отказ закрывает предложение с указанием причины', () => {
+  test('отказ закрывает предложение с указанием причины [US-CHG-003/AC3]', () => {
     const c3 = ch.createChange({
       defKey: 'head-gate1', title: 'Убрать проверку регламентов',
       rationale: 'Проверка регламентов дублирует последующую экспертизу ДТСЗН на Gate 2.',
@@ -268,7 +268,7 @@ describe('Согласование', () => {
 describe('Изменение конвейера сообществом', () => {
   let change;
 
-  test('сокращение срока Gate 2 проходит полный цикл и меняет конвейер', () => {
+  test('сокращение срока Gate 2 проходит полный цикл и меняет конвейер [US-CHG-003/AC6] [US-SG-004/AC2]', () => {
     assert.equal(wf.stageConfig(3).sla_value, 5, 'исходный срок Gate 2 — 5 рабочих дней');
 
     change = ch.createChange({
@@ -311,7 +311,7 @@ describe('Изменение конвейера сообществом', () => {
     assert.equal(wf.stages().length, 6, 'состав этапов не должен был измениться');
   });
 
-  test('вклад автора виден в общем рейтинге социальных советников', () => {
+  test('вклад автора виден в общем рейтинге социальных советников [US-CHG-003/AC7]', () => {
     const stats = hub.advisorStats(employee.id);
     assert.ok(stats.points > 0, 'вклад в процессы не попал в рейтинг');
     const codes = q.all('SELECT DISTINCT rule_code FROM points_ledger WHERE user_id = ?', employee.id)
@@ -321,7 +321,7 @@ describe('Изменение конвейера сообществом', () => {
     }
   });
 
-  test('очки за одно и то же действие не начисляются дважды', () => {
+  test('очки за одно и то же действие не начисляются дважды [US-CHG-003/AC7]', () => {
     const rows = q.all(`SELECT rule_code, COUNT(*) AS c FROM points_ledger
                         WHERE user_id = ? AND process_change_id = ? GROUP BY rule_code`,
       employee.id, change.id);
@@ -330,7 +330,7 @@ describe('Изменение конвейера сообществом', () => {
 });
 
 describe('Просроченные согласования', () => {
-  test('просрочка эскалируется и помечает задачу', () => {
+  test('просрочка эскалируется и помечает задачу [US-CHG-003/AC5]', () => {
     const c = ch.createChange({
       defKey: 'dev-build', title: 'Добавить демонстрацию заказчику в каждый спринт',
       rationale: 'Промежуточные демонстрации сейчас необязательны, из-за чего расхождение с ожиданиями всплывает поздно.',

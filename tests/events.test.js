@@ -80,7 +80,7 @@ describe('Устойчивость к сбою обработчика', () => {
   });
 });
 
-describe('Время в состоянии', () => {
+describe('Время в состоянии [US-ANL-004/AC7]', () => {
   const seedTransitions = (subjectId, steps) => {
     for (const [to, at] of steps) {
       q.run(`INSERT INTO events (type, subject_type, subject_id, to_state, at)
@@ -119,7 +119,7 @@ describe('Время в состоянии', () => {
 });
 
 describe('Восстановление истории переходов', () => {
-  test('события собираются из stage_transitions и повторно не дублируются', () => {
+  test('события собираются из stage_transitions и повторно не дублируются [US-ANL-004/AC7]', () => {
     const id = q.insert(`INSERT INTO initiatives (number, title, problem, solution, expected_effect,
                          author_id, institution_id, stage, status)
                          VALUES ('SOC-EV-0001','П','П','Р','Э',?,?,3,'active')`, author, institution);

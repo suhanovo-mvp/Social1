@@ -21,7 +21,7 @@ const { SHAPES } = await import('../shared/bpmn/layout.js');
 
 const problems = (model) => validateModel(model).map((e) => `${e.code}: ${e.message}`);
 
-describe('Целостность схем', () => {
+describe('Целостность схем [US-BPMN-001/AC6]', () => {
   test('каждая схема начального наполнения проходит проверку модели', () => {
     for (const d of DIAGRAMS) {
       assert.deepEqual(problems(d), [], `${d.id}: схема не проходит проверку`);
@@ -75,7 +75,7 @@ describe('Целостность схем', () => {
   });
 });
 
-describe('Конвейер инициатив в модели', () => {
+describe('Конвейер инициатив в модели [US-SG-004/AC5]', () => {
   const pipeline = () => DIAGRAMS.find((d) => d.isPipeline);
 
   test('конвейер отмечен ровно один', () => {
@@ -115,7 +115,7 @@ describe('Конвейер инициатив в модели', () => {
 });
 
 describe('Пользовательские пути', () => {
-  test('сценариев четыре и все наполнены', () => {
+  test('сценариев четыре и все наполнены [US-BPMN-001/AC1]', () => {
     assert.deepEqual(SCENARIOS.map((s) => s.id), ['initiative', 'ideas', 'providers', 'collab']);
     for (const s of SCENARIOS) {
       assert.ok(s.title && s.lead && s.description, `${s.id}: сценарий описан не полностью`);
@@ -123,21 +123,21 @@ describe('Пользовательские пути', () => {
     }
   });
 
-  test('каждая схема отнесена к существующему сценарию', () => {
+  test('каждая схема отнесена к существующему сценарию [US-BPMN-001/AC1]', () => {
     for (const d of DIAGRAMS) {
       assert.ok(d.scenario, `${d.id}: схема без сценария`);
       assert.equal(scenarioOf(d.scenario).id, d.scenario, `${d.id}: неизвестный сценарий ${d.scenario}`);
     }
   });
 
-  test('схемы сценария идут в альбоме подряд', () => {
+  test('схемы сценария идут в альбоме подряд [US-BPMN-001/AC3]', () => {
     // Нумерация разделов сквозная, поэтому перемешанные сценарии сломали бы содержание
     const order = DIAGRAMS.map((d) => d.scenario);
     const changes = order.filter((s, i) => i === 0 || s !== order[i - 1]).length;
     assert.equal(changes, SCENARIOS.length, 'схемы сценариев перемешаны в альбоме');
   });
 
-  test('у каждой роли сценария описано, что она делает', () => {
+  test('у каждой роли сценария описано, что она делает [US-BPMN-001/AC5]', () => {
     for (const s of SCENARIOS) {
       assert.ok(s.roles.length >= 5, `${s.id}: слишком мало ролей в матрице ответственности`);
       for (const r of s.roles) {
@@ -147,7 +147,7 @@ describe('Пользовательские пути', () => {
     }
   });
 
-  test('путь обсуждения идей покрывает роли модуля', () => {
+  test('путь обсуждения идей покрывает роли модуля [US-BPMN-002/AC2]', () => {
     const ideas = SCENARIOS.find((s) => s.id === 'ideas');
     const roles = ideas.roles.map((r) => r.role);
     for (const expected of ['advisor', 'reviewer', 'moderator', 'head']) {
@@ -155,7 +155,7 @@ describe('Пользовательские пути', () => {
     }
   });
 
-  test('быстрое ревью описано отдельной схемой с разбором', () => {
+  test('быстрое ревью описано отдельной схемой с разбором [US-BPMN-002/AC2]', () => {
     const d = DIAGRAMS.find((x) => x.id === 'adv-review');
     assert.ok(d, 'схема ревью отсутствует в альбоме');
     assert.equal(d.scenario, 'ideas');
@@ -167,7 +167,7 @@ describe('Пользовательские пути', () => {
     }
   });
 
-  test('путь каталога разработчиков описан для всех трёх ролей каталога', () => {
+  test('путь каталога разработчиков описан для всех трёх ролей каталога [US-BPMN-001/AC1]', () => {
     const groups = new Set(diagramsForScenario('providers').map((d) => d.group));
     for (const g of ['Пользователь каталога', 'Модератор каталога', 'Администратор каталога']) {
       assert.ok(groups.has(g), `нет схемы для группы «${g}»`);
@@ -176,7 +176,7 @@ describe('Пользовательские пути', () => {
     assert.deepEqual(DIAGRAMS.slice(20, 25).map((d) => d.scenario), Array(5).fill('providers'));
   });
 
-  test('совместная работа: изменение процессов, база знаний и опросы описаны схемами', () => {
+  test('совместная работа: изменение процессов, база знаний и опросы описаны схемами [US-BPMN-001/AC1]', () => {
     const ids = diagramsForScenario('collab').map((d) => d.id);
     // Сквозной путь изменения, согласование, документ базы знаний, связь с работой, опросы
     for (const id of ['chg-e2e', 'chg-approve', 'kb-doc', 'kb-work', 'form-build', 'form-fill']) {
@@ -191,13 +191,13 @@ describe('Пользовательские пути', () => {
 });
 
 describe('Отбор схем', () => {
-  test('фильтр по роли включает сквозные схемы', () => {
+  test('фильтр по роли включает сквозные схемы [US-BPMN-001/AC4]', () => {
     const forEmployee = diagramsForRole('employee');
     assert.ok(forEmployee.every((d) => d.role === 'employee' || d.role === 'all'));
     assert.ok(forEmployee.some((d) => d.role === 'all'));
   });
 
-  test('перечень ролей покрывает все схемы', () => {
+  test('перечень ролей покрывает все схемы [US-BPMN-001/AC4]', () => {
     for (const d of DIAGRAMS) {
       assert.ok(ROLE_ORDER.includes(d.role), `${d.id}: роль ${d.role} отсутствует в перечне`);
     }
@@ -215,21 +215,21 @@ describe('Альбом из репозитория', () => {
     repo.ensureProcesses();
   });
 
-  test('в репозиторий попали все схемы начального наполнения', () => {
+  test('в репозиторий попали все схемы начального наполнения [US-BPMN-004/AC5]', () => {
     assert.equal(repo.listDefs().length, DIAGRAMS.length);
   });
 
-  test('порядок разделов в альбоме сохранён', () => {
+  test('порядок разделов в альбоме сохранён [US-BPMN-004/AC5]', () => {
     assert.deepEqual(repo.album().map((d) => d.id), DIAGRAMS.map((d) => d.id));
   });
 
-  test('действующие модели из репозитория проходят проверку', () => {
+  test('действующие модели из репозитория проходят проверку [US-BPMN-001/AC6]', () => {
     for (const d of repo.album()) {
       assert.deepEqual(problems(d), [], `${d.id}: модель из репозитория не проходит проверку`);
     }
   });
 
-  test('первая версия каждой схемы опубликована', () => {
+  test('первая версия каждой схемы опубликована [US-BPMN-004/AC5]', () => {
     for (const def of repo.listDefs()) {
       assert.equal(def.current_version, 1, `${def.key}: нет действующей версии`);
       assert.ok(def.published_at, `${def.key}: версия не помечена опубликованной`);
@@ -238,7 +238,7 @@ describe('Альбом из репозитория', () => {
 });
 
 describe('Оглавление альбома', () => {
-  test('в оглавление попадают все схемы и ни одна страница не переполнена', async () => {
+  test('в оглавление попадают все схемы и ни одна страница не переполнена [US-BPMN-003/AC3]', async () => {
     const { tocLayout, TOC_HEIGHT } = await import('../server/bpmn-pdf.js');
     // Растим альбом вдвое: оглавление обязано переходить на следующие страницы
     const many = [...DIAGRAMS, ...DIAGRAMS.map((d) => ({ ...d, id: `${d.id}-copy` }))];

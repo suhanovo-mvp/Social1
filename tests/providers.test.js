@@ -32,7 +32,7 @@ before(() => {
 });
 
 describe('Доступ к каталогу', () => {
-  test('по умолчанию каталог видит только центральный аппарат', () => {
+  test('по умолчанию каталог видит только центральный аппарат [US-PROV-003/AC1]', () => {
     assert.ok(auth.can(admin, 'provider.read'));
     assert.ok(auth.can(admin, 'provider.admin'));
     for (const role of ['employee', 'head', 'expert', 'developer', 'supplier']) {
@@ -40,7 +40,7 @@ describe('Доступ к каталогу', () => {
     }
   });
 
-  test('выданная роль даёт права, повторная выдача заменяет прежнюю', () => {
+  test('выданная роль даёт права, повторная выдача заменяет прежнюю [US-PROV-003/AC2]', () => {
     pr.grantAccess(editor.id, 'provider_viewer', admin, '');
     let u = loadUser(editor.id);
     assert.ok(auth.can(u, 'provider.read'));
@@ -54,22 +54,22 @@ describe('Доступ к каталогу', () => {
     assert.ok(pr.accessList().granted.some((g) => g.user_id === editor.id));
   });
 
-  test('поиск сотрудника не зависит от регистра кириллицы', () => {
+  test('поиск сотрудника не зависит от регистра кириллицы [US-PROV-003/AC4]', () => {
     q.run("UPDATE users SET full_name = 'Смирнова Ирина' WHERE id = ?", stranger.id);
     assert.ok(pr.accessCandidates('смир').some((u) => u.id === stranger.id));
   });
 
-  test('чужую роль платформы через каталог не выдать', () => {
+  test('чужую роль платформы через каталог не выдать [US-PROV-003/AC3]', () => {
     assert.throws(() => pr.grantAccess(stranger.id, 'dtszn', admin, ''), /не относится/);
   });
 
-  test('отзыв снимает все роли каталога', () => {
+  test('отзыв снимает все роли каталога [US-PROV-003/AC2]', () => {
     pr.grantAccess(stranger.id, 'provider_manager', admin, '');
     pr.revokeAccess(stranger.id, admin, '');
     assert.ok(!auth.can(loadUser(stranger.id), 'provider.read'));
   });
 
-  test('администратор каталога по роли не может отозвать доступ у себя', () => {
+  test('администратор каталога по роли не может отозвать доступ у себя [US-PROV-003/AC3]', () => {
     pr.grantAccess(stranger.id, 'provider_manager', admin, '');
     const self = loadUser(stranger.id);
     assert.throws(() => pr.revokeAccess(self.id, self, ''), /самого себя/);
@@ -78,7 +78,7 @@ describe('Доступ к каталогу', () => {
 });
 
 describe('Карточка разработчика', () => {
-  test('ввод проверяется, ссылка без схемы дополняется, опасная — отклоняется', () => {
+  test('ввод проверяется, ссылка без схемы дополняется, опасная — отклоняется [US-PROV-002/AC1]', () => {
     assert.throws(() => pr.createProvider({ kind: 'external' }, admin, ''), /название/);
     assert.throws(() => pr.createProvider({ kind: 'robots', name: 'X' }, admin, ''), /Вид/);
     assert.throws(() => pr.createProvider({ kind: 'external', name: 'X', inn: '123' }, admin, ''), /ИНН/);
@@ -90,7 +90,7 @@ describe('Карточка разработчика', () => {
     assert.deepEqual(p.tags, ['Python', 'GigaChat']);
   });
 
-  test('второй вендор с тем же ИНН не заводится, похожее название распознаётся', () => {
+  test('второй вендор с тем же ИНН не заводится, похожее название распознаётся [US-PROV-002/AC2]', () => {
     pr.createProvider({ kind: 'external', name: 'АО «Вектор»', inn: '7701234567' }, admin, '');
     assert.throws(() => pr.createProvider({ kind: 'external', name: 'Другой', inn: '7701234567' }, admin, ''),
       (e) => e.status === 409);
@@ -98,14 +98,14 @@ describe('Карточка разработчика', () => {
     assert.ok(dups.some((d) => d.reason === 'name'));
   });
 
-  test('у внутренней команды нет ИНН и признака МСП', () => {
+  test('у внутренней команды нет ИНН и признака МСП [US-PROV-002/AC3]', () => {
     const p = pr.createProvider({ kind: 'internal', name: 'Команда ЦТ', inn: '7701234567',
       org_unit: 'Центр цифровой трансформации', compliance: ['msp', 'pdn'] }, admin, '');
     assert.equal(p.inn, null);
     assert.deepEqual(p.compliance, ['pdn']);
   });
 
-  test('заполненность растёт с портфолио и каталогом', () => {
+  test('заполненность растёт с портфолио и каталогом [US-PROV-002/AC4]', () => {
     const p = pr.createProvider({ kind: 'dit', name: 'Команда ДИТ по ИИ', org_unit: 'Управление ИИ' }, admin, '');
     const before = p.completeness;
     pr.saveCase(p.id, null, { title: 'Ассистент оператора', public_sector: true, year: 2025 }, admin, '');
@@ -116,7 +116,7 @@ describe('Карточка разработчика', () => {
     assert.equal(after.solutions_count, 1);
   });
 
-  test('оценка одна от участника и уточняется', () => {
+  test('оценка одна от участника и уточняется [US-PROV-002/AC6]', () => {
     const p = pr.listProviders({ kind: 'dit' }).providers[0];
     pr.saveReview(p.id, { quality: 5, deadlines: 3, communication: 4 }, admin, '');
     pr.saveReview(p.id, { quality: 5, deadlines: 5, communication: 5 }, admin, '');
@@ -126,7 +126,7 @@ describe('Карточка разработчика', () => {
     assert.throws(() => pr.saveReview(p.id, { quality: 7, deadlines: 1, communication: 1 }, admin, ''));
   });
 
-  test('чужую запись журнала редактор не удалит', () => {
+  test('чужую запись журнала редактор не удалит [US-PROV-002/AC6]', () => {
     const p = pr.listProviders({ kind: 'dit' }).providers[0];
     const note = pr.addNote(p.id, { kind: 'meeting', body: 'Обсудили пилот' }, admin, '');
     assert.throws(() => pr.deleteNote(p.id, note.id, editor, false, ''), /свою/);
@@ -135,39 +135,39 @@ describe('Карточка разработчика', () => {
 });
 
 describe('Фильтры, сортировка и каталог', () => {
-  test('фильтр по виду оставляет счётчики остальных видов', () => {
+  test('фильтр по виду оставляет счётчики остальных видов [US-PROV-001/AC1]', () => {
     const r = pr.listProviders({ kind: 'external' });
     assert.ok(r.providers.every((p) => p.kind === 'external'));
     assert.ok(r.counts.internal >= 1 && r.counts.dit >= 1);
   });
 
-  test('компетенции требуются все сразу', () => {
+  test('компетенции требуются все сразу [US-PROV-001/AC2]', () => {
     const r = pr.listProviders({ competencies: ['llm'] });
     assert.ok(r.providers.length >= 1);
     assert.equal(pr.listProviders({ competencies: ['llm', 'cv'] }).providers.length, 0);
   });
 
-  test('архив скрыт, пока его не выбрали', () => {
+  test('архив скрыт, пока его не выбрали [US-PROV-001/AC2]', () => {
     const p = pr.createProvider({ kind: 'external', name: 'Ушедший вендор' }, admin, '');
     pr.setStatus(p.id, 'archived', admin, '');
     assert.ok(!pr.listProviders({}).providers.some((x) => x.id === p.id));
     assert.ok(pr.listProviders({ status: 'archived' }).providers.some((x) => x.id === p.id));
   });
 
-  test('сортировка по названию и по числу проектов', () => {
+  test('сортировка по названию и по числу проектов [US-PROV-001/AC3]', () => {
     const names = pr.listProviders({ sort: 'name' }).providers.map((p) => p.name);
     assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, 'ru')));
     const byCases = pr.listProviders({ sort: 'cases' }).providers;
     assert.equal(byCases[0].name, 'Команда ДИТ по ИИ');
   });
 
-  test('сквозной каталог находит решение по компетенции', () => {
+  test('сквозной каталог находит решение по компетенции [US-PROV-001/AC4]', () => {
     const found = pr.listSolutions({ competency: 'nlp' });
     assert.equal(found.length, 1);
     assert.equal(found[0].provider_kind, 'dit');
   });
 
-  test('выгрузка обезвреживает формулы', () => {
+  test('выгрузка обезвреживает формулы [US-PROV-001/AC5]', () => {
     pr.createProvider({ kind: 'external', name: '=HYPERLINK("x")' }, admin, '');
     const csv = pr.exportCsv({});
     assert.ok(csv.startsWith('﻿'));
@@ -176,7 +176,7 @@ describe('Фильтры, сортировка и каталог', () => {
 });
 
 describe('Демонстрационный набор', () => {
-  test('по три разработчика каждого вида, повторный запуск ничего не добавляет, удаление не трогает ручные', async () => {
+  test('по три разработчика каждого вида, повторный запуск ничего не добавляет, удаление не трогает ручные [US-PROV-005/AC3]', async () => {
     const seed = await import('../server/seed-providers.js');
     const { hash, salt } = auth.hashPassword('test');
     q.insert(`INSERT INTO users (email, full_name, password_hash, password_salt, role)
@@ -205,7 +205,7 @@ describe('Представитель разработчика', () => {
     pr.saveReview(card.id, { quality: 2, deadlines: 2, communication: 2, comment: 'внутреннее' }, admin, '');
   });
 
-  test('поставщик ведёт свою карточку, но не видит каталог', () => {
+  test('поставщик ведёт свою карточку, но не видит каталог [US-PROV-004/AC1]', () => {
     assert.ok(auth.can(rep, 'provider.self'));
     assert.ok(!auth.can(rep, 'provider.read'));
     assert.ok(!pr.isMember(rep, card.id));
@@ -214,7 +214,7 @@ describe('Представитель разработчика', () => {
     assert.deepEqual(pr.membershipsOf(rep).map((m) => m.id), [card.id]);
   });
 
-  test('представителю не показываются оценки, журнал, статус и ориентир стоимости', () => {
+  test('представителю не показываются оценки, журнал, статус и ориентир стоимости [US-PROV-004/AC2]', () => {
     const v = pr.representativeView(pr.getProvider(card.id));
     for (const k of ['reviews', 'notes', 'rating', 'price_band', 'status', 'owner_name']) {
       assert.ok(!(k in v), `поле «${k}» не должно доходить до представителя`);
@@ -222,7 +222,7 @@ describe('Представитель разработчика', () => {
     assert.ok(Array.isArray(v.solutions) && Array.isArray(v.cases));
   });
 
-  test('правка профиля меняет только технологические поля и ставит карточку на проверку', () => {
+  test('правка профиля меняет только технологические поля и ставит карточку на проверку [US-PROV-004/AC3]', () => {
     const after = pr.updateProfile(card.id, { name: 'Подмена', inn: '7700000098', description: 'Умеем',
       competencies: ['cv'], tags: 'OpenCV', availability: 'available' }, rep, '');
     assert.equal(after.name, 'ООО «Своя компания»', 'название меняет только модератор');
@@ -236,14 +236,14 @@ describe('Представитель разработчика', () => {
       'повторная правка до проверки не должна плодить уведомления');
   });
 
-  test('модератор подтверждает сведения, представитель узнаёт об этом', () => {
+  test('модератор подтверждает сведения, представитель узнаёт об этом [US-PROV-004/AC3]', () => {
     const after = pr.confirmProfile(card.id, admin, '');
     assert.equal(after.profile_status, 'confirmed');
     assert.ok(q.get('SELECT 1 FROM notifications WHERE user_id = ? AND provider_id = ?', rep.id, card.id));
     assert.ok(pr.listProviders({ pending: true }).providers.every((p) => p.id !== card.id));
   });
 
-  test('отвязанный представитель теряет доступ', () => {
+  test('отвязанный представитель теряет доступ [US-PROV-004/AC4]', () => {
     pr.removeMember(card.id, rep.id, admin, '');
     assert.ok(!pr.isMember(rep, card.id));
   });

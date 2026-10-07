@@ -39,7 +39,7 @@ before(() => {
 });
 
 describe('Опросник ИИ-решений ДЗМ', () => {
-  test('форма опубликована и доступна по ссылке без входа', () => {
+  test('форма опубликована и доступна по ссылке без входа [US-FORM-005/AC1]', () => {
     assert.equal(form.slug, sample.AI_DZM_SLUG);
     assert.equal(form.status, 'published');
     assert.equal(form.access, 'link');
@@ -47,7 +47,7 @@ describe('Опросник ИИ-решений ДЗМ', () => {
     assert.match(form.description, /5–7 минут/);
   });
 
-  test('пять блоков требований стали разделами формы', () => {
+  test('пять блоков требований стали разделами формы [US-FORM-005/AC2]', () => {
     const blocks = questions.filter((qn) => qn.type === 'section' && /^Блок \d/.test(qn.title));
     assert.equal(blocks.length, 5);
     assert.deepEqual(blocks.map((b) => b.title.replace(/^Блок \d\. /, '')), [
@@ -59,7 +59,7 @@ describe('Опросник ИИ-решений ДЗМ', () => {
     ]);
   });
 
-  test('каждое из пяти решений ДЗМ оценивается по шкале от 1 до 5', () => {
+  test('каждое из пяти решений ДЗМ оценивается по шкале от 1 до 5 [US-FORM-005/AC2]', () => {
     const scales = questions.filter((qn) => qn.type === 'scale');
     assert.equal(scales.length, 5);
     for (const s of scales) {
@@ -72,7 +72,7 @@ describe('Опросник ИИ-решений ДЗМ', () => {
     for (const s of solutions) assert.ok(s.hint, `${s.title}: нет описания решения`);
   });
 
-  test('вопросы требований на месте — 24 плюс условное описание ограничений', () => {
+  test('вопросы требований на месте — 24 плюс условное описание ограничений [US-FORM-005/AC2]', () => {
     const answerable = questions.filter((qn) => isAnswerable(qn.type));
     assert.equal(answerable.length, 25);
     assert.ok(answerable.every((qn) => qn.title.trim().length > 10));
@@ -83,7 +83,7 @@ describe('Опросник ИИ-решений ДЗМ', () => {
     assert.equal(institutions.settings.allow_other, true);
   });
 
-  test('уточнения об эффектах показываются только при оценке 3 и выше', () => {
+  test('уточнения об эффектах показываются только при оценке 3 и выше [US-FORM-005/AC3]', () => {
     const low = visibleKeys(questions, { q7: 2, q11: 1, q14: 2, q16: 2, q18: 1 });
     for (const key of ['q8', 'q9', 'q10', 'q12', 'q15', 'q17', 'q19']) {
       assert.ok(!low.has(key), `${key}: уточнение показано при низкой оценке`);
@@ -96,13 +96,13 @@ describe('Опросник ИИ-решений ДЗМ', () => {
     assert.ok(low.has('q11') && low.has('q18'));
   });
 
-  test('описание ограничений безопасности открывается только строгим ответом', () => {
+  test('описание ограничений безопасности открывается только строгим ответом [US-FORM-005/AC3]', () => {
     assert.ok(!visibleKeys(questions, { q21: { choice: 'open' } }).has('q21_details'));
     assert.ok(!visibleKeys(questions, { q21: { choice: 'legal' } }).has('q21_details'));
     assert.ok(visibleKeys(questions, { q21: { choice: 'strict' } }).has('q21_details'));
   });
 
-  test('короткая анкета проходит целиком: обязательны только показанные вопросы', () => {
+  test('короткая анкета проходит целиком: обязательны только показанные вопросы [US-FORM-002/AC3]', () => {
     // Отвечает участник, которого нет среди демонстрационных ответов
     const { hash, salt } = auth.hashPassword('test');
     const id = q.insert(`INSERT INTO users (email, full_name, password_hash, password_salt, role, institution_id)
@@ -126,7 +126,7 @@ describe('Опросник ИИ-решений ДЗМ', () => {
     assert.equal(saved.answered, 15, 'сохранены только показанные вопросы');
   });
 
-  test('демонстрационные ответы собраны и сводка их считает', () => {
+  test('демонстрационные ответы собраны и сводка их считает [US-FORM-005/AC4]', () => {
     const r = forms.results(form.id);
     assert.ok(r.responses >= 6, `ответов слишком мало: ${r.responses}`);
 
@@ -141,14 +141,14 @@ describe('Опросник ИИ-решений ДЗМ', () => {
     assert.ok(where.shown > 0, 'условный вопрос не показали никому');
   });
 
-  test('выгрузка содержит все вопросы анкеты', () => {
+  test('выгрузка содержит все вопросы анкеты [US-FORM-005/AC4]', () => {
     const head = forms.toCsv(form.id).split('\n')[0];
     assert.match(head, /ФИО и должность/);
     assert.match(head, /Дополнительные комментарии/);
     assert.equal(head.split(';').length, 25 + 4, 'колонки: служебные плюс все вопросы');
   });
 
-  test('повторный запуск форму не задваивает', () => {
+  test('повторный запуск форму не задваивает [US-FORM-005/AC1]', () => {
     assert.equal(sample.ensureSampleForms(), null);
     assert.equal(q.get('SELECT COUNT(*) AS c FROM forms').c, 1);
   });

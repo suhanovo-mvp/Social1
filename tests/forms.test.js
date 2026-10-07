@@ -71,7 +71,7 @@ beforeEach(() => {
 
 // ─────────────────────────────────────────────────────────────
 describe('Структура формы', () => {
-  test('вопросы сохраняются с ключами, порядком и вариантами', () => {
+  test('вопросы сохраняются с ключами, порядком и вариантами [US-FORM-001/AC2]', () => {
     const form = newForm();
     const questions = forms.questionsOf(form.id);
     assert.equal(questions.length, 4);
@@ -80,7 +80,7 @@ describe('Структура формы', () => {
     assert.equal(questions[1].settings.max_label, 'Критически важно');
   });
 
-  test('вопрос без текста не сохраняется', () => {
+  test('вопрос без текста не сохраняется [US-FORM-001/AC2]', () => {
     const form = forms.createForm({ title: 'Пустая', user: author });
     assert.throws(() => forms.saveQuestions({
       formId: form.id, user: author,
@@ -88,7 +88,7 @@ describe('Структура формы', () => {
     }), /не заполнен текст вопроса/);
   });
 
-  test('условие не может ссылаться на вопрос ниже по форме', () => {
+  test('условие не может ссылаться на вопрос ниже по форме [US-FORM-002/AC2]', () => {
     const form = forms.createForm({ title: 'Кривая', user: author });
     assert.throws(() => forms.saveQuestions({
       formId: form.id, user: author,
@@ -100,7 +100,7 @@ describe('Структура формы', () => {
     }), /идёт ниже по форме/);
   });
 
-  test('сравнение проверяется по типу вопроса, на который ссылается условие', () => {
+  test('сравнение проверяется по типу вопроса, на который ссылается условие [US-FORM-002/AC2]', () => {
     const form = forms.createForm({ title: 'Кривая', user: author });
     assert.throws(() => forms.saveQuestions({
       formId: form.id, user: author,
@@ -112,7 +112,7 @@ describe('Структура формы', () => {
     }), /не подходит/);
   });
 
-  test('шкала не выходит за допустимые границы', () => {
+  test('шкала не выходит за допустимые границы [US-FORM-001/AC2]', () => {
     const form = forms.createForm({ title: 'Шкала', user: author });
     assert.throws(() => forms.saveQuestions({
       formId: form.id, user: author,
@@ -120,7 +120,7 @@ describe('Структура формы', () => {
     }), /шкала/i);
   });
 
-  test('правка структуры сохраняет уже собранные ответы', () => {
+  test('правка структуры сохраняет уже собранные ответы [US-FORM-001/AC4]', () => {
     const form = published();
     forms.submitResponse({ form, user: colleague, answers: { rate: 4, where: 'В кол-центре' } });
 
@@ -134,7 +134,7 @@ describe('Структура формы', () => {
     assert.ok(table.columns.some((c) => c.key === 'extra'));
   });
 
-  test('удалённый вопрос уносит свои ответы', () => {
+  test('удалённый вопрос уносит свои ответы [US-FORM-001/AC4]', () => {
     const form = published();
     forms.submitResponse({ form, user: colleague, answers: { rate: 4, where: 'В кол-центре' } });
     forms.saveQuestions({ formId: form.id, user: author, questions: SCALED.slice(0, 2) });
@@ -144,24 +144,24 @@ describe('Структура формы', () => {
 
 // ─────────────────────────────────────────────────────────────
 describe('Публикация', () => {
-  test('форма без вопросов не публикуется', () => {
+  test('форма без вопросов не публикуется [US-FORM-003/AC1]', () => {
     const form = forms.createForm({ title: 'Пустая', user: author });
     assert.deepEqual(forms.publishIssues(form.id), ['В форме нет ни одного вопроса']);
     assert.throws(() => forms.publishForm({ formId: form.id, user: author }), /нельзя опубликовать/);
   });
 
-  test('форма из одних разделов вопросом не считается', () => {
+  test('форма из одних разделов вопросом не считается [US-FORM-003/AC1]', () => {
     const form = newForm(author, [{ type: 'section', key: 's', title: 'Блок' }]);
     assert.ok(forms.publishIssues(form.id).length);
   });
 
-  test('черновик не принимает ответы', () => {
+  test('черновик не принимает ответы [US-FORM-003/AC1]', () => {
     const form = newForm();
     assert.throws(() => forms.submitResponse({ form, user: colleague, answers: { rate: 3 } }),
       /ещё не опубликована/);
   });
 
-  test('закрытая форма ответы не принимает, но результаты остаются', () => {
+  test('закрытая форма ответы не принимает, но результаты остаются [US-FORM-003/AC1]', () => {
     const form = published();
     forms.submitResponse({ form, user: colleague, answers: { rate: 2 } });
     forms.setStatus({ formId: form.id, status: 'closed', user: author });
@@ -172,12 +172,12 @@ describe('Публикация', () => {
     assert.equal(forms.results(form.id).responses, 1);
   });
 
-  test('срок сбора закрывает форму сам', () => {
+  test('срок сбора закрывает форму сам [US-FORM-003/AC2]', () => {
     const form = published(author, SCALED, { closes_at: '2020-01-01 00:00:00' });
     assert.equal(forms.isOpen(form), false);
   });
 
-  test('форму с ответами нельзя вернуть в черновик', () => {
+  test('форму с ответами нельзя вернуть в черновик [US-FORM-003/AC2]', () => {
     const form = published();
     forms.submitResponse({ form, user: colleague, answers: { rate: 5, where: 'Приём' } });
     assert.throws(() => forms.setStatus({ formId: form.id, status: 'draft', user: author }),
@@ -186,7 +186,7 @@ describe('Публикация', () => {
 });
 
 // ─────────────────────────────────────────────────────────────
-describe('Условные вопросы', () => {
+describe('Условные вопросы [US-FORM-002/AC3]', () => {
   test('скрытый вопрос не обязателен, даже если помечен обязательным', () => {
     const form = published();
     const saved = forms.submitResponse({ form, user: colleague, answers: { rate: 1 } });
@@ -234,20 +234,20 @@ describe('Проверка ответов', () => {
     catch (e) { return (e.details ?? []).map((d) => d.message).join(' | '); }
   };
 
-  test('вариант не из списка отвергается', () => {
+  test('вариант не из списка отвергается [US-FORM-003/AC7]', () => {
     const form = published();
     assert.match(failure(() => forms.submitResponse({
       form, user: colleague, answers: { rate: 4, where: 'Приём', effect: { choices: ['подделка'] } },
     })), /которого нет в списке/);
   });
 
-  test('оценка вне шкалы отвергается', () => {
+  test('оценка вне шкалы отвергается [US-FORM-003/AC7]', () => {
     const form = published();
     assert.match(failure(() => forms.submitResponse({ form, user: colleague, answers: { rate: 9 } })),
       /вне шкалы от 1 до 5/);
   });
 
-  test('«другое» принимается только там, где оно разрешено', () => {
+  test('«другое» принимается только там, где оно разрешено [US-FORM-001/AC3]', () => {
     const form = published();
     const ok = forms.submitResponse({
       form, user: colleague,
@@ -265,14 +265,14 @@ describe('Проверка ответов', () => {
     })), /свой ответ не предусмотрен/);
   });
 
-  test('почта проверяется по написанию', () => {
+  test('почта проверяется по написанию [US-FORM-003/AC7]', () => {
     const form = published(author, [{ type: 'email', key: 'mail', title: 'Почта', required: true }]);
     assert.match(failure(() => forms.submitResponse({ form, user: colleague, answers: { mail: 'без-собаки' } })),
       /записан неверно/);
     assert.ok(forms.submitResponse({ form, user: colleague, answers: { mail: 'i@mos.ru' } }).id);
   });
 
-  test('ошибки возвращаются списком по вопросам, а не первой попавшейся', () => {
+  test('ошибки возвращаются списком по вопросам, а не первой попавшейся [US-FORM-003/AC7]', () => {
     const form = published(author, [
       { type: 'short_text', key: 'fio', title: 'ФИО', required: true },
       { type: 'short_text', key: 'pos', title: 'Должность', required: true },
@@ -289,21 +289,21 @@ describe('Проверка ответов', () => {
 
 // ─────────────────────────────────────────────────────────────
 describe('Сбор ответов', () => {
-  test('повторный ответ не принимается, когда так настроена форма', () => {
+  test('повторный ответ не принимается, когда так настроена форма [US-FORM-003/AC5]', () => {
     const form = published();
     forms.submitResponse({ form, user: colleague, answers: { rate: 2 } });
     assert.throws(() => forms.submitResponse({ form, user: colleague, answers: { rate: 3, where: 'Тут' } }),
       /уже отвечали/);
   });
 
-  test('при разрешении нескольких ответов принимается каждый', () => {
+  test('при разрешении нескольких ответов принимается каждый [US-FORM-003/AC5]', () => {
     const form = published(author, SCALED, { one_per_user: 0 });
     forms.submitResponse({ form, user: colleague, answers: { rate: 2 } });
     forms.submitResponse({ form, user: colleague, answers: { rate: 4, where: 'Кол-центр' } });
     assert.equal(forms.results(form.id).responses, 2);
   });
 
-  test('анонимная форма не запоминает, кто отвечал', () => {
+  test('анонимная форма не запоминает, кто отвечал [US-FORM-003/AC5]', () => {
     const form = published(author, SCALED, { is_anonymous: 1 });
     forms.submitResponse({ form, user: colleague, answers: { rate: 5, where: 'Приём' } });
     const row = q.get('SELECT * FROM form_responses WHERE form_id = ?', form.id);
@@ -312,7 +312,7 @@ describe('Сбор ответов', () => {
     assert.equal(forms.responseTable(form.id).rows[0].respondent, null);
   });
 
-  test('черновик ответа превращается в отправленный, а не во второй ответ', () => {
+  test('черновик ответа превращается в отправленный, а не во второй ответ [US-FORM-003/AC6]', () => {
     const form = published();
     const draft = forms.saveResponseDraft({ form, user: colleague, answers: { rate: 4 } });
     assert.equal(draft.status, 'draft');
@@ -324,7 +324,7 @@ describe('Сбор ответов', () => {
     assert.equal(forms.results(form.id).responses, 1);
   });
 
-  test('чужой ответ не перезаписывается указанием его номера', () => {
+  test('чужой ответ не перезаписывается указанием его номера [US-FORM-003/AC6]', () => {
     const form = published(author, SCALED, { one_per_user: 0 });
     const mine = forms.submitResponse({ form, user: colleague, answers: { rate: 2 } });
     const other = forms.submitResponse({
@@ -335,13 +335,13 @@ describe('Сбор ответов', () => {
       colleague.id);
   });
 
-  test('форму «только участникам» нельзя заполнить по ссылке', () => {
+  test('форму «только участникам» нельзя заполнить по ссылке [US-FORM-003/AC3]', () => {
     const form = published();
     assert.throws(() => forms.submitResponse({ form, user: null, answers: { rate: 2 }, source: 'link' }),
       /только участникам платформы/);
   });
 
-  test('ответ по ссылке принимается без входа и остаётся безымянным', () => {
+  test('ответ по ссылке принимается без входа и остаётся безымянным [US-FORM-003/AC3]', () => {
     const form = published(author, SCALED, { access: 'link' });
     forms.submitResponse({ form, user: null, answers: { rate: 3, where: 'Приём' }, source: 'link' });
     const row = q.get('SELECT * FROM form_responses WHERE form_id = ?', form.id);
@@ -360,7 +360,7 @@ describe('Результаты', () => {
     forms.submitResponse({ form, user: author, answers: { rate: 1 } });
   };
 
-  test('сводка считает среднее по шкале и распределение по вариантам', () => {
+  test('сводка считает среднее по шкале и распределение по вариантам [US-FORM-004/AC1]', () => {
     const form = published(author, SCALED, { one_per_user: 0 });
     fill(form);
     const r = forms.results(form.id);
@@ -377,7 +377,7 @@ describe('Результаты', () => {
     assert.deepEqual(effect.rows.find((x) => x.code === schema.OTHER).texts, ['Контроль качества']);
   });
 
-  test('у условного вопроса охват считается по тем, кому он показывался', () => {
+  test('у условного вопроса охват считается по тем, кому он показывался [US-FORM-004/AC2]', () => {
     const form = published(author, SCALED, { one_per_user: 0 });
     fill(form);
     const where = forms.results(form.id).questions.find((x) => x.key === 'where');
@@ -386,14 +386,14 @@ describe('Результаты', () => {
     assert.equal(where.answered, 2);
   });
 
-  test('тексты свободных ответов возвращаются целиком', () => {
+  test('тексты свободных ответов возвращаются целиком [US-FORM-004/AC1]', () => {
     const form = published(author, SCALED, { one_per_user: 0 });
     fill(form);
     const where = forms.results(form.id).questions.find((x) => x.key === 'where');
     assert.deepEqual(where.texts.sort(), ['Кол-центр', 'Первичный приём']);
   });
 
-  test('выгрузка содержит заголовки вопросов и ответы построчно', () => {
+  test('выгрузка содержит заголовки вопросов и ответы построчно [US-FORM-004/AC3]', () => {
     const form = published(author, SCALED, { one_per_user: 0 });
     fill(form);
     const csv = forms.toCsv(form.id);
@@ -407,7 +407,7 @@ describe('Результаты', () => {
 
 // ─────────────────────────────────────────────────────────────
 describe('Доступ', () => {
-  test('чужую форму нельзя изменить', () => {
+  test('чужую форму нельзя изменить [US-FORM-001/AC5]', () => {
     const form = newForm();
     assert.throws(() => forms.updateForm({ formId: form.id, patch: { title: 'Моя' }, user: colleague }),
       /только её автор/);
@@ -415,7 +415,7 @@ describe('Доступ', () => {
     assert.equal(forms.canSeeResults(colleague, form), false);
   });
 
-  test('администратор форм ведёт любую', () => {
+  test('администратор форм ведёт любую [US-FORM-001/AC5]', () => {
     const admin = makeUser(`dtszn-${Date.now()}@s.ru`, 'dtszn');
     const form = newForm();
     assert.equal(forms.canEdit(admin, form), true);
@@ -423,21 +423,21 @@ describe('Доступ', () => {
       'Правка ДТСЗН');
   });
 
-  test('адрес формы читается и не повторяется', () => {
+  test('адрес формы читается и не повторяется [US-FORM-003/AC4]', () => {
     const a = forms.createForm({ title: 'Оценка ИИ-решений ДЗМ', user: author });
     const b = forms.createForm({ title: 'Оценка ИИ-решений ДЗМ', user: author });
     assert.equal(a.slug, 'ocenka-ii-resheniy-dzm');
     assert.equal(b.slug, 'ocenka-ii-resheniy-dzm-2');
   });
 
-  test('адрес опубликованной формы не меняется вместе с названием', () => {
+  test('адрес опубликованной формы не меняется вместе с названием [US-FORM-003/AC4]', () => {
     const form = published();
     const slug = form.slug;
     const renamed = forms.updateForm({ formId: form.id, patch: { title: 'Новое название' }, user: author });
     assert.equal(renamed.slug, slug, 'разосланная ссылка продолжает работать');
   });
 
-  test('копия формы повторяет вопросы и начинается черновиком', () => {
+  test('копия формы повторяет вопросы и начинается черновиком [US-FORM-001/AC5]', () => {
     const form = published();
     const copy = forms.duplicateForm({ formId: form.id, user: author });
     assert.equal(copy.status, 'draft');
